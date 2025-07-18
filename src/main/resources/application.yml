@@ -1,0 +1,11 @@
+spring:
+  application:
+    name: launchpad
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/biolab
+    username: biolab
+    password: biolab
+
+  liquibase:
+    change-log: classpath:/liquibase/changelog.yaml
