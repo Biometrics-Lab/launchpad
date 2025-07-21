@@ -3,6 +3,7 @@ databaseChangeLog:
       id: 1-BL-21-1
       author: viktor.badovskyi
       changes:
+        # createTable measurement
         - createTable:
             tableName: measurement
             columns:
@@ -18,3 +19,226 @@ databaseChangeLog:
                   type: varchar(100)
                   constraints:
                     nullable: false
+        #  createTable report
+        - createTable:
+            tableName: report
+            columns:
+              - column:
+                  name: id
+                  type: integer
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: name
+                  type: varchar(100)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: ext_ref
+                  type: varchar(100)
+                  constraints:
+                    nullable: false
+        # createTable data_source_type_dictionary
+        - createTable:
+            tableName: data_source_type_dictionary
+            columns:
+              - column:
+                  name: name
+                  type: varchar(50)
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: description
+                  type: varchar(250)
+                  constraints:
+                    nullable: true
+        # createTable data_source
+        - createTable:
+            tableName: data_source
+            columns:
+              - column:
+                  name: id
+                  type: integer
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: name
+                  type: varchar(50)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: type
+                  type: varchar(50)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: description
+                  type: varchar(250)
+                  constraints:
+                    nullable: true
+        - addForeignKeyConstraint:
+            baseTableName: data_source
+            baseColumnNames: type
+            referencedTableName: data_source_type_dictionary
+            referencedColumnNames: name
+            constraintName: fk_data_source_data_source_type_dictionary
+        # createTable metric
+        - createTable:
+            tableName: metric
+            columns:
+              - column:
+                  name: id
+                  type: integer
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: name
+                  type: varchar(100)
+                  constraints:
+                    nullable: true
+              - column:
+                  name: measurement_id
+                  type: integer
+                  constraints:
+                    nullable: true
+              - column:
+                  name: negate
+                  type: boolean
+                  constraints:
+                    nullable: false
+        - addForeignKeyConstraint:
+            baseTableName: metric
+            baseColumnNames: measurement_id
+            referencedTableName: measurement
+            referencedColumnNames: id
+            constraintName: fk_metric_measurement
+        # createTable resource_type_dictionary
+        - createTable:
+            tableName: resource_type_dictionary
+            columns:
+              - column:
+                  name: name
+                  type: varchar(50)
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: description
+                  type: varchar(250)
+                  constraints:
+                    nullable: false
+        # createTable sport_dictionary
+        - createTable:
+            tableName: sport_dictionary
+            columns:
+              - column:
+                  name: name
+                  type: varchar(50)
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: description
+                  type: varchar(250)
+                  constraints:
+                    nullable: true
+        # createTable organisation
+        - createTable:
+            tableName: organisation
+            columns:
+              - column:
+                  name: id
+                  type: integer
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: name
+                  type: varchar(100)
+                  constraints:
+                    nullable: true
+        # createTable team
+        - createTable:
+            tableName: team
+            columns:
+              - column:
+                  name: id
+                  type: integer
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: organisation_id
+                  type: integer
+                  constraints:
+                    nullable: false
+              - column:
+                  name: name
+                  type: varchar(100)
+                  constraints:
+                    nullable: true
+              - column:
+                  name: sport
+                  type: varchar(50)
+                  constraints:
+                    nullable: true
+              - column:
+                  name: description
+                  type: varchar(250)
+                  constraints:
+                    nullable: false
+        - addForeignKeyConstraint:
+            baseTableName: team
+            baseColumnNames: organisation_id
+            referencedTableName: organisation
+            referencedColumnNames: id
+            constraintName: fk_team_organisation
+        - addForeignKeyConstraint:
+            baseTableName: team
+            baseColumnNames: sport
+            referencedTableName: sport_dictionary
+            referencedColumnNames: name
+            constraintName: fk_team_sport_dictionary
+        # createTable player
+        - createTable:
+            tableName: player
+            columns:
+              - column:
+                  name: id
+                  type: integer
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: name
+                  type: varchar(100)
+                  constraints:
+                    nullable: true
+              - column:
+                  name: graduation_year
+                  type: integer
+                  constraints:
+                    nullable: false
+              - column:
+                  name: team_id
+                  type: integer
+                  constraints:
+                    nullable: false
+              - column:
+                  name: dob
+                  type: date
+                  constraints:
+                    nullable: true
+        - addForeignKeyConstraint:
+            baseTableName: player
+            baseColumnNames: team_id
+            referencedTableName: team
+            referencedColumnNames: id
+            constraintName: fk_player_team
