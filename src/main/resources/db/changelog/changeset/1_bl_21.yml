@@ -14,7 +14,7 @@ databaseChangeLog:
                   autoIncrement: true
                   constraints:
                     primaryKey: true
-                    nullable: true
+                    nullable: false
               - column:
                   name: name
                   type: varchar(100)
@@ -30,7 +30,7 @@ databaseChangeLog:
                   autoIncrement: true
                   constraints:
                     primaryKey: true
-                    nullable: true
+                    nullable: false
               - column:
                   name: name
                   type: varchar(100)
@@ -38,7 +38,7 @@ databaseChangeLog:
                     nullable: true
               - column:
                   name: ext_ref
-                  type: varchar(100)
+                  type: varchar(250)
                   constraints:
                     nullable: true
         # data_source_type_dictionary
@@ -50,7 +50,7 @@ databaseChangeLog:
                   type: varchar(50)
                   constraints:
                     primaryKey: true
-                    nullable: true
+                    nullable: false
               - column:
                   name: description
                   type: varchar(250)
@@ -66,7 +66,7 @@ databaseChangeLog:
                   autoIncrement: true
                   constraints:
                     primaryKey: true
-                    nullable: true
+                    nullable: false
               - column:
                   name: name
                   type: varchar(50)
@@ -92,7 +92,7 @@ databaseChangeLog:
                   autoIncrement: true
                   constraints:
                     primaryKey: true
-                    nullable: true
+                    nullable: false
               - column:
                   name: name
                   type: varchar(100)
@@ -132,7 +132,7 @@ databaseChangeLog:
                   type: varchar(50)
                   constraints:
                     primaryKey: true
-                    nullable: true
+                    nullable: false
               - column:
                   name: description
                   type: varchar(250)
@@ -147,7 +147,7 @@ databaseChangeLog:
                   type: integer
                   constraints:
                     primaryKey: true
-                    nullable: true
+                    nullable: false
               - column:
                   name: name
                   type: varchar(100)
@@ -162,7 +162,7 @@ databaseChangeLog:
                   type: integer
                   constraints:
                     primaryKey: true
-                    nullable: true
+                    nullable: false
               - column:
                   name: organisation_id
                   type: integer
@@ -192,7 +192,7 @@ databaseChangeLog:
                   type: integer
                   constraints:
                     primaryKey: true
-                    nullable: true
+                    nullable: false
               - column:
                   name: name
                   type: varchar(100)
@@ -222,7 +222,7 @@ databaseChangeLog:
                   type: varchar(50)
                   constraints:
                     primaryKey: true
-                    nullable: true
+                    nullable: false
               - column:
                   name: description
                   type: varchar(250)
@@ -237,7 +237,7 @@ databaseChangeLog:
                   type: integer
                   constraints:
                     primaryKey: true
-                    nullable: true
+                    nullable: false
               - column:
                   name: name
                   type: varchar(100)
@@ -257,7 +257,7 @@ databaseChangeLog:
                   type: integer
                   constraints:
                     primaryKey: true
-                    nullable: true
+                    nullable: false
               - column:
                   name: user_id
                   type: integer
@@ -277,7 +277,7 @@ databaseChangeLog:
                   type: varchar(50)
                   constraints:
                     primaryKey: true
-                    nullable: true
+                    nullable: false
               - column:
                   name: description
                   type: varchar(250)
@@ -292,7 +292,7 @@ databaseChangeLog:
                   type: integer
                   constraints:
                     primaryKey: true
-                    nullable: true
+                    nullable: false
               - column:
                   name: sport
                   type: varchar(50)
@@ -317,7 +317,7 @@ databaseChangeLog:
                   type: integer
                   constraints:
                     primaryKey: true
-                    nullable: true
+                    nullable: false
               - column:
                   name: model_id
                   type: integer
@@ -342,7 +342,7 @@ databaseChangeLog:
                   type: integer
                   constraints:
                     primaryKey: true
-                    nullable: true
+                    nullable: false
               - column:
                   name: name
                   type: varchar(100)
@@ -367,14 +367,14 @@ databaseChangeLog:
                  type: integer
                  constraints:
                   primaryKey: true
-                  nullable: true
+                  nullable: false
              - column:
                  name: template_id
                  type: integer
                  constraints:
                    nullable: true
              - column:
-                 name: metrics_id
+                 name: metric_id
                  type: integer
                  constraints:
                    nullable: true
@@ -392,7 +392,7 @@ databaseChangeLog:
                   type: integer
                   constraints:
                     primaryKey: true
-                    nullable: true
+                    nullable: false
               - column:
                   name: player_id
                   type: integer
@@ -417,14 +417,14 @@ databaseChangeLog:
                   type: integer
                   constraints:
                     primaryKey: true
-                    nullable: true
+                    nullable: false
               - column:
                   name: assessment_id
                   type: integer
                   constraints:
                     nullable: true
               - column:
-                  name: metrics_id
+                  name: metric_id
                   type: integer
                   constraints:
                     nullable: true
@@ -462,7 +462,7 @@ databaseChangeLog:
                   type: integer
                   constraints:
                     primaryKey: true
-                    nullable: true
+                    nullable: false
               - column:
                   name: assessment_id
                   type: integer
@@ -482,7 +482,7 @@ databaseChangeLog:
                   type: integer
                   constraints:
                     primaryKey: true
-                    nullable: true
+                    nullable: false
               - column:
                   name: session_id
                   type: integer
@@ -502,7 +502,7 @@ databaseChangeLog:
                   type: integer
                   constraints:
                     primaryKey: true
-                    nullable: true
+                    nullable: false
               - column:
                   name: session_id
                   type: integer
@@ -537,7 +537,7 @@ databaseChangeLog:
                   type: integer
                   constraints:
                     primaryKey: true
-                    nullable: true
+                    nullable: false
               - column:
                   name: rep_id
                   type: integer
@@ -562,7 +562,7 @@ databaseChangeLog:
                   type: integer
                   constraints:
                     primaryKey: true
-                    nullable: true
+                    nullable: false
               - column:
                   name: rep_metric_id
                   type: integer
@@ -587,7 +587,7 @@ databaseChangeLog:
                   type: integer
                   constraints:
                     primaryKey: true
-                    nullable: true
+                    nullable: false
               - column:
                   name: assessment_id
                   type: integer
@@ -612,7 +612,7 @@ databaseChangeLog:
                   type: integer
                   constraints:
                     primaryKey: true
-                    nullable: true
+                    nullable: false
               - column:
                   name: session_id
                   type: integer
@@ -637,7 +637,7 @@ databaseChangeLog:
                   type: integer
                   constraints:
                     primaryKey: true
-                    nullable: true
+                    nullable: false
               - column:
                   name: rep_id
                   type: integer
@@ -750,16 +750,16 @@ databaseChangeLog:
             constraintName: fk_template_metric_assessment_template
         - addForeignKeyConstraint:
             baseTableName: template_metric
-            baseColumnNames: metrics_id
+            baseColumnNames: metric_id
             referencedTableName: metric
             referencedColumnNames: id
             constraintName: fk_template_metric_metric
         - addForeignKeyConstraint:
             baseTableName: template_metric
             baseColumnNames: source_id
-            referencedTableName: rep_metric_source
+            referencedTableName: data_source
             referencedColumnNames: id
-            constraintName: fk_template_metric_rep_metric_source
+            constraintName: fk_template_metric_data_source
         # assessment
         - addForeignKeyConstraint:
             baseTableName: assessment
@@ -788,7 +788,7 @@ databaseChangeLog:
             constraintName: fk_assessment_metric_assessment
         - addForeignKeyConstraint:
             baseTableName: assessment_metric
-            baseColumnNames: metrics_id
+            baseColumnNames: metric_id
             referencedTableName: metric
             referencedColumnNames: id
             constraintName: fk_assessment_metric_metric
