@@ -35,7 +35,11 @@ jobs:
 
     - name: Print Gradle wrapper
       shell: bash
-      run: echo $PATH
+      run: sudo apt install tree
+
+    - name: Print tree
+      run: tree .
+
 
     - name: Build with Gradle Wrapper
       run: ./gradlew build
