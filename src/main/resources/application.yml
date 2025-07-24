@@ -8,4 +8,4 @@ spring:
     password: biolab
 
   liquibase:
-    change-log: classpath:/liquibase/changelog.yaml
+    change-log: db/changelog/biolab.changelog.yml
