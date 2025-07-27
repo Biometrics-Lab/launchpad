@@ -11,7 +11,6 @@ class LaunchpadApplicationTests {
 
 	@Test
 	void contextLoads() {
-		System.out.printf("stopping test\n");
 		// This test will pass if the application context loads successfully
 		// No additional assertions are needed for this test
 		// It serves as a basic smoke test to ensure that the application can start up without issues
