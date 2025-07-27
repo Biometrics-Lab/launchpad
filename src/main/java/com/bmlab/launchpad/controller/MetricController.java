@@ -42,7 +42,7 @@ public class MetricController {
     @PutMapping("/{id}")
     public ResponseEntity<Metric> update(@PathVariable Integer id, @RequestBody Metric updatedMetric) {
 
-        if (!metricService.findById(id).isPresent()) {
+        if (metricService.findById(id).isEmpty()) {
             return ResponseEntity.notFound().build(); // 404
         }
 
