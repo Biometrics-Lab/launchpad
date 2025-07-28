@@ -92,6 +92,9 @@ tasks.named('bootBuildImage') {
 tasks.named('test') {
 	outputs.dir snippetsDir
 	useJUnitPlatform()
+	testLogging {
+		events "started", "passed", "skipped", "failed"
+	}
 }
 
 tasks.named('asciidoctor') {
