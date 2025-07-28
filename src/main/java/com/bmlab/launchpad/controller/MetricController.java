@@ -3,7 +3,9 @@ package com.bmlab.launchpad.controller;
 import com.bmlab.launchpad.repository.Metric;
 import com.bmlab.launchpad.service.MetricService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -13,10 +15,17 @@ public class MetricController {
 
     private final MetricService metricService;
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
-    public Metric create(@RequestBody Metric metric) {
-        return metricService.create(metric);
+    public ResponseEntity<Metric> create(@RequestBody Metric metric) {
+        if (metric.getId() != null) {
+            return ResponseEntity.badRequest().build(); // 400 Bad Request, ID should not be in the query
+        }
+
+        Metric created = metricService.create(metric); // create
+        return ResponseEntity.status(HttpStatus.CREATED).body(created); // 201 Created
     }
+
 
     @GetMapping
     public Iterable<Metric> getAll() {
@@ -29,6 +38,7 @@ public class MetricController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Integer id) {
         if (metricService.findById(id).isPresent()) {
@@ -39,6 +49,7 @@ public class MetricController {
         }
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{id}")
     public ResponseEntity<Metric> update(@PathVariable Integer id, @RequestBody Metric updatedMetric) {
 
