@@ -21,11 +21,11 @@ public class MetricService {
         return metricRepository.findAll();
     }
     public Optional<Metric> findById(Integer id) {
-        return metricRepository.findById(Long.valueOf(id));
+        return metricRepository.findById(id);
     }
 
     public void deleteById(Integer id) {
-        metricRepository.deleteById(Long.valueOf(id));
+        metricRepository.deleteById(id);
     }
 
     public Metric update(Metric metric) {

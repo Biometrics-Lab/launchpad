@@ -2,13 +2,14 @@ package com.bmlab.launchpad.repository;
 
 import lombok.*;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.relational.core.mapping.Table;
 
-//@Entity
 @Getter
 @Setter
 @RequiredArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PACKAGE)
 @EqualsAndHashCode(of = "id")
+@Table("metric")
 public class Metric {
 
     @Id

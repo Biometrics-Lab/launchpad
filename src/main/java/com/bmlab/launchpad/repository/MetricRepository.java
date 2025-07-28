@@ -1,8 +1,10 @@
 package com.bmlab.launchpad.repository;
 
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.stereotype.Repository;
 
-public interface MetricRepository extends CrudRepository<Metric, Long> {
+@Repository
+public interface MetricRepository extends CrudRepository<Metric, Integer> {
 
 
 }

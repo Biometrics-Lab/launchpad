@@ -1,3 +1,5 @@
 databaseChangeLog:
   - include:
       file: db/changelog/changeset/1_bl_21.yml
+  - include:
+      file: db/changelog/changeset/1_bl_28.yml

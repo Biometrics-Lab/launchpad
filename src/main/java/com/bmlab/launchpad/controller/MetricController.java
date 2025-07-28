@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/metrics")
+//@RequestMapping("/api/metrics")
 public class MetricController {
 
     private final MetricService metricService;
@@ -53,3 +53,4 @@ public class MetricController {
 
 
 }
+
