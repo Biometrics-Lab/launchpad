@@ -1,5 +1,7 @@
 package com.bmlab.launchpad.service;
 
+import com.bmlab.launchpad.dto.MetricDTO;
+//import com.bmlab.launchpad.dto.mapping.MetricMapping;
 import com.bmlab.launchpad.repository.Metric;
 import com.bmlab.launchpad.repository.MetricRepository;
 import lombok.RequiredArgsConstructor;
@@ -13,7 +15,12 @@ public class MetricService {
 
     private final MetricRepository metricRepository;
 
-    public Metric create(Metric metric) {
+    public Metric create(MetricDTO metricDTO) {
+        Metric metric = Metric.builder()
+                .name(metricDTO.getName())
+                .measurementId(metricDTO.getMeasurementId())
+                .negate(metricDTO.getNegate())
+                .build();
         return metricRepository.save(metric);
     }
 
@@ -21,7 +28,7 @@ public class MetricService {
         return metricRepository.findAll();
     }
     public Optional<Metric> findById(Integer id) {
-        return metricRepository.findById(id);
+        return metricRepository.findById(id);//.map(metricMapping::toMetricDTO);
     }
 
     public void deleteById(Integer id) {

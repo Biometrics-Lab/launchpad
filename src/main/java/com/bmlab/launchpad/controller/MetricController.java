@@ -1,5 +1,6 @@
 package com.bmlab.launchpad.controller;
 
+import com.bmlab.launchpad.dto.MetricDTO;
 import com.bmlab.launchpad.repository.Metric;
 import com.bmlab.launchpad.service.MetricService;
 import lombok.RequiredArgsConstructor;
@@ -10,20 +11,25 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
-//@RequestMapping("/api/metrics")
+@RequestMapping("/api/v1/metrics")
 public class MetricController {
 
     private final MetricService metricService;
 
-    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
-    public ResponseEntity<Metric> create(@RequestBody Metric metric) {
-        if (metric.getId() != null) {
-            return ResponseEntity.badRequest().build(); // 400 Bad Request, ID should not be in the query
+    public ResponseEntity<?> create(@RequestBody MetricDTO metricDTO) {
+
+        if (metricDTO.getName() == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("Name must not be null");
         }
 
-        Metric created = metricService.create(metric); // create
-        return ResponseEntity.status(HttpStatus.CREATED).body(created); // 201 Created
+        Metric created = metricService.create(metricDTO);
+        if (created == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("Failed to create metric");
+        }
+        return ResponseEntity.ok(created);
     }
 
 
@@ -38,7 +44,6 @@ public class MetricController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Integer id) {
         if (metricService.findById(id).isPresent()) {
@@ -49,7 +54,6 @@ public class MetricController {
         }
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{id}")
     public ResponseEntity<Metric> update(@PathVariable Integer id, @RequestBody Metric updatedMetric) {
 
