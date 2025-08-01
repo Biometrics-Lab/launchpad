@@ -1,0 +1,6 @@
+CREATE USER biolab WITH PASSWORD 'biolab';
+CREATE DATABASE biolab;
+GRANT ALL PRIVILEGES ON DATABASE biolab TO biolab;
+
+
+
