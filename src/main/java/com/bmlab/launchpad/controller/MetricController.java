@@ -54,10 +54,16 @@ public class MetricController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Metric> update(@PathVariable Integer id, @RequestBody Metric updatedMetric) {
+    public ResponseEntity<?> update(@PathVariable Integer id, @RequestBody Metric updatedMetric) {
 
         if (metricService.findById(id).isEmpty()) {
-            return ResponseEntity.notFound().build(); // 404
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("id can not be empty"); // 404
+        }
+
+        if (updatedMetric.getName() == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("Name must not be null");
         }
 
         updatedMetric.setId(id);
