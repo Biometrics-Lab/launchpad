@@ -22,7 +22,7 @@ class MetricApiTest {
     private MockMvc mockMvc;
 
     @Test
-    void testCreateMetric() throws Exception {
+    void testCreate() throws Exception {
         String json = """
             {
                 "name": "Test Metric",
