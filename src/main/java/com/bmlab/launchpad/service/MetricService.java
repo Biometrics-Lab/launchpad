@@ -1,7 +1,6 @@
 package com.bmlab.launchpad.service;
 
 import com.bmlab.launchpad.dto.MetricDTO;
-//import com.bmlab.launchpad.dto.mapping.MetricMapping;
 import com.bmlab.launchpad.repository.Metric;
 import com.bmlab.launchpad.repository.MetricRepository;
 import lombok.RequiredArgsConstructor;
@@ -28,7 +27,7 @@ public class MetricService {
         return metricRepository.findAll();
     }
     public Optional<Metric> findById(Integer id) {
-        return metricRepository.findById(id);//.map(metricMapping::toMetricDTO);
+        return metricRepository.findById(id);
     }
 
     public void deleteById(Integer id) {
