@@ -18,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class metricControllerUnit {
+class MetricControllerUnitTest {
     @InjectMocks
     private MetricController metricController;
     @Mock
