@@ -3,7 +3,6 @@ package com.bmlab.launchpad.metric;
 import com.bmlab.launchpad.controller.MetricController;
 import com.bmlab.launchpad.dto.MetricDTO;
 import com.bmlab.launchpad.repository.Metric;
-import com.bmlab.launchpad.repository.MetricRepository;
 import com.bmlab.launchpad.service.MetricService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -19,10 +18,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class MetricControllerTestUnit {
-    @Mock
-    private MetricRepository metricRepository;
-
+class metricControllerTestUnit {
     @InjectMocks
     private MetricController metricController;
     @Mock

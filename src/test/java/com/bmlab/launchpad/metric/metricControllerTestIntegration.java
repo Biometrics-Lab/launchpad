@@ -18,7 +18,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
 @AutoConfigureMockMvc
-class MetricControllerTestIntegration {
+class metricControllerTestIntegration {
 
     @Autowired
     private MockMvc mockMvc;
