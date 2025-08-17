@@ -101,3 +101,17 @@ tasks.named('asciidoctor') {
 	inputs.dir snippetsDir
 	dependsOn test
 }
+
+tasks.register('initDB', Exec) {
+	group = 'db'
+	workingDir 'src/main/resources/db/scripts/'
+	//on linux
+	commandLine './initialize-db.sh'
+}
+
+tasks.register('dropDB', Exec) {
+	group = 'db'
+	workingDir 'src/main/resources/db/scripts/'
+	//on linux
+	commandLine './drop-db.sh'
+}
