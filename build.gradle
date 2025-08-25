@@ -55,6 +55,7 @@ dependencies {
 	implementation 'org.springframework.modulith:spring-modulith-starter-core'
 	implementation 'org.springframework.modulith:spring-modulith-starter-jdbc'
 	implementation 'org.springframework.session:spring-session-jdbc'
+	implementation 'org.mapstruct:mapstruct:1.6.3'
 	compileOnly 'org.projectlombok:lombok'
 	runtimeOnly 'io.micrometer:micrometer-registry-prometheus'
 	runtimeOnly 'org.postgresql:postgresql'
@@ -63,6 +64,8 @@ dependencies {
 	runtimeOnly 'org.springframework.modulith:spring-modulith-observability'
 	annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
 	annotationProcessor 'org.projectlombok:lombok'
+	annotationProcessor 'org.mapstruct:mapstruct-processor:1.6.3'
+	annotationProcessor 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.boot:spring-boot-testcontainers'
 	testImplementation 'org.springframework.cloud:spring-cloud-starter-contract-stub-runner'
@@ -100,4 +103,18 @@ tasks.named('test') {
 tasks.named('asciidoctor') {
 	inputs.dir snippetsDir
 	dependsOn test
+}
+
+tasks.register('initDB', Exec) {
+	group = 'db'
+	workingDir 'src/main/resources/db/scripts/'
+	//on linux
+	commandLine './initialize-db.sh'
+}
+
+tasks.register('dropDB', Exec) {
+	group = 'db'
+	workingDir 'src/main/resources/db/scripts/'
+	//on linux
+	commandLine './drop-db.sh'
 }
