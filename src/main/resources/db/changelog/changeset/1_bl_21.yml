@@ -1,7 +1,7 @@
 databaseChangeLog:
   - changeSet:
       id: 1-BL-21-1
-      author: viktor.badovskyi
+      author: viktor
       changes:
         # --------------create tables--------------
         # measurement
