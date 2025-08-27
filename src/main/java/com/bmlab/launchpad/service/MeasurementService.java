@@ -1,9 +1,7 @@
 package com.bmlab.launchpad.service;
 
 import com.bmlab.launchpad.repository.MeasurementRepository;
-import com.bmlab.launchpad.repository.MetricRepository;
 import com.bmlab.launchpad.repository.model.Measurement;
-import com.bmlab.launchpad.repository.model.Metric;
 import com.bmlab.launchpad.security.exceptions.NotFoundByException;
 import com.bmlab.launchpad.security.exceptions.PersistException;
 import lombok.RequiredArgsConstructor;
