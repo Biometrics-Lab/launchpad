@@ -6,7 +6,7 @@ public class TestLaunchpadApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.from(LaunchpadApplication::main)
-				.with(TestcontainersConfiguration.class) //comment to use real DB
+//				.with(TestcontainersConfiguration.class) //comment to use real DB
 				.run(args);
 	}
 

@@ -63,7 +63,6 @@ class MetricControllerIntegrationTest {
     @Nested
     @DisplayName("Create")
     class CreateTests {
-        @Disabled
         @Test
         @DisplayName("POST /metrics -> creates and returns the new Metric")
         void create() throws Exception {
