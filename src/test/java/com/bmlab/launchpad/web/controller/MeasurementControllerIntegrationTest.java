@@ -20,6 +20,7 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @ExtendWith(SpringExtension.class)
@@ -141,6 +142,7 @@ class MeasurementControllerIntegrationTest {
 
             String jsonResponse = mvc.perform(
                             get(API)
+                                    .contentType(MediaType.APPLICATION_JSON)
                                     .with(httpBasic("biolab", "biolab"))
                     )
                     .andExpect(status().isOk())
@@ -287,7 +289,7 @@ class MeasurementControllerIntegrationTest {
             String expectedResponse = """
                 {
                     "status" : 404,
-                    "message": "Measurement not updated with id: 999999"
+                    "message": "MeasurementService. Could not update Measurement by id: 999999"
                 }
                 """;
 
@@ -346,7 +348,7 @@ class MeasurementControllerIntegrationTest {
             String expectedResponse = """
                 {
                     "status" : 404,
-                    "message": "Measurement not deleted with id: 999999"
+                    "message": "MeasurementService. Could not delete id: 999999"
                 }
                 """;
 
