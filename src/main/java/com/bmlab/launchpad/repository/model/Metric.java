@@ -1,15 +1,14 @@
 package com.bmlab.launchpad.repository.model;
 
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
-import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Table;
 
 
 @Data
 @SuperBuilder
+@NoArgsConstructor
 @Table("metric")
 public class Metric extends IDName {
     @NotNull(message = "Measurement ID cannot be null")
