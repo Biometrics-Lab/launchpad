@@ -11,7 +11,7 @@ import java.util.List;
 public interface MetricMapper {
     MetricMapper metricMapper = Mappers.getMapper(MetricMapper.class);
 
-    MetricDto toDto(Metric metricDto);
+    MetricDto toDto(Metric metric);
     Metric toModel(MetricDto metricDto);
     List<MetricDto> toDtos(List<Metric> metrics);
     List<Metric> toModels(List<MetricDto> metricDtos);

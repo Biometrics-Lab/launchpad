@@ -18,10 +18,10 @@ public class SecurityConfig {
         return http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(HttpMethod.POST  , "/api/v1/metrics/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.GET   , "/api/v1/metrics/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.PUT   , "/api/v1/metrics/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.DELETE, "/api/v1/metrics/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST  , "/api/v1/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET   , "/api/v1/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT   , "/api/v1/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/v1/**").hasRole("ADMIN")
                         .anyRequest().authenticated()                 )
                 .httpBasic(Customizer.withDefaults())
                 .build();
