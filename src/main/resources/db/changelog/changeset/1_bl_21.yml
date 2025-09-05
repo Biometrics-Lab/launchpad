@@ -76,7 +76,7 @@ databaseChangeLog:
                   name: type
                   type: varchar(50)
                   constraints:
-                    nullable: true
+                    nullable: false
               - column:
                   name: description
                   type: varchar(250)
@@ -167,7 +167,7 @@ databaseChangeLog:
                   name: organisation_id
                   type: integer
                   constraints:
-                    nullable: true
+                    nullable: false
               - column:
                   name: name
                   type: varchar(100)
@@ -177,7 +177,7 @@ databaseChangeLog:
                   name: sport
                   type: varchar(50)
                   constraints:
-                    nullable: true
+                    nullable: false
               - column:
                   name: description
                   type: varchar(250)
@@ -207,7 +207,7 @@ databaseChangeLog:
                   name: team_id
                   type: integer
                   constraints:
-                    nullable: true
+                    nullable: false
               - column:
                   name: dob
                   type: date
@@ -247,7 +247,7 @@ databaseChangeLog:
                   name: role
                   type: varchar(50)
                   constraints:
-                    nullable: true
+                    nullable: false
         # user_player
         - createTable:
             tableName: user_player
@@ -262,12 +262,12 @@ databaseChangeLog:
                   name: user_id
                   type: integer
                   constraints:
-                    nullable: true
+                    nullable: false
               - column:
                   name: player_id
                   type: integer
                   constraints:
-                    nullable: true
+                    nullable: false
         # age_group_dictionary
         - createTable:
             tableName: age_group_dictionary
@@ -297,12 +297,12 @@ databaseChangeLog:
                   name: sport
                   type: varchar(50)
                   constraints:
-                    nullable: true
+                    nullable: false
               - column:
                   name: age_group
                   type: varchar(50)
                   constraints:
-                    nullable: true
+                    nullable: false
               - column:
                   name: description
                   type: varchar(250)
@@ -322,12 +322,12 @@ databaseChangeLog:
                   name: model_id
                   type: integer
                   constraints:
-                    nullable: true
+                    nullable: false
               - column:
                   name: metric_id
                   type: integer
                   constraints:
-                    nullable: true
+                    nullable: false
               - column:
                   name: value
                   type: number
@@ -352,7 +352,7 @@ databaseChangeLog:
                   name: sport
                   type: varchar(50)
                   constraints:
-                    nullable: true
+                    nullable: false
               - column:
                   name: description
                   type: text
@@ -372,17 +372,17 @@ databaseChangeLog:
                  name: template_id
                  type: integer
                  constraints:
-                   nullable: true
+                   nullable: false
              - column:
                  name: metric_id
                  type: integer
                  constraints:
-                   nullable: true
+                   nullable: false
              - column:
                 name: source_id
                 type: integer
                 constraints:
-                  nullable: true
+                  nullable: false
         #  assessment
         - createTable:
             tableName: assessment
@@ -397,17 +397,17 @@ databaseChangeLog:
                   name: player_id
                   type: integer
                   constraints:
-                    nullable: true
+                    nullable: false
               - column:
                   name: sport
                   type: varchar(50)
                   constraints:
-                    nullable: true
+                    nullable: false
               - column:
                   name: template_id
                   type: integer
                   constraints:
-                    nullable: true
+                    nullable: false
         #  assessment_metric
         - createTable:
             tableName: assessment_metric
@@ -422,17 +422,17 @@ databaseChangeLog:
                   name: assessment_id
                   type: integer
                   constraints:
-                    nullable: true
+                    nullable: false
               - column:
                   name: metric_id
                   type: integer
                   constraints:
-                    nullable: true
+                    nullable: false
               - column:
                   name: source_id
                   type: integer
                   constraints:
-                    nullable: true
+                    nullable: false
               - column:
                   name: min_value
                   type: number
@@ -467,7 +467,7 @@ databaseChangeLog:
                   name: assessment_id
                   type: integer
                   constraints:
-                    nullable: true
+                    nullable: false
               - column:
                   name: start_time
                   type: timestamp
@@ -487,7 +487,7 @@ databaseChangeLog:
                   name: session_id
                   type: integer
                   constraints:
-                    nullable: true
+                    nullable: false
               - column:
                   name: start_time
                   type: timestamp
@@ -507,12 +507,12 @@ databaseChangeLog:
                   name: session_id
                   type: integer
                   constraints:
-                    nullable: true
+                    nullable: false
               - column:
                   name: metric_id
                   type: integer
                   constraints:
-                    nullable: true
+                    nullable: false
               - column:
                   name: min_value
                   type: number
@@ -542,12 +542,12 @@ databaseChangeLog:
                   name: rep_id
                   type: integer
                   constraints:
-                    nullable: true
+                    nullable: false
               - column:
                   name: metric_id
                   type: integer
                   constraints:
-                    nullable: true
+                    nullable: false
               - column:
                   name: value
                   type: number
@@ -567,12 +567,12 @@ databaseChangeLog:
                   name: rep_metric_id
                   type: integer
                   constraints:
-                    nullable: true
+                    nullable: false
               - column:
                   name: data_source_id
                   type: integer
                   constraints:
-                    nullable: true
+                    nullable: false
               - column:
                   name: description
                   type: varchar(250)
@@ -592,12 +592,12 @@ databaseChangeLog:
                   name: assessment_id
                   type: integer
                   constraints:
-                    nullable: true
+                    nullable: false
               - column:
                   name: type
                   type: varchar(50)
                   constraints:
-                    nullable: true
+                    nullable: false
               - column:
                   name: url
                   type: varchar(200)
@@ -617,12 +617,12 @@ databaseChangeLog:
                   name: session_id
                   type: integer
                   constraints:
-                    nullable: true
+                    nullable: false
               - column:
                   name: type
                   type: varchar(50)
                   constraints:
-                    nullable: true
+                    nullable: false
               - column:
                   name: url
                   type: varchar(200)
@@ -642,12 +642,12 @@ databaseChangeLog:
                   name: rep_id
                   type: integer
                   constraints:
-                    nullable: true
+                    nullable: false
               - column:
                   name: type
                   type: varchar(50)
                   constraints:
-                    nullable: true
+                    nullable: false
               - column:
                   name: url
                   type: varchar(200)
