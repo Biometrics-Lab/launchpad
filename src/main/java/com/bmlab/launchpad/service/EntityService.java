@@ -13,7 +13,7 @@ import java.util.Optional;
 
 @RequiredArgsConstructor
 @Log4j2
-public class EntityService <T extends IDName> {
+public class EntityService<T extends IDName> {
 
     protected final CrudRepository<T, Integer> repository;
 

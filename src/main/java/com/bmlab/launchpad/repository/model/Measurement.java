@@ -9,4 +9,4 @@ import org.springframework.data.relational.core.mapping.Table;
 @SuperBuilder
 @NoArgsConstructor
 @Table("measurement")
-public class Measurement extends IDName{}
+public class Measurement extends IDName {}

@@ -4,7 +4,6 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
-import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Table;
 
 import java.sql.Timestamp;
@@ -13,9 +12,7 @@ import java.sql.Timestamp;
 @SuperBuilder
 @NoArgsConstructor
 @Table("session")
-public class Session {
-    @Id
-    private Integer id;
+public class Session  extends ID {
     @NotNull(message = "Session assessment_id cannot be null")
     private Integer assessment_id;
     @NotNull(message = "Session start_time cannot be null")

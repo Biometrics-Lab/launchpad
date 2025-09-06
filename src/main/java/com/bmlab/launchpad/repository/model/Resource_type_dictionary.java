@@ -10,8 +10,6 @@ import org.springframework.data.relational.core.mapping.Table;
 @SuperBuilder
 @NoArgsConstructor
 @Table("resource_type_dictionary")
-public class Resource_type_dictionary {
-    @Id
-    private String name;
+public class Resource_type_dictionary extends Name{
     private String description;
 }

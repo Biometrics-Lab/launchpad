@@ -4,16 +4,13 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
-import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Table;
 
 @Data
 @SuperBuilder
 @NoArgsConstructor
 @Table("assesment_metric")
-public class Assesment_metric {
-    @Id
-    private Integer id;
+public class Assessment_metric extends ID {
     @NotNull(message = "Assesment_metric assessment_id cannot be null")
     private Integer assessment_id;
     @NotNull(message = "Assesment_metric metric_id cannot be null")
