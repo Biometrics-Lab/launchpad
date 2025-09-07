@@ -9,9 +9,9 @@ import org.springframework.stereotype.Service;
 
 @Service
 @Log4j2
-public class User_roles_dictionaryService extends EntityServiceName<User_role_dictionary> {
+public class User_role_dictionaryService extends EntityServiceName<User_role_dictionary> {
     @Autowired
-    public User_roles_dictionaryService(CrudRepository<User_role_dictionary, String> repository) {
+    public User_role_dictionaryService(CrudRepository<User_role_dictionary, String> repository) {
         super(repository);
     }
 }
