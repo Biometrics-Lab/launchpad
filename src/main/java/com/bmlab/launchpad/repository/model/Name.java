@@ -10,5 +10,5 @@ import org.springframework.data.annotation.Id;
 @NoArgsConstructor
 public abstract class Name {
     @Id
-    protected Integer Name;
+    protected String Name;
     }

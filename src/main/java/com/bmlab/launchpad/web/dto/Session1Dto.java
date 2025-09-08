@@ -6,7 +6,7 @@ import lombok.Builder;
 import java.sql.Timestamp;
 
 @Builder
-public record SessionDto(
+public record Session1Dto(
         Integer id,
         @NotNull(message = "Session assessment_id cannot be null")
         Integer assessment_id,

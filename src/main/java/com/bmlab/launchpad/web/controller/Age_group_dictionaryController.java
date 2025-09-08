@@ -26,6 +26,7 @@ public class Age_group_dictionaryController {
 
     @PostMapping
     public Age_group_dictionaryDto create(@Valid @RequestBody Age_group_dictionaryDto age_group_dictionaryDto) {
+
         Age_group_dictionary created = age_group_dictionaryService.create(age_group_dictionaryMapper.toModel(age_group_dictionaryDto));
         return age_group_dictionaryMapper.toDto(created);
     }

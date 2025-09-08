@@ -26,6 +26,7 @@ databaseChangeLog:
               - column:
                   name: id
                   type: integer
+                  autoIncrement: true
                   constraints:
                     primaryKey: true
                     nullable: false
@@ -71,6 +72,7 @@ databaseChangeLog:
               - column:
                   name: id
                   type: integer
+                  autoIncrement: true
                   constraints:
                     primaryKey: true
                     nullable: false
@@ -96,6 +98,7 @@ databaseChangeLog:
               - column:
                   name: id
                   type: integer
+                  autoIncrement: true
                   constraints:
                     primaryKey: true
                     nullable: false
@@ -121,6 +124,7 @@ databaseChangeLog:
               - column:
                   name: id
                   type: integer
+                  autoIncrement: true
                   constraints:
                     primaryKey: true
                     nullable: false
@@ -229,6 +233,7 @@ databaseChangeLog:
               - column:
                   name: id
                   type: integer
+                  autoIncrement: true
                   constraints:
                     primaryKey: true
                     nullable: false
@@ -254,6 +259,7 @@ databaseChangeLog:
               - column:
                   name: id
                   type: integer
+                  autoIncrement: true
                   constraints:
                     primaryKey: true
                     nullable: false
@@ -279,6 +285,7 @@ databaseChangeLog:
               - column:
                   name: id
                   type: integer
+                  autoIncrement: true
                   constraints:
                     primaryKey: true
                     nullable: false
@@ -294,6 +301,7 @@ databaseChangeLog:
               - column:
                   name: id
                   type: integer
+                  autoIncrement: true
                   constraints:
                     primaryKey: true
                     nullable: false
@@ -324,11 +332,12 @@ databaseChangeLog:
               - column:
                   name: id
                   type: integer
+                  autoIncrement: true
                   constraints:
                     primaryKey: true
                     nullable: false
               - column:
-                  name: session_id
+                  name: session1_id
                   type: integer
                   constraints:
                     nullable: false
@@ -344,6 +353,7 @@ databaseChangeLog:
               - column:
                   name: id
                   type: integer
+                  autoIncrement: true
                   constraints:
                     primaryKey: true
                     nullable: false
@@ -369,6 +379,7 @@ databaseChangeLog:
               - column:
                   name: id
                   type: integer
+                  autoIncrement: true
                   constraints:
                     primaryKey: true
                     nullable: false
@@ -394,6 +405,7 @@ databaseChangeLog:
               - column:
                   name: id
                   type: integer
+                  autoIncrement: true
                   constraints:
                     primaryKey: true
                     nullable: false
@@ -448,13 +460,14 @@ databaseChangeLog:
                   type: varchar(250)
                   constraints:
                     nullable: true
-        #  session
+        #  session1
         - createTable:
-            tableName: session
+            tableName: session1
             columns:
               - column:
                   name: id
                   type: integer
+                  autoIncrement: true
                   constraints:
                     primaryKey: true
                     nullable: false
@@ -475,11 +488,12 @@ databaseChangeLog:
               - column:
                   name: id
                   type: integer
+                  autoIncrement: true
                   constraints:
                     primaryKey: true
                     nullable: false
               - column:
-                  name: session_id
+                  name: session1_id
                   type: integer
                   constraints:
                     nullable: false
@@ -510,11 +524,12 @@ databaseChangeLog:
               - column:
                   name: id
                   type: integer
+                  autoIncrement: true
                   constraints:
                     primaryKey: true
                     nullable: false
               - column:
-                  name: session_id
+                  name: session1_id
                   type: integer
                   constraints:
                     nullable: false
@@ -550,6 +565,7 @@ databaseChangeLog:
               - column:
                   name: id
                   type: integer
+                  autoIncrement: true
                   constraints:
                     primaryKey: true
                     nullable: false
@@ -580,6 +596,7 @@ databaseChangeLog:
               - column:
                   name: id
                   type: integer
+                  autoIncrement: true
                   constraints:
                     primaryKey: true
                     nullable: false
@@ -605,6 +622,7 @@ databaseChangeLog:
               - column:
                   name: id
                   type: integer
+                  autoIncrement: true
                   constraints:
                     primaryKey: true
                     nullable: false
@@ -625,6 +643,7 @@ databaseChangeLog:
               - column:
                   name: id
                   type: integer
+                  autoIncrement: true
                   constraints:
                     primaryKey: true
                     nullable: false
@@ -798,9 +817,9 @@ databaseChangeLog:
             referencedTableName: data_source
             referencedColumnNames: id
             constraintName: fk_assessment_metric_data_source
-        # session
+        # session1
         - addForeignKeyConstraint:
-            baseTableName: session
+            baseTableName: session1
             baseColumnNames: assessment_id
             referencedTableName: assessment
             referencedColumnNames: id
@@ -808,15 +827,15 @@ databaseChangeLog:
         # rep
         - addForeignKeyConstraint:
             baseTableName: rep
-            baseColumnNames: session_id
-            referencedTableName: session
+            baseColumnNames: session1_id
+            referencedTableName: session1
             referencedColumnNames: id
             constraintName: fk_rep_session
         # session_metric
         - addForeignKeyConstraint:
             baseTableName: session_metric
-            baseColumnNames: session_id
-            referencedTableName: session
+            baseColumnNames: session1_id
+            referencedTableName: session1
             referencedColumnNames: id
             constraintName: fk_session_metric_session
         - addForeignKeyConstraint:
@@ -867,8 +886,8 @@ databaseChangeLog:
         # session_resource
         - addForeignKeyConstraint:
             baseTableName: session_resource
-            baseColumnNames: session_id
-            referencedTableName: session
+            baseColumnNames: session1_id
+            referencedTableName: session1
             referencedColumnNames: id
             constraintName: fk_session_resource_session
         - addForeignKeyConstraint:
