@@ -14,3 +14,8 @@ spring:
 
   liquibase:
     change-log: db/changelog/biolab.changelog.yml
+  modulith:
+    events:
+      jdbc:
+        schema-initialization:
+          enabled: true
