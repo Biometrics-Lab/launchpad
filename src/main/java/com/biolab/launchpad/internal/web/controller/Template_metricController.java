@@ -1,11 +1,11 @@
-package com.bmlab.launchpad.web.controller;
+package com.biolab.launchpad.internal.web.controller;
 
-import com.bmlab.launchpad.repository.model.Template_metric;
-import com.bmlab.launchpad.security.exceptions.NotFoundByException;
-import com.bmlab.launchpad.service.Template_metricService;
-import com.bmlab.launchpad.web.dto.ResponseCode;
-import com.bmlab.launchpad.web.dto.ResponseDto;
-import com.bmlab.launchpad.web.dto.Template_metricDto;
+import com.biolab.launchpad.internal.repository.model.Template_metric;
+import com.biolab.launchpad.internal.security.exceptions.NotFoundByException;
+import com.biolab.launchpad.internal.service.Template_metricService;
+import com.biolab.launchpad.internal.web.dto.ResponseCode;
+import com.biolab.launchpad.internal.web.dto.ResponseDto;
+import com.biolab.launchpad.internal.web.dto.Template_metricDto;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Optional;
 
-import static com.bmlab.launchpad.web.mapper.Template_metricMapper.template_metricMapper;
+import static com.biolab.launchpad.internal.web.mapper.Template_metricMapper.template_metricMapper;
 
 @RestController
 @RequiredArgsConstructor

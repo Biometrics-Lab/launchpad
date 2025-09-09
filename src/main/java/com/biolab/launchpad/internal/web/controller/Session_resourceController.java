@@ -1,11 +1,11 @@
-package com.bmlab.launchpad.web.controller;
+package com.biolab.launchpad.internal.web.controller;
 
-import com.bmlab.launchpad.repository.model.Session_resource;
-import com.bmlab.launchpad.security.exceptions.NotFoundByException;
-import com.bmlab.launchpad.service.Session_resourceService;
-import com.bmlab.launchpad.web.dto.ResponseCode;
-import com.bmlab.launchpad.web.dto.ResponseDto;
-import com.bmlab.launchpad.web.dto.Session_resourceDto;
+import com.biolab.launchpad.internal.repository.model.Session_resource;
+import com.biolab.launchpad.internal.security.exceptions.NotFoundByException;
+import com.biolab.launchpad.internal.service.Session_resourceService;
+import com.biolab.launchpad.internal.web.dto.ResponseCode;
+import com.biolab.launchpad.internal.web.dto.ResponseDto;
+import com.biolab.launchpad.internal.web.dto.Session_resourceDto;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Optional;
 
-import static com.bmlab.launchpad.web.mapper.Session_resourceMapper.session_resourceMapper;
+import static com.biolab.launchpad.internal.web.mapper.Session_resourceMapper.session_resourceMapper;
 
 @RestController
 @RequiredArgsConstructor

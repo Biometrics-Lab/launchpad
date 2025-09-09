@@ -1,7 +1,7 @@
-package com.bmlab.launchpad.web.mapper;
+package com.biolab.launchpad.internal.web.mapper;
 
-import com.bmlab.launchpad.repository.model.Data_source_type_dictionary;
-import com.bmlab.launchpad.web.dto.Data_source_type_dictionaryDto;
+import com.biolab.launchpad.internal.repository.model.Data_source_type_dictionary;
+import com.biolab.launchpad.internal.web.dto.Data_source_type_dictionaryDto;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 

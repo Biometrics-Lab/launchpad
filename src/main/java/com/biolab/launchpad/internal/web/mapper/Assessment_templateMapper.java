@@ -1,7 +1,7 @@
-package com.bmlab.launchpad.web.mapper;
+package com.biolab.launchpad.internal.web.mapper;
 
-import com.bmlab.launchpad.repository.model.Assessment_template;
-import com.bmlab.launchpad.web.dto.Assessment_templateDto;
+import com.biolab.launchpad.internal.repository.model.Assessment_template;
+import com.biolab.launchpad.internal.web.dto.Assessment_templateDto;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 

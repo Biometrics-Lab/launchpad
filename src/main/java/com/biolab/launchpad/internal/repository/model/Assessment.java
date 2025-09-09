@@ -1,4 +1,4 @@
-package com.bmlab.launchpad.repository.model;
+package com.biolab.launchpad.internal.repository.model;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;

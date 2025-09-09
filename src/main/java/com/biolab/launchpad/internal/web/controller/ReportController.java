@@ -1,11 +1,11 @@
-package com.bmlab.launchpad.web.controller;
+package com.biolab.launchpad.internal.web.controller;
 
-import com.bmlab.launchpad.repository.model.Report;
-import com.bmlab.launchpad.security.exceptions.NotFoundByException;
-import com.bmlab.launchpad.service.ReportService;
-import com.bmlab.launchpad.web.dto.ResponseCode;
-import com.bmlab.launchpad.web.dto.ResponseDto;
-import com.bmlab.launchpad.web.dto.ReportDto;
+import com.biolab.launchpad.internal.repository.model.Report;
+import com.biolab.launchpad.internal.security.exceptions.NotFoundByException;
+import com.biolab.launchpad.internal.service.ReportService;
+import com.biolab.launchpad.internal.web.dto.ResponseCode;
+import com.biolab.launchpad.internal.web.dto.ResponseDto;
+import com.biolab.launchpad.internal.web.dto.ReportDto;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Optional;
 
-import static com.bmlab.launchpad.web.mapper.ReportMapper.reportMapper;
+import static com.biolab.launchpad.internal.web.mapper.ReportMapper.reportMapper;
 
 @RestController
 @RequiredArgsConstructor

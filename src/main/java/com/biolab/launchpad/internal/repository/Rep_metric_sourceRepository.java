@@ -1,6 +1,6 @@
-package com.bmlab.launchpad.repository;
+package com.biolab.launchpad.internal.repository;
 
-import com.bmlab.launchpad.repository.model.Rep_metric_source;
+import com.biolab.launchpad.internal.repository.model.Rep_metric_source;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 

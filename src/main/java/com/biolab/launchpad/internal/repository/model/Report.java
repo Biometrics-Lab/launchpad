@@ -1,4 +1,4 @@
-package com.bmlab.launchpad.repository.model;
+package com.biolab.launchpad.internal.repository.model;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;

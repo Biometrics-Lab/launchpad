@@ -1,6 +1,6 @@
-package com.bmlab.launchpad.service;
+package com.biolab.launchpad.internal.service;
 
-import com.bmlab.launchpad.repository.model.Team;
+import com.biolab.launchpad.internal.repository.model.Team;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.CrudRepository;

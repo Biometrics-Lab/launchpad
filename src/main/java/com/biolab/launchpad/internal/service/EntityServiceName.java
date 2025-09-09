@@ -1,8 +1,8 @@
-package com.bmlab.launchpad.service;
+package com.biolab.launchpad.internal.service;
 
-import com.bmlab.launchpad.repository.model.Name;
-import com.bmlab.launchpad.security.exceptions.NotFoundByException;
-import com.bmlab.launchpad.security.exceptions.PersistException;
+import com.biolab.launchpad.internal.repository.model.Name;
+import com.biolab.launchpad.internal.security.exceptions.NotFoundByException;
+import com.biolab.launchpad.internal.security.exceptions.PersistException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.repository.CrudRepository;

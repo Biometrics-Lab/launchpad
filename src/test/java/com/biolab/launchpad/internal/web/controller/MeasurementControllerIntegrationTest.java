@@ -1,7 +1,7 @@
-package com.bmlab.launchpad.web.controller;
+package com.biolab.launchpad.internal.web.controller;
 
-import com.bmlab.launchpad.repository.MeasurementRepository;
-import com.bmlab.launchpad.repository.model.Measurement;
+import com.biolab.launchpad.internal.repository.MeasurementRepository;
+import com.biolab.launchpad.internal.repository.model.Measurement;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.*;

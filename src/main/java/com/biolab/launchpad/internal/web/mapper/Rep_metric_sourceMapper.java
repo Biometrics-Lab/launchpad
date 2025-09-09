@@ -1,7 +1,7 @@
-package com.bmlab.launchpad.web.mapper;
+package com.biolab.launchpad.internal.web.mapper;
 
-import com.bmlab.launchpad.repository.model.Rep_metric_source;
-import com.bmlab.launchpad.web.dto.Rep_metric_sourceDto;
+import com.biolab.launchpad.internal.repository.model.Rep_metric_source;
+import com.biolab.launchpad.internal.web.dto.Rep_metric_sourceDto;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 

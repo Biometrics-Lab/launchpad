@@ -1,9 +1,9 @@
-package com.bmlab.launchpad.service;
+package com.biolab.launchpad.internal.service;
 
-import com.bmlab.launchpad.repository.MeasurementRepository;
-import com.bmlab.launchpad.repository.model.Measurement;
-import com.bmlab.launchpad.security.exceptions.NotFoundByException;
-import com.bmlab.launchpad.security.exceptions.PersistException;
+import com.biolab.launchpad.internal.repository.MeasurementRepository;
+import com.biolab.launchpad.internal.repository.model.Measurement;
+import com.biolab.launchpad.internal.security.exceptions.NotFoundByException;
+import com.biolab.launchpad.internal.security.exceptions.PersistException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;

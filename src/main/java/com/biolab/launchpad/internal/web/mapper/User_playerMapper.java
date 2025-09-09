@@ -1,7 +1,7 @@
-package com.bmlab.launchpad.web.mapper;
+package com.biolab.launchpad.internal.web.mapper;
 
-import com.bmlab.launchpad.repository.model.User_player;
-import com.bmlab.launchpad.web.dto.User_playerDto;
+import com.biolab.launchpad.internal.repository.model.User_player;
+import com.biolab.launchpad.internal.web.dto.User_playerDto;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
