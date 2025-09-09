@@ -1,6 +1,6 @@
 package com.bmlab.launchpad.service;
 
-import com.bmlab.launchpad.repository.model.IDName;
+import com.bmlab.launchpad.repository.model.Name;
 import com.bmlab.launchpad.security.exceptions.NotFoundByException;
 import com.bmlab.launchpad.security.exceptions.PersistException;
 import lombok.RequiredArgsConstructor;
@@ -13,9 +13,9 @@ import java.util.Optional;
 
 @RequiredArgsConstructor
 @Log4j2
-public class EntityService<T extends IDName> {
+public class EntityServiceName<T extends Name> {
 
-    protected final CrudRepository<T, Integer> repository;
+    protected final CrudRepository<T, String> repository;
 
     public T create(T entity) {
         String serviceName = getClass().getSimpleName();
@@ -32,7 +32,7 @@ public class EntityService<T extends IDName> {
         return (List<T>) repository.findAll();
     }
 
-    public Optional<T> findById(Integer id) {
+    public Optional<T> findById(String id) {
         String serviceName = getClass().getSimpleName();
         try {
             return repository.findById(id);
@@ -42,7 +42,7 @@ public class EntityService<T extends IDName> {
         }
     }
 
-    public void deleteById(Integer id) {
+    public void deleteById(String id) {
         String serviceName = getClass().getSimpleName();
         try {
             if (repository.existsById(id)) {
@@ -63,13 +63,13 @@ public class EntityService<T extends IDName> {
         String serviceName = getClass().getSimpleName();
         String entityName = entity.getClass().getSimpleName();
         try {
-            if (repository.existsById(entity.getId())) {
+            if (repository.existsById(String.valueOf(entity.getName()))) {
                 return repository.save(entity);
             } else {
-                throw new NotFoundByException("%s. Could not update %s by id: %d", serviceName, entityName, entity.getId());
+                throw new NotFoundByException("%s. Could not update %s by id: %d", serviceName, entityName, repository.existsById(String.valueOf(entity.getName())));
             }
         } catch (NotFoundByException ex) {
-            log.warn("{}. Could not find {} by id: {}", serviceName, entityName, entity.getId());
+            log.warn("{}. Could not find {} by id: {}", serviceName, entityName, repository.existsById(String.valueOf(entity.getName())));
             throw ex;
         } catch (Exception ex) {
             log.warn("{}. Could not update {}: {}", serviceName, entityName, entity.toString());

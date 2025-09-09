@@ -1,6 +1,6 @@
 package com.bmlab.launchpad.service;
 
-import com.bmlab.launchpad.repository.model.IDName;
+import com.bmlab.launchpad.repository.model.ID;
 import com.bmlab.launchpad.security.exceptions.NotFoundByException;
 import com.bmlab.launchpad.security.exceptions.PersistException;
 import lombok.RequiredArgsConstructor;
@@ -13,7 +13,7 @@ import java.util.Optional;
 
 @RequiredArgsConstructor
 @Log4j2
-public class EntityService<T extends IDName> {
+public class EntityServiceID<T extends ID> {
 
     protected final CrudRepository<T, Integer> repository;
 

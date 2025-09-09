@@ -8,5 +8,7 @@ import org.springframework.data.relational.core.mapping.Table;
 @Data
 @SuperBuilder
 @NoArgsConstructor
-@Table("measurement")
-public class Measurement extends IDName {}
+@Table("resource_type_dictionary")
+public class Resource_type_dictionary extends Name{
+    private String description;
+}

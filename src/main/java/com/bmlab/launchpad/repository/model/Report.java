@@ -8,5 +8,7 @@ import org.springframework.data.relational.core.mapping.Table;
 @Data
 @SuperBuilder
 @NoArgsConstructor
-@Table("measurement")
-public class Measurement extends IDName {}
+@Table("report")
+public class Report extends IDName {
+    private String ext_ref;
+}
