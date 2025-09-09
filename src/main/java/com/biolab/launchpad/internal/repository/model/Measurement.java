@@ -1,17 +1,12 @@
 package com.biolab.launchpad.internal.repository.model;
 
-import jakarta.validation.constraints.NotBlank;
-import lombok.Builder;
 import lombok.Data;
-import org.springframework.data.annotation.Id;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 import org.springframework.data.relational.core.mapping.Table;
 
 @Data
-@Builder
+@SuperBuilder
+@NoArgsConstructor
 @Table("measurement")
-public class Measurement {
-    @Id
-    private Integer id;
-    @NotBlank(message = "Name cannot be blank")
-    private String name;
-}
+public class Measurement extends IDName {}

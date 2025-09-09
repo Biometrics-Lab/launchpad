@@ -1,49 +1,12 @@
 databaseChangeLog:
   - changeSet:
       id: 1-BL-21-1
-      author: viktor.badovskyi
+      author: viktor
       changes:
         # --------------create tables--------------
-        # measurement
+        # age_group_dictionary
         - createTable:
-            tableName: measurement
-            columns:
-              - column:
-                  name: id
-                  type: integer
-                  autoIncrement: true
-                  constraints:
-                    primaryKey: true
-                    nullable: false
-              - column:
-                  name: name
-                  type: varchar(100)
-                  constraints:
-                    nullable: false
-        #  report
-        - createTable:
-            tableName: report
-            columns:
-              - column:
-                  name: id
-                  type: integer
-                  autoIncrement: true
-                  constraints:
-                    primaryKey: true
-                    nullable: false
-              - column:
-                  name: name
-                  type: varchar(100)
-                  constraints:
-                    nullable: true
-              - column:
-                  name: ext_ref
-                  type: varchar(250)
-                  constraints:
-                    nullable: true
-        # data_source_type_dictionary
-        - createTable:
-            tableName: data_source_type_dictionary
+            tableName: age_group_dictionary
             columns:
               - column:
                   name: name
@@ -54,6 +17,130 @@ databaseChangeLog:
               - column:
                   name: description
                   type: varchar(250)
+                  constraints:
+                    nullable: true
+        #  assessment_metric
+        - createTable:
+            tableName: assessment_metric
+            columns:
+              - column:
+                  name: id
+                  type: integer
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: assessment_id
+                  type: integer
+                  constraints:
+                    nullable: false
+              - column:
+                  name: metric_id
+                  type: integer
+                  constraints:
+                    nullable: false
+              - column:
+                  name: source_id
+                  type: integer
+                  constraints:
+                    nullable: false
+              - column:
+                  name: min_value
+                  type: number
+                  constraints:
+                    nullable: true
+              - column:
+                  name: max_value
+                  type: number
+                  constraints:
+                    nullable: true
+              - column:
+                  name: avg_value
+                  type: number
+                  constraints:
+                    nullable: true
+              - column:
+                  name: last_value
+                  type: number
+                  constraints:
+                    nullable: true
+        #  assessment
+        - createTable:
+            tableName: assessment
+            columns:
+              - column:
+                  name: id
+                  type: integer
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: player_id
+                  type: integer
+                  constraints:
+                    nullable: false
+              - column:
+                  name: sport
+                  type: varchar(50)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: template_id
+                  type: integer
+                  constraints:
+                    nullable: false
+        #  assessment_resource
+        - createTable:
+            tableName: assessment_resource
+            columns:
+              - column:
+                  name: id
+                  type: integer
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: assessment_id
+                  type: integer
+                  constraints:
+                    nullable: false
+              - column:
+                  name: type
+                  type: varchar(50)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: url
+                  type: varchar(200)
+                  constraints:
+                    nullable: false
+        #  assessment_template
+        - createTable:
+            tableName: assessment_template
+            columns:
+              - column:
+                  name: id
+                  type: integer
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: name
+                  type: varchar(100)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: sport
+                  type: varchar(50)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: description
+                  type: text
                   constraints:
                     nullable: true
         # data_source
@@ -76,12 +163,43 @@ databaseChangeLog:
                   name: type
                   type: varchar(50)
                   constraints:
-                    nullable: true
+                    nullable: false
               - column:
                   name: description
                   type: varchar(250)
                   constraints:
                     nullable: true
+        # data_source_type_dictionary
+        - createTable:
+            tableName: data_source_type_dictionary
+            columns:
+              - column:
+                  name: name
+                  type: varchar(50)
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: description
+                  type: varchar(250)
+                  constraints:
+                    nullable: true
+        # measurement
+        - createTable:
+            tableName: measurement
+            columns:
+              - column:
+                  name: id
+                  type: integer
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: name
+                  type: varchar(100)
+                  constraints:
+                    nullable: false
         # metric
         - createTable:
             tableName: metric
@@ -108,34 +226,56 @@ databaseChangeLog:
                   type: boolean
                   constraints:
                     nullable: true
-        # resource_type_dictionary
+        # model
         - createTable:
-            tableName: resource_type_dictionary
+            tableName: model
             columns:
               - column:
-                  name: name
-                  type: varchar(50)
+                  name: id
+                  type: integer
+                  autoIncrement: true
                   constraints:
                     primaryKey: true
+                    nullable: false
+              - column:
+                  name: sport
+                  type: varchar(50)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: age_group
+                  type: varchar(50)
+                  constraints:
                     nullable: false
               - column:
                   name: description
                   type: varchar(250)
                   constraints:
                     nullable: true
-        # sport_dictionary
+        # model_metric
         - createTable:
-            tableName: sport_dictionary
+            tableName: model_metric
             columns:
               - column:
-                  name: name
-                  type: varchar(50)
+                  name: id
+                  type: integer
+                  autoIncrement: true
                   constraints:
                     primaryKey: true
                     nullable: false
               - column:
-                  name: description
-                  type: varchar(250)
+                  name: model_id
+                  type: integer
+                  constraints:
+                    nullable: false
+              - column:
+                  name: metric_id
+                  type: integer
+                  constraints:
+                    nullable: false
+              - column:
+                  name: value
+                  type: number
                   constraints:
                     nullable: true
         # organisation
@@ -145,6 +285,7 @@ databaseChangeLog:
               - column:
                   name: id
                   type: integer
+                  autoIncrement: true
                   constraints:
                     primaryKey: true
                     nullable: false
@@ -153,36 +294,6 @@ databaseChangeLog:
                   type: varchar(100)
                   constraints:
                     nullable: false
-        # team
-        - createTable:
-            tableName: team
-            columns:
-              - column:
-                  name: id
-                  type: integer
-                  constraints:
-                    primaryKey: true
-                    nullable: false
-              - column:
-                  name: organisation_id
-                  type: integer
-                  constraints:
-                    nullable: true
-              - column:
-                  name: name
-                  type: varchar(100)
-                  constraints:
-                    nullable: false
-              - column:
-                  name: sport
-                  type: varchar(50)
-                  constraints:
-                    nullable: true
-              - column:
-                  name: description
-                  type: varchar(250)
-                  constraints:
-                    nullable: true
         # player
         - createTable:
             tableName: player
@@ -190,6 +301,7 @@ databaseChangeLog:
               - column:
                   name: id
                   type: integer
+                  autoIncrement: true
                   constraints:
                     primaryKey: true
                     nullable: false
@@ -207,12 +319,344 @@ databaseChangeLog:
                   name: team_id
                   type: integer
                   constraints:
-                    nullable: true
+                    nullable: false
               - column:
                   name: dob
                   type: date
                   constraints:
                     nullable: true
+        #  rep
+        - createTable:
+            tableName: rep
+            columns:
+              - column:
+                  name: id
+                  type: integer
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: session1_id
+                  type: integer
+                  constraints:
+                    nullable: false
+              - column:
+                  name: start_time
+                  type: timestamp
+                  constraints:
+                    nullable: false
+        #  rep_metric
+        - createTable:
+            tableName: rep_metric
+            columns:
+              - column:
+                  name: id
+                  type: integer
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: rep_id
+                  type: integer
+                  constraints:
+                    nullable: false
+              - column:
+                  name: metric_id
+                  type: integer
+                  constraints:
+                    nullable: false
+              - column:
+                  name: value
+                  type: number
+                  constraints:
+                    nullable: true
+        #  rep_metric_source
+        - createTable:
+            tableName: rep_metric_source
+            columns:
+              - column:
+                  name: id
+                  type: integer
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: rep_metric_id
+                  type: integer
+                  constraints:
+                    nullable: false
+              - column:
+                  name: data_source_id
+                  type: integer
+                  constraints:
+                    nullable: false
+              - column:
+                  name: description
+                  type: varchar(250)
+                  constraints:
+                    nullable: true
+        #  rep_resource
+        - createTable:
+            tableName: rep_resource
+            columns:
+              - column:
+                  name: id
+                  type: integer
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: rep_id
+                  type: integer
+                  constraints:
+                    nullable: false
+              - column:
+                  name: type
+                  type: varchar(50)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: url
+                  type: varchar(200)
+                  constraints:
+                    nullable: false
+        #  report
+        - createTable:
+            tableName: report
+            columns:
+              - column:
+                  name: id
+                  type: integer
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: name
+                  type: varchar(100)
+                  constraints:
+                    nullable: true
+              - column:
+                  name: ext_ref
+                  type: varchar(250)
+                  constraints:
+                    nullable: true
+        # resource_type_dictionary
+        - createTable:
+            tableName: resource_type_dictionary
+            columns:
+              - column:
+                  name: name
+                  type: varchar(50)
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: description
+                  type: varchar(250)
+                  constraints:
+                    nullable: true
+        #  session1
+        - createTable:
+            tableName: session1
+            columns:
+              - column:
+                  name: id
+                  type: integer
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: assessment_id
+                  type: integer
+                  constraints:
+                    nullable: false
+              - column:
+                  name: start_time
+                  type: timestamp
+                  constraints:
+                    nullable: false
+        #  session_metric
+        - createTable:
+            tableName: session_metric
+            columns:
+              - column:
+                  name: id
+                  type: integer
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: session1_id
+                  type: integer
+                  constraints:
+                    nullable: false
+              - column:
+                  name: metric_id
+                  type: integer
+                  constraints:
+                    nullable: false
+              - column:
+                  name: min_value
+                  type: number
+                  constraints:
+                    nullable: true
+              - column:
+                  name: max_value
+                  type: number
+                  constraints:
+                    nullable: true
+              - column:
+                  name: avg_value
+                  type: number
+                  constraints:
+                    nullable: true
+        #  session_resource
+        - createTable:
+            tableName: session_resource
+            columns:
+              - column:
+                  name: id
+                  type: integer
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: session1_id
+                  type: integer
+                  constraints:
+                    nullable: false
+              - column:
+                  name: type
+                  type: varchar(50)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: url
+                  type: varchar(200)
+                  constraints:
+                    nullable: false
+        # sport_dictionary
+        - createTable:
+            tableName: sport_dictionary
+            columns:
+              - column:
+                  name: name
+                  type: varchar(50)
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: description
+                  type: varchar(250)
+                  constraints:
+                    nullable: true
+        # team
+        - createTable:
+            tableName: team
+            columns:
+              - column:
+                  name: id
+                  type: integer
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: organisation_id
+                  type: integer
+                  constraints:
+                    nullable: false
+              - column:
+                  name: name
+                  type: varchar(100)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: sport
+                  type: varchar(50)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: description
+                  type: varchar(250)
+                  constraints:
+                    nullable: true
+        #  template_metric
+        - createTable:
+            tableName: template_metric
+            columns:
+              - column:
+                  name: id
+                  type: integer
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: template_id
+                  type: integer
+                  constraints:
+                    nullable: false
+              - column:
+                  name: metric_id
+                  type: integer
+                  constraints:
+                    nullable: false
+              - column:
+                  name: source_id
+                  type: integer
+                  constraints:
+                    nullable: false
+        # user
+        - createTable:
+            tableName: user
+            columns:
+              - column:
+                  name: id
+                  type: integer
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: name
+                  type: varchar(100)
+                  constraints:
+                    nullable: true
+              - column:
+                  name: role
+                  type: varchar(50)
+                  constraints:
+                    nullable: false
+        # user_player
+        - createTable:
+            tableName: user_player
+            columns:
+              - column:
+                  name: id
+                  type: integer
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: user_id
+                  type: integer
+                  constraints:
+                    nullable: false
+              - column:
+                  name: player_id
+                  type: integer
+                  constraints:
+                    nullable: false
         # user_roles_dictionary
         - createTable:
             tableName: user_roles_dictionary
@@ -228,431 +672,6 @@ databaseChangeLog:
                   type: varchar(250)
                   constraints:
                     nullable: true
-        # user
-        - createTable:
-            tableName: user
-            columns:
-              - column:
-                  name: id
-                  type: integer
-                  constraints:
-                    primaryKey: true
-                    nullable: false
-              - column:
-                  name: name
-                  type: varchar(100)
-                  constraints:
-                    nullable: true
-              - column:
-                  name: role
-                  type: varchar(50)
-                  constraints:
-                    nullable: true
-        # user_player
-        - createTable:
-            tableName: user_player
-            columns:
-              - column:
-                  name: id
-                  type: integer
-                  constraints:
-                    primaryKey: true
-                    nullable: false
-              - column:
-                  name: user_id
-                  type: integer
-                  constraints:
-                    nullable: true
-              - column:
-                  name: player_id
-                  type: integer
-                  constraints:
-                    nullable: true
-        # age_group_dictionary
-        - createTable:
-            tableName: age_group_dictionary
-            columns:
-              - column:
-                  name: name
-                  type: varchar(50)
-                  constraints:
-                    primaryKey: true
-                    nullable: false
-              - column:
-                  name: description
-                  type: varchar(250)
-                  constraints:
-                    nullable: true
-        # model
-        - createTable:
-            tableName: model
-            columns:
-              - column:
-                  name: id
-                  type: integer
-                  constraints:
-                    primaryKey: true
-                    nullable: false
-              - column:
-                  name: sport
-                  type: varchar(50)
-                  constraints:
-                    nullable: true
-              - column:
-                  name: age_group
-                  type: varchar(50)
-                  constraints:
-                    nullable: true
-              - column:
-                  name: description
-                  type: varchar(250)
-                  constraints:
-                    nullable: true
-        # model_metric
-        - createTable:
-            tableName: model_metric
-            columns:
-              - column:
-                  name: id
-                  type: integer
-                  constraints:
-                    primaryKey: true
-                    nullable: false
-              - column:
-                  name: model_id
-                  type: integer
-                  constraints:
-                    nullable: true
-              - column:
-                  name: metric_id
-                  type: integer
-                  constraints:
-                    nullable: true
-              - column:
-                  name: value
-                  type: number
-                  constraints:
-                    nullable: true
-        #  assessment_template
-        - createTable:
-            tableName: assessment_template
-            columns:
-              - column:
-                  name: id
-                  type: integer
-                  constraints:
-                    primaryKey: true
-                    nullable: false
-              - column:
-                  name: name
-                  type: varchar(100)
-                  constraints:
-                    nullable: false
-              - column:
-                  name: sport
-                  type: varchar(50)
-                  constraints:
-                    nullable: true
-              - column:
-                  name: description
-                  type: text
-                  constraints:
-                    nullable: true
-        #  template_metric
-        - createTable:
-            tableName: template_metric
-            columns:
-             - column:
-                 name: id
-                 type: integer
-                 constraints:
-                  primaryKey: true
-                  nullable: false
-             - column:
-                 name: template_id
-                 type: integer
-                 constraints:
-                   nullable: true
-             - column:
-                 name: metric_id
-                 type: integer
-                 constraints:
-                   nullable: true
-             - column:
-                name: source_id
-                type: integer
-                constraints:
-                  nullable: true
-        #  assessment
-        - createTable:
-            tableName: assessment
-            columns:
-              - column:
-                  name: id
-                  type: integer
-                  constraints:
-                    primaryKey: true
-                    nullable: false
-              - column:
-                  name: player_id
-                  type: integer
-                  constraints:
-                    nullable: true
-              - column:
-                  name: sport
-                  type: varchar(50)
-                  constraints:
-                    nullable: true
-              - column:
-                  name: template_id
-                  type: integer
-                  constraints:
-                    nullable: true
-        #  assessment_metric
-        - createTable:
-            tableName: assessment_metric
-            columns:
-              - column:
-                  name: id
-                  type: integer
-                  constraints:
-                    primaryKey: true
-                    nullable: false
-              - column:
-                  name: assessment_id
-                  type: integer
-                  constraints:
-                    nullable: true
-              - column:
-                  name: metric_id
-                  type: integer
-                  constraints:
-                    nullable: true
-              - column:
-                  name: source_id
-                  type: integer
-                  constraints:
-                    nullable: true
-              - column:
-                  name: min_value
-                  type: number
-                  constraints:
-                    nullable: true
-              - column:
-                  name: max_value
-                  type: number
-                  constraints:
-                    nullable: true
-              - column:
-                  name: avg_value
-                  type: number
-                  constraints:
-                    nullable: true
-              - column:
-                  name: last_value
-                  type: number
-                  constraints:
-                    nullable: true
-        #  session
-        - createTable:
-            tableName: session
-            columns:
-              - column:
-                  name: id
-                  type: integer
-                  constraints:
-                    primaryKey: true
-                    nullable: false
-              - column:
-                  name: assessment_id
-                  type: integer
-                  constraints:
-                    nullable: true
-              - column:
-                  name: start_time
-                  type: timestamp
-                  constraints:
-                    nullable: false
-        #  rep
-        - createTable:
-            tableName: rep
-            columns:
-              - column:
-                  name: id
-                  type: integer
-                  constraints:
-                    primaryKey: true
-                    nullable: false
-              - column:
-                  name: session_id
-                  type: integer
-                  constraints:
-                    nullable: true
-              - column:
-                  name: start_time
-                  type: timestamp
-                  constraints:
-                    nullable: false
-        #  session_metric
-        - createTable:
-            tableName: session_metric
-            columns:
-              - column:
-                  name: id
-                  type: integer
-                  constraints:
-                    primaryKey: true
-                    nullable: false
-              - column:
-                  name: session_id
-                  type: integer
-                  constraints:
-                    nullable: true
-              - column:
-                  name: metric_id
-                  type: integer
-                  constraints:
-                    nullable: true
-              - column:
-                  name: min_value
-                  type: number
-                  constraints:
-                    nullable: true
-              - column:
-                  name: max_value
-                  type: number
-                  constraints:
-                    nullable: true
-              - column:
-                  name: avg_value
-                  type: number
-                  constraints:
-                    nullable: true
-        #  rep_metric
-        - createTable:
-            tableName: rep_metric
-            columns:
-              - column:
-                  name: id
-                  type: integer
-                  constraints:
-                    primaryKey: true
-                    nullable: false
-              - column:
-                  name: rep_id
-                  type: integer
-                  constraints:
-                    nullable: true
-              - column:
-                  name: metric_id
-                  type: integer
-                  constraints:
-                    nullable: true
-              - column:
-                  name: value
-                  type: number
-                  constraints:
-                    nullable: true
-        #  rep_metric_source
-        - createTable:
-            tableName: rep_metric_source
-            columns:
-              - column:
-                  name: id
-                  type: integer
-                  constraints:
-                    primaryKey: true
-                    nullable: false
-              - column:
-                  name: rep_metric_id
-                  type: integer
-                  constraints:
-                    nullable: true
-              - column:
-                  name: data_source_id
-                  type: integer
-                  constraints:
-                    nullable: true
-              - column:
-                  name: description
-                  type: varchar(250)
-                  constraints:
-                    nullable: true
-        #  assessment_resource
-        - createTable:
-            tableName: assessment_resource
-            columns:
-              - column:
-                  name: id
-                  type: integer
-                  constraints:
-                    primaryKey: true
-                    nullable: false
-              - column:
-                  name: assessment_id
-                  type: integer
-                  constraints:
-                    nullable: true
-              - column:
-                  name: type
-                  type: varchar(50)
-                  constraints:
-                    nullable: true
-              - column:
-                  name: url
-                  type: varchar(200)
-                  constraints:
-                    nullable: false
-        #  session_resource
-        - createTable:
-            tableName: session_resource
-            columns:
-              - column:
-                  name: id
-                  type: integer
-                  constraints:
-                    primaryKey: true
-                    nullable: false
-              - column:
-                  name: session_id
-                  type: integer
-                  constraints:
-                    nullable: true
-              - column:
-                  name: type
-                  type: varchar(50)
-                  constraints:
-                    nullable: true
-              - column:
-                  name: url
-                  type: varchar(200)
-                  constraints:
-                    nullable: false
-        #  rep_resource
-        - createTable:
-            tableName: rep_resource
-            columns:
-              - column:
-                  name: id
-                  type: integer
-                  constraints:
-                    primaryKey: true
-                    nullable: false
-              - column:
-                  name: rep_id
-                  type: integer
-                  constraints:
-                    nullable: true
-              - column:
-                  name: type
-                  type: varchar(50)
-                  constraints:
-                    nullable: true
-              - column:
-                  name: url
-                  type: varchar(200)
-                  constraints:
-                    nullable: false
         # --------------add Foreign key--------------
         # metric
         - addForeignKeyConstraint:
@@ -798,9 +817,9 @@ databaseChangeLog:
             referencedTableName: data_source
             referencedColumnNames: id
             constraintName: fk_assessment_metric_data_source
-        # session
+        # session1
         - addForeignKeyConstraint:
-            baseTableName: session
+            baseTableName: session1
             baseColumnNames: assessment_id
             referencedTableName: assessment
             referencedColumnNames: id
@@ -808,15 +827,15 @@ databaseChangeLog:
         # rep
         - addForeignKeyConstraint:
             baseTableName: rep
-            baseColumnNames: session_id
-            referencedTableName: session
+            baseColumnNames: session1_id
+            referencedTableName: session1
             referencedColumnNames: id
             constraintName: fk_rep_session
         # session_metric
         - addForeignKeyConstraint:
             baseTableName: session_metric
-            baseColumnNames: session_id
-            referencedTableName: session
+            baseColumnNames: session1_id
+            referencedTableName: session1
             referencedColumnNames: id
             constraintName: fk_session_metric_session
         - addForeignKeyConstraint:
@@ -867,8 +886,8 @@ databaseChangeLog:
         # session_resource
         - addForeignKeyConstraint:
             baseTableName: session_resource
-            baseColumnNames: session_id
-            referencedTableName: session
+            baseColumnNames: session1_id
+            referencedTableName: session1
             referencedColumnNames: id
             constraintName: fk_session_resource_session
         - addForeignKeyConstraint:
