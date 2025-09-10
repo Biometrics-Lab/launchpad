@@ -8,7 +8,7 @@ import org.springframework.data.relational.core.mapping.Table;
 @Data
 @SuperBuilder
 @NoArgsConstructor
-@Table("user_role_dictionary")
-public class User_role_dictionary extends Name1 {
+@Table("user_roles_dictionary")
+public class User_role_dictionary extends Name {
     private String description;
 }

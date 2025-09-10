@@ -10,7 +10,7 @@ import org.springframework.data.domain.Persistable;
 @Data
 @SuperBuilder
 @NoArgsConstructor
-public abstract class Name1 implements Persistable<String> {
+public abstract class Name implements Persistable<String> {
     @Id
     protected String name;
 

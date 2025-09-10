@@ -9,6 +9,6 @@ import org.springframework.data.relational.core.mapping.Table;
 @SuperBuilder
 @NoArgsConstructor
 @Table("sport_dictionary")
-public class Sport_dictionary extends Name1 {
+public class Sport_dictionary extends Name {
     private String description;
 }

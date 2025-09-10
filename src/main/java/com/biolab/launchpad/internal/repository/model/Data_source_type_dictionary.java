@@ -9,6 +9,6 @@ import org.springframework.data.relational.core.mapping.Table;
 @SuperBuilder
 @NoArgsConstructor
 @Table("data_source_type_dictionary")
-public class Data_source_type_dictionary extends Name1 {
+public class Data_source_type_dictionary extends Name {
     private String description;
 }

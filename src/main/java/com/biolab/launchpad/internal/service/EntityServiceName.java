@@ -1,6 +1,6 @@
 package com.biolab.launchpad.internal.service;
 
-import com.biolab.launchpad.internal.repository.model.Name1;
+import com.biolab.launchpad.internal.repository.model.Name;
 import com.biolab.launchpad.internal.security.exceptions.NotFoundByException;
 import com.biolab.launchpad.internal.security.exceptions.PersistException;
 import lombok.RequiredArgsConstructor;
@@ -13,7 +13,7 @@ import java.util.Optional;
 
 @RequiredArgsConstructor
 @Log4j2
-public class EntityServiceName<T extends Name1> {
+public class EntityServiceName<T extends Name> {
 
     protected final CrudRepository<T, String> repository;
 
