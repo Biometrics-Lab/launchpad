@@ -1,6 +1,6 @@
 package com.biolab.launchpad.internal.service;
 
-import com.biolab.launchpad.internal.repository.model.Name;
+import com.biolab.launchpad.internal.repository.model.Name1;
 import com.biolab.launchpad.internal.security.exceptions.NotFoundByException;
 import com.biolab.launchpad.internal.security.exceptions.PersistException;
 import lombok.RequiredArgsConstructor;
@@ -13,7 +13,7 @@ import java.util.Optional;
 
 @RequiredArgsConstructor
 @Log4j2
-public class EntityServiceName<T extends Name> {
+public class EntityServiceName<T extends Name1> {
 
     protected final CrudRepository<T, String> repository;
 
@@ -21,7 +21,14 @@ public class EntityServiceName<T extends Name> {
         String serviceName = getClass().getSimpleName();
         String entityName = entity.getClass().getSimpleName();
         try {
-            return repository.save(entity);
+
+            if (repository.existsById(String.valueOf(entity.getName()))) {
+                throw new NotFoundByException("%s. already exist %s by id: %d", serviceName, entityName, repository.existsById(String.valueOf(entity.getName())));
+            } else {
+                entity.markAsNew(true);
+                return repository.save(entity);
+            }
+
         } catch (Exception ex) {
             log.warn("{}. Could not create {}: {}", serviceName, entityName, entity.toString());
             throw new PersistException(ex.getMessage());
@@ -64,6 +71,7 @@ public class EntityServiceName<T extends Name> {
         String entityName = entity.getClass().getSimpleName();
         try {
             if (repository.existsById(String.valueOf(entity.getName()))) {
+                entity.markAsNew(false);
                 return repository.save(entity);
             } else {
                 throw new NotFoundByException("%s. Could not update %s by id: %d", serviceName, entityName, repository.existsById(String.valueOf(entity.getName())));
