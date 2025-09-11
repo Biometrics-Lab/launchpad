@@ -23,7 +23,7 @@ public class EntityServiceName<T extends Name> {
         try {
 
             if (repository.existsById(String.valueOf(entity.getName()))) {
-                throw new NotFoundByException("%s. already exist %s by id: %d", serviceName, entityName, repository.existsById(String.valueOf(entity.getName())));
+                throw new NotFoundByException("%s. already exist %s by id: %s", serviceName, entityName, entity.getName());
             } else {
                 entity.markAsNew(true);
                 return repository.save(entity);
@@ -55,7 +55,7 @@ public class EntityServiceName<T extends Name> {
             if (repository.existsById(id)) {
                 repository.deleteById(id);
             } else {
-                throw new NotFoundByException("%s. Could not delete id: %d", serviceName, id);
+                throw new NotFoundByException("%s. Could not delete id: %s", "serviceName", id);
             }
         } catch (NotFoundByException ex) {
             log.warn("{}. Could not find by id: {}", serviceName, id);
@@ -70,14 +70,13 @@ public class EntityServiceName<T extends Name> {
         String serviceName = getClass().getSimpleName();
         String entityName = entity.getClass().getSimpleName();
         try {
-            if (repository.existsById(String.valueOf(entity.getName()))) {
-                entity.markAsNew(false);
+            if (repository.existsById(entity.getName())) {
                 return repository.save(entity);
             } else {
-                throw new NotFoundByException("%s. Could not update %s by id: %d", serviceName, entityName, repository.existsById(String.valueOf(entity.getName())));
+                throw new NotFoundByException("%s. Could not update %s by id: %s", serviceName, entityName, entity.getName());
             }
         } catch (NotFoundByException ex) {
-            log.warn("{}. Could not find {} by id: {}", serviceName, entityName, repository.existsById(String.valueOf(entity.getName())));
+            log.warn("{}. Could not find {} by id: {}", serviceName, entityName, entity.getName());
             throw ex;
         } catch (Exception ex) {
             log.warn("{}. Could not update {}: {}", serviceName, entityName, entity.toString());
