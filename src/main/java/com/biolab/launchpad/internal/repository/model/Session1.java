@@ -11,7 +11,7 @@ import java.sql.Timestamp;
 @Data
 @SuperBuilder
 @NoArgsConstructor
-@Table("session")
+@Table("session1")
 public class Session1 extends ID {
     @NotNull(message = "Session assessment_id cannot be null")
     private Integer assessment_id;
