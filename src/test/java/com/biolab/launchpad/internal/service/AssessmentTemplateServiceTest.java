@@ -1,6 +1,6 @@
 package com.biolab.launchpad.internal.service;
 
-import com.biolab.launchpad.internal.repository.Assessment_templateRepository;
+import com.biolab.launchpad.internal.repository.AssessmentTemplateRepository;
 import com.biolab.launchpad.internal.repository.model.AssessmentTemplate;
 import com.biolab.launchpad.internal.security.exceptions.NotFoundByException;
 import com.biolab.launchpad.internal.security.exceptions.PersistException;
@@ -25,7 +25,7 @@ import static org.mockito.Mockito.*;
 class AssessmentTemplateServiceTest {
 
     @Mock
-    private Assessment_templateRepository assessmentTemplateRepository;
+    private AssessmentTemplateRepository assessmentTemplateRepository;
 
     @InjectMocks
     private AssessmentTemplateService assessmentTemplateService;
