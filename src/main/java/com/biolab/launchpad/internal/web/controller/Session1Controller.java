@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Optional;
 
-import static com.biolab.launchpad.internal.web.mapper.Session1Mapper.SESSION_1_MAPPER;
+import static com.biolab.launchpad.internal.web.mapper.Session1Mapper.session1Mapper;
 
 @RestController
 @RequiredArgsConstructor
@@ -26,18 +26,18 @@ public class Session1Controller {
 
     @PostMapping
     public Session1Dto create(@Valid @RequestBody Session1Dto session1Dto) {
-        Session1 created = session1Service.create(SESSION_1_MAPPER.toModel(session1Dto));
-        return SESSION_1_MAPPER.toDto(created);
+        Session1 created = session1Service.create(session1Mapper.toModel(session1Dto));
+        return session1Mapper.toDto(created);
     }
 
     @GetMapping
     public List<Session1Dto> getAll() {
-        return SESSION_1_MAPPER.toDtos(session1Service.findAll());
+        return session1Mapper.toDtos(session1Service.findAll());
     }
 
     @GetMapping("/{id}")
     public Session1Dto getById(@PathVariable Integer id) {
-        Optional<Session1Dto> sessionOptional = session1Service.findById(id).map(SESSION_1_MAPPER::toDto);
+        Optional<Session1Dto> sessionOptional = session1Service.findById(id).map(session1Mapper::toDto);
         if (sessionOptional.isPresent()) {
             return sessionOptional.get();
         } else {
@@ -54,7 +54,7 @@ public class Session1Controller {
 
     @PutMapping
     public Session1Dto update(@Valid @RequestBody Session1Dto session1DTO) {
-        Session1 updated = session1Service.update(SESSION_1_MAPPER.toModel(session1DTO));
-        return SESSION_1_MAPPER.toDto(updated);
+        Session1 updated = session1Service.update(session1Mapper.toModel(session1DTO));
+        return session1Mapper.toDto(updated);
     }
 }

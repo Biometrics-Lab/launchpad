@@ -1,9 +1,9 @@
 package com.biolab.launchpad.internal.repository;
 
-import com.biolab.launchpad.internal.repository.model.AssessmentTemplate;
+import com.biolab.launchpad.internal.repository.model.UserPlayer;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface Assessment_templateRepository extends CrudRepository<AssessmentTemplate, Integer> {
+public interface UserPlayerRepository extends CrudRepository<UserPlayer, Integer> {
 }
