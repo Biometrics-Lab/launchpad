@@ -37,9 +37,9 @@ public class ResourceTypeDictionaryController {
 
     @GetMapping("/{id}")
     public ResourceTypeDictionaryDto getById(@PathVariable String id) {
-        Optional<ResourceTypeDictionaryDto> resource_type_dictionaryOptional = resourceTypeDictionaryService.findById(id).map(resourceTypeDictionaryMapper::toDto);
-        if (resource_type_dictionaryOptional.isPresent()) {
-            return resource_type_dictionaryOptional.get();
+        Optional<ResourceTypeDictionaryDto> resourceTypeDictionaryOptional = resourceTypeDictionaryService.findById(id).map(resourceTypeDictionaryMapper::toDto);
+        if (resourceTypeDictionaryOptional.isPresent()) {
+            return resourceTypeDictionaryOptional.get();
         } else {
             log.warn("Could not find resource_type_dictionary with id {}", id);
             throw new NotFoundByException("Resource_type_dictionary not found by id: %d", id);

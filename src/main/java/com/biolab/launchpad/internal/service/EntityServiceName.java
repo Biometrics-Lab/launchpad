@@ -22,7 +22,7 @@ public class EntityServiceName<T extends Name> {
         String entityName = entity.getClass().getSimpleName();
         try {
 
-            if (repository.existsById(String.valueOf(entity.getName()))) {
+            if (repository.existsById(entity.getName())) {
                 throw new NotFoundByException("%s. already exist %s by id: %s", serviceName, entityName, entity.getName());
             } else {
                 entity.markAsNew(true);

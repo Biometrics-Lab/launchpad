@@ -23,7 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("User_role_dictionaryService Unit Tests")
+@DisplayName("UserRoleDictionaryService Unit Tests")
 class UserRoleDictionaryServiceTest {
 
     @Mock

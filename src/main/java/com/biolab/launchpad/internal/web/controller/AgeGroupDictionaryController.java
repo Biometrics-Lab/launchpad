@@ -38,9 +38,9 @@ public class AgeGroupDictionaryController {
 
     @GetMapping("/{id}")
     public AgeGroupDictionaryDto getById(@PathVariable String id) {
-        Optional<AgeGroupDictionaryDto> age_group_dictionaryOptional = ageGroupDictionaryService.findById(id).map(ageGroupDictionaryMapper::toDto);
-        if (age_group_dictionaryOptional.isPresent()) {
-            return age_group_dictionaryOptional.get();
+        Optional<AgeGroupDictionaryDto> ageGroupDictionaryOptional = ageGroupDictionaryService.findById(id).map(ageGroupDictionaryMapper::toDto);
+        if (ageGroupDictionaryOptional.isPresent()) {
+            return ageGroupDictionaryOptional.get();
         } else {
             log.warn("Could not find age_group_dictionary with id {}", id);
             throw new NotFoundByException("Age_group_dictionary not found by id: %d", id);

@@ -21,7 +21,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("Assessment_templateService Unit Tests")
+@DisplayName("AssessmentTemplateService Unit Tests")
 class AssessmentTemplateServiceTest {
 
     @Mock

@@ -37,9 +37,9 @@ public class DataSourceTypeDictionaryController {
 
     @GetMapping("/{id}")
     public DataSourceTypeDictionaryDto getById(@PathVariable String id) {
-        Optional<DataSourceTypeDictionaryDto> data_source_type_dictionaryOptional = dataSourceTypeDictionaryService.findById(id).map(dataSourceTypeDictionaryMapper::toDto);
-        if (data_source_type_dictionaryOptional.isPresent()) {
-            return data_source_type_dictionaryOptional.get();
+        Optional<DataSourceTypeDictionaryDto> dataSourceTypeDictionaryOptional = dataSourceTypeDictionaryService.findById(id).map(dataSourceTypeDictionaryMapper::toDto);
+        if (dataSourceTypeDictionaryOptional.isPresent()) {
+            return dataSourceTypeDictionaryOptional.get();
         } else {
             log.warn("Could not find data_source_type_dictionary with id {}", id);
             throw new NotFoundByException("Data_source_type_dictionary not found by id: %d", id);

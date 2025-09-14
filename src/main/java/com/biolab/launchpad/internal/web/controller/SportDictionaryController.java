@@ -37,9 +37,9 @@ public class SportDictionaryController {
 
     @GetMapping("/{id}")
     public SportDictionaryDto getById(@PathVariable String id) {
-        Optional<SportDictionaryDto> sport_dictionaryOptional = sportDictionaryService.findById(id).map(sportDictionaryMapper::toDto);
-        if (sport_dictionaryOptional.isPresent()) {
-            return sport_dictionaryOptional.get();
+        Optional<SportDictionaryDto> sportDictionaryOptional = sportDictionaryService.findById(id).map(sportDictionaryMapper::toDto);
+        if (sportDictionaryOptional.isPresent()) {
+            return sportDictionaryOptional.get();
         } else {
             log.warn("Could not find sport_dictionary with id {}", id);
             throw new NotFoundByException("Sport_dictionary not found by id: %d", id);

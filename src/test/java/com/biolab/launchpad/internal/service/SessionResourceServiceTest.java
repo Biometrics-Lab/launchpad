@@ -21,7 +21,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("Session_resourceService Unit Tests")
+@DisplayName("SessionResourceService Unit Tests")
 class SessionResourceServiceTest {
 
     @Mock

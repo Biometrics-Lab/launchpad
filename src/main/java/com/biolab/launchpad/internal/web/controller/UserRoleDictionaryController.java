@@ -37,9 +37,9 @@ public class UserRoleDictionaryController {
 
     @GetMapping("/{id}")
     public UserRoleDictionaryDto getById(@PathVariable String id) {
-        Optional<UserRoleDictionaryDto> user_role_dictionaryOptional = userRoleDictionaryService.findById(id).map(user_role_dictionaryMapper::toDto);
-        if (user_role_dictionaryOptional.isPresent()) {
-            return user_role_dictionaryOptional.get();
+        Optional<UserRoleDictionaryDto> userRoleDictionaryOptional = userRoleDictionaryService.findById(id).map(user_role_dictionaryMapper::toDto);
+        if (userRoleDictionaryOptional.isPresent()) {
+            return userRoleDictionaryOptional.get();
         } else {
             log.warn("Could not find user_role_dictionary with id {}", id);
             throw new NotFoundByException("User_role_dictionary not found by id: %d", id);

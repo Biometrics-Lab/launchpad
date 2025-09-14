@@ -23,7 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("Data_source_type_dictionaryService Unit Tests")
+@DisplayName("DataSourceTypeDictionaryService Unit Tests")
 class DataSourceTypeDictionaryServiceTest {
 
     @Mock
