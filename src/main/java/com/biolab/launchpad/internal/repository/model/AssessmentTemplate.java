@@ -5,16 +5,15 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import org.springframework.data.relational.core.mapping.Table;
+import org.w3c.dom.Text;
 
-import java.sql.Timestamp;
 
 @Data
 @SuperBuilder
 @NoArgsConstructor
-@Table("session1")
-public class Session1 extends ID {
-    @NotNull(message = "Session assessment_id cannot be null")
-    private Integer assessment_id;
-    @NotNull(message = "Session start_time cannot be null")
-    private Timestamp start_time;
+@Table("assessment_template")
+public class AssessmentTemplate extends IDName {
+    @NotNull(message = "Assessment_template sport cannot be null")
+    private String sport;
+    private Text description;
 }

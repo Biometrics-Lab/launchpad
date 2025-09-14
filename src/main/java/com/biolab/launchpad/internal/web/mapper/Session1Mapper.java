@@ -9,7 +9,7 @@ import java.util.List;
 
 @Mapper(componentModel = "spring")
 public interface Session1Mapper {
-    Session1Mapper SESSION_1_MAPPER = Mappers.getMapper(Session1Mapper.class);
+    Session1Mapper session1Mapper = Mappers.getMapper(Session1Mapper.class);
 
     Session1Dto toDto(Session1 session1);
     Session1 toModel(Session1Dto session1Dto);

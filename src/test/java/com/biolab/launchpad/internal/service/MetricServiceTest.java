@@ -4,7 +4,6 @@ import com.biolab.launchpad.internal.repository.MetricRepository;
 import com.biolab.launchpad.internal.repository.model.Metric;
 import com.biolab.launchpad.internal.security.exceptions.NotFoundByException;
 import com.biolab.launchpad.internal.security.exceptions.PersistException;
-import com.biolab.launchpad.internal.service.MetricService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;

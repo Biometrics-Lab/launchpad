@@ -6,15 +6,13 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import org.springframework.data.relational.core.mapping.Table;
 
-import java.sql.Timestamp;
 
 @Data
 @SuperBuilder
 @NoArgsConstructor
-@Table("session1")
-public class Session1 extends ID {
-    @NotNull(message = "Session assessment_id cannot be null")
-    private Integer assessment_id;
-    @NotNull(message = "Session start_time cannot be null")
-    private Timestamp start_time;
+@Table("data_source")
+public class DataSource extends IDName {
+    @NotNull(message = "Data_source type cannot be null")
+    private String type;
+    private String description;
 }
