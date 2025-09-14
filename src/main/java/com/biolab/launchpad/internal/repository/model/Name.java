@@ -15,7 +15,7 @@ public abstract class Name implements Persistable<String> {
     protected String name;
 
     @Transient
-    private boolean isNew;
+    private boolean newObject;
 
     @Override
     public String getId() {
@@ -24,11 +24,11 @@ public abstract class Name implements Persistable<String> {
 
     @Override
     public boolean isNew() {
-        return isNew;
+        return newObject;
     }
 
     public void markAsNew(boolean value) {
-        this.isNew = value;
+        this.newObject = value;
     }
 
 
