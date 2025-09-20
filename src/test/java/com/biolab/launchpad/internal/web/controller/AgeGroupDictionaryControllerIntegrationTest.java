@@ -1,12 +1,13 @@
 package com.biolab.launchpad.internal.web.controller;
 
-import com.biolab.launchpad.internal.repository.MeasurementRepository;
-import com.biolab.launchpad.internal.repository.MetricRepository;
-import com.biolab.launchpad.internal.repository.model.Measurement;
-import com.biolab.launchpad.internal.repository.model.Metric;
+import com.biolab.launchpad.internal.repository.model.AgeGroupDictionary;
+import com.biolab.launchpad.internal.repository.AgeGroupDictionaryRepository;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -16,21 +17,20 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
+import static junit.framework.TestCase.assertFalse;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
 @AutoConfigureMockMvc
-@DisplayName("MetricController Integration Tests")
-class MetricControllerIntegrationTest {
+@DisplayName("AgeGroupDictionaryController Integration Tests")
+class AgeGroupDictionaryControllerIntegrationTest {
 
-    private static final String API = "/api/v1/metrics";
+    private static final String API = "/api/v1/ageGroupDictionarys";
 
     @Autowired
     private MockMvc mvc;
@@ -39,42 +39,26 @@ class MetricControllerIntegrationTest {
     ObjectMapper objectMapper;
 
     @Autowired
-    MeasurementRepository measurementRepository;
-    @Autowired
-    MetricRepository metricRepository;
-
-    Measurement mph;
-
-    @BeforeEach
-    void setUp() {
-        mph = measurementRepository.save(
-                Measurement.builder()
-                        .name("Mph")
-                        .build()
-        );
-    }
+    AgeGroupDictionaryRepository ageGroupDictionaryRepository;
 
     @AfterEach
     void tearDown() {
-        metricRepository.deleteAll();
-        measurementRepository.deleteAll();
+        ageGroupDictionaryRepository.deleteAll();
     }
 
     @Nested
     @DisplayName("Create")
     class CreateTests {
         @Test
-        @DisplayName("POST /metrics -> creates and returns the new Metric")
+        @DisplayName("POST /ageGroupDictionarys -> creates and returns the new AgeGroupDictionary")
         void create() throws Exception {
 
             String request =
-                    """ 
+                    """
                                 {
-                                    "name"         : "avg_exit_velocity",
-                                    "measurementId": %d,
-                                    "negate"       : false
+                                    "name" : "AgeGroup"
                                 }
-                            """.formatted(mph.getId());
+                            """;
 
             String jsonResponse = mvc.perform(
                             post(API)
@@ -85,38 +69,35 @@ class MetricControllerIntegrationTest {
                     .andExpect(status().isOk())
                     .andReturn().getResponse().getContentAsString();
 
-
             JsonNode responseNode = objectMapper.readTree(jsonResponse);
 
-            int metricId = responseNode.get("id").asInt();
-            assertThat(metricId).isPositive();
+            String ageGroupDictionaryId = responseNode.get("id").asText();
+            assertThat(ageGroupDictionaryId).isNotBlank();
 
 
             String expectedResponse =
-                    """ 
+                    """
                             {
                                         "id"           : %d,
-                                        "name"         : "avg_exit_velocity",
-                                        "measurementId": %d,
-                                        "negate"       : false
+                                        "name"         : "AgeGroup"
                                     }
-                            """.formatted(metricId, mph.getId());
+                            """.formatted(ageGroupDictionaryId);
 
             JsonNode expectedResponseNode = objectMapper.readTree(expectedResponse);
 
-            assertEquals(expectedResponseNode, responseNode); // deep comparison without order
+            assertEquals(expectedResponseNode, responseNode);
         }
 
         @Test
-        @DisplayName("POST /metrics with validation message -> returns 422")
+        @DisplayName("POST /ageGroupDictionarys with validation message -> returns 422")
         void createValidationError() throws Exception {
 
             String request =
-                    """ 
-                                {
-                                    "negate"       : true
-                                }
-                            """;
+                    """
+                         {
+                               "name" : ""
+                         }
+                    """;
 
             String jsonResponse = mvc.perform(
                             post(API)
@@ -131,10 +112,10 @@ class MetricControllerIntegrationTest {
             JsonNode responseNode = objectMapper.readTree(jsonResponse);
 
             String expectedResponse =
-                    """ 
+                    """
                             {
-                                "status"       : 422,
-                                "message"        : "Validation failed: measurementId: Measurement ID cannot be null, and name: Name cannot be blank"
+                                "status"  : 422,
+                                "message" : "Validation failed: name: Name cannot be blank"
                             }
                             """;
 
@@ -149,23 +130,20 @@ class MetricControllerIntegrationTest {
     class ReadTests {
 
         @Test
-        @DisplayName("GET /metrics -> returns all metrics")
+        @DisplayName("GET /ageGroupDictionarys -> returns all ageGroupDictionarys")
         void getAll() throws Exception {
 
-            Metric metric1 = metricRepository.save(Metric.builder()
-                    .name("avg_exit_velocity")
-                    .measurementId(mph.getId())
-                    .negate(false)
+            AgeGroupDictionary ageGroupDictionary1 = ageGroupDictionaryRepository.save(AgeGroupDictionary.builder()
+                    .name("avg_launch_angle")
                     .build());
 
-            Metric metric2 = metricRepository.save(Metric.builder()
-                    .name("max_entry_velocity")
-                    .measurementId(mph.getId())
-                    .negate(true)
+            AgeGroupDictionary ageGroupDictionary2 = ageGroupDictionaryRepository.save(AgeGroupDictionary.builder()
+                    .name("max_launch_angle")
                     .build());
 
             String jsonResponse = mvc.perform(
                             get(API)
+                                    .contentType(MediaType.APPLICATION_JSON)
                                     .with(httpBasic("biolab", "biolab"))
                     )
                     .andExpect(status().isOk())
@@ -175,18 +153,14 @@ class MetricControllerIntegrationTest {
                 [
                     {
                         "id"           : %d,
-                        "name"         : "avg_exit_velocity",
-                        "measurementId": %d,
-                        "negate"       : false
+                        "name"         : "avg_ageGroup"
                     },
                     {
                         "id"           : %d,
-                        "name"         : "max_entry_velocity",
-                        "measurementId": %d,
-                        "negate"       : true
+                        "name"         : "max_ageGroup"
                     }
                 ]
-                """.formatted(metric1.getId(), mph.getId(), metric2.getId(), mph.getId());
+                """.formatted(ageGroupDictionary1.getId(), ageGroupDictionary2.getId());
 
             JsonNode expectedNode = objectMapper.readTree(expectedResponse);
             JsonNode actualNode   = objectMapper.readTree(jsonResponse);
@@ -195,17 +169,15 @@ class MetricControllerIntegrationTest {
         }
 
         @Test
-        @DisplayName("GET /metrics/{id} -> returns metric by ID")
+        @DisplayName("GET /ageGroupDictionarys/{id} -> returns ageGroupDictionary by ID")
         void getById() throws Exception {
 
-            Metric metric = metricRepository.save(Metric.builder()
-                    .name("avg_exit_velocity")
-                    .measurementId(mph.getId())
-                    .negate(false)
+            AgeGroupDictionary ageGroupDictionary = ageGroupDictionaryRepository.save(AgeGroupDictionary.builder()
+                    .name("ageGroup")
                     .build());
 
             String jsonResponse = mvc.perform(
-                            get(API + "/" + metric.getId())
+                            get(API + "/" + ageGroupDictionary.getId())
                                     .with(httpBasic("biolab", "biolab"))
                     )
                     .andExpect(status().isOk())
@@ -214,11 +186,9 @@ class MetricControllerIntegrationTest {
             String expectedResponse = """
                 {
                     "id"           : %d,
-                    "name"         : "avg_exit_velocity",
-                    "measurementId": %d,
-                    "negate"       : false
+                    "name"         : "ageGroup"
                 }
-                """.formatted(metric.getId(), mph.getId());
+                """.formatted(ageGroupDictionary.getId());
 
             JsonNode expectedNode = objectMapper.readTree(expectedResponse);
             JsonNode actualNode   = objectMapper.readTree(jsonResponse);
@@ -227,7 +197,7 @@ class MetricControllerIntegrationTest {
         }
 
         @Test
-        @DisplayName("GET /metrics/{id} with unknown ID -> returns 404")
+        @DisplayName("GET /ageGroupDictionarys/{id} with unknown ID -> returns 404")
         void getByIdValidationError() throws Exception {
             String jsonResponse = mvc.perform(
                             get(API + "/999999")
@@ -239,7 +209,7 @@ class MetricControllerIntegrationTest {
             String expectedResponse = """
                 {
                     "status" : 404,
-                    "message": "Metric not found by id: 999999"
+                    "message": "AgeGroupDictionary not found by id: 999999"
                 }
                 """;
 
@@ -256,22 +226,18 @@ class MetricControllerIntegrationTest {
     class UpdateTests {
 
         @Test
-        @DisplayName("PUT /metrics -> updates and returns the Metric")
+        @DisplayName("PUT /ageGroupDictionarys -> updates and returns the AgeGroupDictionary")
         void update() throws Exception {
-            Metric original = metricRepository.save(Metric.builder()
-                    .name("avg_exit_velocity")
-                    .measurementId(mph.getId())
-                    .negate(true)
+            AgeGroupDictionary original = ageGroupDictionaryRepository.save(AgeGroupDictionary.builder()
+                    .name("ageGroup")
                     .build());
 
             String updateRequest = """
                 {
                     "id"            : %d,
-                    "name"          : "updated_velocity",
-                    "measurementId" : %d,
-                    "negate"        : false
+                    "name"          : "updated_ageGroup"
                 }
-                """.formatted(original.getId(), mph.getId());
+                """.formatted(original.getId());
 
             String jsonResponse = mvc.perform(
                             put(API)
@@ -287,33 +253,29 @@ class MetricControllerIntegrationTest {
             String expectedResponse = """
                 {
                     "id"           : %d,
-                    "name"         : "updated_velocity",
-                    "measurementId": %d,
-                    "negate"       : false
+                    "name"         : "updated_ageGroup
                 }
-                """.formatted(original.getId(), mph.getId());
+                """.formatted(original.getId());
 
             JsonNode expectedNode = objectMapper.readTree(expectedResponse);
 
             assertEquals(expectedNode, responseNode);
 
-            Metric updated = metricRepository.findById(original.getId()).orElseThrow();
-            assertEquals("updated_velocity", updated.getName());
-            assertFalse(updated.isNegate());
+            AgeGroupDictionary updated = ageGroupDictionaryRepository.findById(original.getId()).orElseThrow();
+            assertEquals("updated_ageGroup", updated.getName());
 
         }
 
         @Test
-        @DisplayName("PUT /metrics with invalid id -> returns 404")
+        @DisplayName("PUT /ageGroupDictionarys with invalid id -> returns 404")
         void updateValidationError() throws Exception {
 
             String updateRequest = """
                 {
                     "id"            : 999999,
-                    "name"          : "updated_velocity",
-                    "measurementId": %d
+                    "name"          : "updated_ageGroup"
                 }
-                """.formatted(mph.getId());
+                """;
 
             String jsonResponse = mvc.perform(
                             put(API)
@@ -328,7 +290,7 @@ class MetricControllerIntegrationTest {
             String expectedResponse = """
                 {
                     "status" : 404,
-                    "message": "MetricService. Could not update Metric by id: 999999"
+                    "message": "AgeGroupDictionaryService. Could not update AgeGroupDictionary by id: 999999"
                 }
                 """;
 
@@ -346,16 +308,14 @@ class MetricControllerIntegrationTest {
     class DeleteTests {
 
         @Test
-        @DisplayName("DELETE /metrics/{id} -> deletes the Metric")
+        @DisplayName("DELETE /ageGroupDictionarys/{id} -> deletes the AgeGroupDictionary")
         void delete() throws Exception {
-            Metric metric = metricRepository.save(Metric.builder()
-                    .name("avg_exit_velocity")
-                    .measurementId(mph.getId())
-                    .negate(false)
+            AgeGroupDictionary ageGroupDictionary = ageGroupDictionaryRepository.save(AgeGroupDictionary.builder()
+                    .name("ageGroup")
                     .build());
 
             String jsonResponse = mvc.perform(
-                            MockMvcRequestBuilders.delete(API + "/" + metric.getId())
+                            MockMvcRequestBuilders.delete(API + "/" + ageGroupDictionary.getId())
                                     .with(httpBasic("biolab", "biolab"))
                     )
                     .andExpect(status().isOk())
@@ -373,11 +333,11 @@ class MetricControllerIntegrationTest {
 
             assertEquals(expectedNode, actualNode);
 
-            assertFalse(metricRepository.existsById(metric.getId()));
+            assertFalse(ageGroupDictionaryRepository.existsById(ageGroupDictionary.getId()));
         }
 
         @Test
-        @DisplayName("DELETE /metrics/{id} with unknown ID -> returns 404")
+        @DisplayName("DELETE /ageGroupDictionarys/{id} with unknown ID -> returns 404")
         void deleteValidationError() throws Exception {
             String jsonResponse = mvc.perform(
                             MockMvcRequestBuilders.delete(API + "/999999")
@@ -389,7 +349,7 @@ class MetricControllerIntegrationTest {
             String expectedResponse = """
                 {
                     "status" : 404,
-                    "message": "MetricService. Could not delete id: 999999"
+                    "message": "AgeGroupDictionaryService. Could not delete id: 999999"
                 }
                 """;
 
@@ -399,4 +359,5 @@ class MetricControllerIntegrationTest {
             assertEquals(expectedNode, actualNode);
         }
     }
+
 }

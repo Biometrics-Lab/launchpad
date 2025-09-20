@@ -52,7 +52,7 @@ class MeasurementControllerIntegrationTest {
         void create() throws Exception {
 
             String request =
-                    """ 
+                    """
                                 {
                                     "name" : "launch_angle"
                                 }
@@ -74,7 +74,7 @@ class MeasurementControllerIntegrationTest {
 
 
             String expectedResponse =
-                    """ 
+                    """
                             {
                                         "id"           : %d,
                                         "name"         : "launch_angle"
@@ -357,7 +357,4 @@ class MeasurementControllerIntegrationTest {
             assertEquals(expectedNode, actualNode);
         }
     }
-
-
-
 }
