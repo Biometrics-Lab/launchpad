@@ -5,6 +5,8 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Data;
 
+import java.time.LocalDate;
+
 @Builder
 public record PlayerDto(
         Integer id,
@@ -13,6 +15,6 @@ public record PlayerDto(
         Integer graduation_year,
         @NotNull(message = "Player team_id cannot be null")
         Integer team_id,
-        Data dob
+        LocalDate dob
 ) { }
 

@@ -6,6 +6,8 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import org.springframework.data.relational.core.mapping.Table;
 
+import java.time.LocalDate;
+
 
 @Data
 @SuperBuilder
@@ -15,5 +17,5 @@ public class Player extends IDName {
     private Integer graduation_year;
     @NotNull(message = "Player team_id cannot be null")
     private Integer team_id;
-    private Data dob;
+    private LocalDate dob;
 }
