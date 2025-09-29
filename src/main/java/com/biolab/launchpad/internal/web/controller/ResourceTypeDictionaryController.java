@@ -42,7 +42,7 @@ public class ResourceTypeDictionaryController {
             return resourceTypeDictionaryOptional.get();
         } else {
             log.warn("Could not find resource_type_dictionary with id {}", id);
-            throw new NotFoundByException("Resource_type_dictionary not found by id: %d", id);
+            throw new NotFoundByException("Resource_type_dictionary not found by id: %s", id);
         }
     }
 

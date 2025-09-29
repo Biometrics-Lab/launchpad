@@ -42,7 +42,7 @@ public class SportDictionaryController {
             return sportDictionaryOptional.get();
         } else {
             log.warn("Could not find sport_dictionary with id {}", id);
-            throw new NotFoundByException("Sport_dictionary not found by id: %d", id);
+            throw new NotFoundByException("Sport_dictionary not found by id: %s", id);
         }
     }
 

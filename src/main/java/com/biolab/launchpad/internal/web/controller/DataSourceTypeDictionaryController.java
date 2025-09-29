@@ -42,7 +42,7 @@ public class DataSourceTypeDictionaryController {
             return dataSourceTypeDictionaryOptional.get();
         } else {
             log.warn("Could not find data_source_type_dictionary with id {}", id);
-            throw new NotFoundByException("Data_source_type_dictionary not found by id: %d", id);
+            throw new NotFoundByException("Data_source_type_dictionary not found by id: %s", id);
         }
     }
 

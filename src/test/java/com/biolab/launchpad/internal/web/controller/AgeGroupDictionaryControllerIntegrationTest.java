@@ -1,7 +1,7 @@
 package com.biolab.launchpad.internal.web.controller;
 
-import com.biolab.launchpad.internal.repository.model.AgeGroupDictionary;
 import com.biolab.launchpad.internal.repository.AgeGroupDictionaryRepository;
+import com.biolab.launchpad.internal.repository.model.AgeGroupDictionary;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.AfterEach;
@@ -30,7 +30,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @DisplayName("AgeGroupDictionaryController Integration Tests")
 class AgeGroupDictionaryControllerIntegrationTest {
 
-    private static final String API = "/api/v1/ageGroupDictionarys";
+    private static final String API = "/api/v1/age_group_dictionarys";
 
     @Autowired
     private MockMvc mvc;
@@ -50,13 +50,14 @@ class AgeGroupDictionaryControllerIntegrationTest {
     @DisplayName("Create")
     class CreateTests {
         @Test
-        @DisplayName("POST /ageGroupDictionarys -> creates and returns the new AgeGroupDictionary")
+        @DisplayName("POST /age_group_dictionarys -> creates and returns the new AgeGroupDictionary")
         void create() throws Exception {
 
             String request =
-                    """
+                            """
                                 {
-                                    "name" : "AgeGroup"
+                                    "name" : "AgeGroup",
+                                    "description" : "other description"
                                 }
                             """;
 
@@ -71,17 +72,16 @@ class AgeGroupDictionaryControllerIntegrationTest {
 
             JsonNode responseNode = objectMapper.readTree(jsonResponse);
 
-            String ageGroupDictionaryId = responseNode.get("id").asText();
+            String ageGroupDictionaryId = responseNode.get("name").asText();
             assertThat(ageGroupDictionaryId).isNotBlank();
 
-
             String expectedResponse =
-                    """
-                            {
-                                        "id"           : %d,
-                                        "name"         : "AgeGroup"
-                                    }
-                            """.formatted(ageGroupDictionaryId);
+                                     """
+                                        {
+                                             "name" : "AgeGroup",
+                                             "description" : "other description"
+                                         }
+                    """.formatted(ageGroupDictionaryId);
 
             JsonNode expectedResponseNode = objectMapper.readTree(expectedResponse);
 
@@ -89,7 +89,7 @@ class AgeGroupDictionaryControllerIntegrationTest {
         }
 
         @Test
-        @DisplayName("POST /ageGroupDictionarys with validation message -> returns 422")
+        @DisplayName("POST /age_group_dictionarys with validation message -> returns 422")
         void createValidationError() throws Exception {
 
             String request =
@@ -130,16 +130,23 @@ class AgeGroupDictionaryControllerIntegrationTest {
     class ReadTests {
 
         @Test
-        @DisplayName("GET /ageGroupDictionarys -> returns all ageGroupDictionarys")
+        @DisplayName("GET /age_group_dictionarys -> returns all ageGroupDictionarys")
         void getAll() throws Exception {
 
-            AgeGroupDictionary ageGroupDictionary1 = ageGroupDictionaryRepository.save(AgeGroupDictionary.builder()
-                    .name("avg_launch_angle")
-                    .build());
+            AgeGroupDictionary ageGroupDictionary1 = AgeGroupDictionary.builder()
+                                                                        .name("avg_launch_angle")
+                                                                        .description("other description")
+                                                                        .build();
+            AgeGroupDictionary ageGroupDictionary2 = AgeGroupDictionary.builder()
+                                                                        .name("max_launch_angle")
+                                                                        .description("other description")
+                                                                        .build();
 
-            AgeGroupDictionary ageGroupDictionary2 = ageGroupDictionaryRepository.save(AgeGroupDictionary.builder()
-                    .name("max_launch_angle")
-                    .build());
+            ageGroupDictionary1.markAsNew(true);
+            ageGroupDictionary2.markAsNew(true);
+
+            ageGroupDictionaryRepository.save(ageGroupDictionary1);
+            ageGroupDictionaryRepository.save(ageGroupDictionary2);
 
             String jsonResponse = mvc.perform(
                             get(API)
@@ -152,15 +159,15 @@ class AgeGroupDictionaryControllerIntegrationTest {
             String expectedResponse = """
                 [
                     {
-                        "id"           : %d,
-                        "name"         : "avg_ageGroup"
+                        "name"           : "%s",
+                        "description" : "other description"
                     },
                     {
-                        "id"           : %d,
-                        "name"         : "max_ageGroup"
+                        "name"           : "%s",
+                        "description" : "other description"
                     }
                 ]
-                """.formatted(ageGroupDictionary1.getId(), ageGroupDictionary2.getId());
+                """.formatted(ageGroupDictionary1.getName(), ageGroupDictionary2.getName());
 
             JsonNode expectedNode = objectMapper.readTree(expectedResponse);
             JsonNode actualNode   = objectMapper.readTree(jsonResponse);
@@ -169,12 +176,16 @@ class AgeGroupDictionaryControllerIntegrationTest {
         }
 
         @Test
-        @DisplayName("GET /ageGroupDictionarys/{id} -> returns ageGroupDictionary by ID")
+        @DisplayName("GET /age_group_dictionarys/{id} -> returns ageGroupDictionary by ID")
         void getById() throws Exception {
 
-            AgeGroupDictionary ageGroupDictionary = ageGroupDictionaryRepository.save(AgeGroupDictionary.builder()
-                    .name("ageGroup")
-                    .build());
+            AgeGroupDictionary ageGroupDictionary = AgeGroupDictionary.builder()
+                                                    .name("ageGroup")
+                                                    .description("other description")
+                                                    .build();
+            ageGroupDictionary.markAsNew(true);
+
+            ageGroupDictionaryRepository.save(ageGroupDictionary);
 
             String jsonResponse = mvc.perform(
                             get(API + "/" + ageGroupDictionary.getId())
@@ -184,11 +195,11 @@ class AgeGroupDictionaryControllerIntegrationTest {
                     .andReturn().getResponse().getContentAsString();
 
             String expectedResponse = """
-                {
-                    "id"           : %d,
-                    "name"         : "ageGroup"
-                }
-                """.formatted(ageGroupDictionary.getId());
+                                        {
+                                             "name" : "%s",
+                                             "description" : "other description"
+                                         }
+                                        """.formatted(ageGroupDictionary.getName());
 
             JsonNode expectedNode = objectMapper.readTree(expectedResponse);
             JsonNode actualNode   = objectMapper.readTree(jsonResponse);
@@ -197,7 +208,7 @@ class AgeGroupDictionaryControllerIntegrationTest {
         }
 
         @Test
-        @DisplayName("GET /ageGroupDictionarys/{id} with unknown ID -> returns 404")
+        @DisplayName("GET /age_group_dictionarys/{id} with unknown ID -> returns 404")
         void getByIdValidationError() throws Exception {
             String jsonResponse = mvc.perform(
                             get(API + "/999999")
@@ -209,7 +220,7 @@ class AgeGroupDictionaryControllerIntegrationTest {
             String expectedResponse = """
                 {
                     "status" : 404,
-                    "message": "AgeGroupDictionary not found by id: 999999"
+                    "message": "Age_group_dictionary not found by id: 999999"
                 }
                 """;
 
@@ -226,18 +237,23 @@ class AgeGroupDictionaryControllerIntegrationTest {
     class UpdateTests {
 
         @Test
-        @DisplayName("PUT /ageGroupDictionarys -> updates and returns the AgeGroupDictionary")
+        @DisplayName("PUT /age_group_dictionarys -> updates and returns the AgeGroupDictionary")
         void update() throws Exception {
-            AgeGroupDictionary original = ageGroupDictionaryRepository.save(AgeGroupDictionary.builder()
+
+            AgeGroupDictionary ageGroupDictionary = AgeGroupDictionary.builder()
                     .name("ageGroup")
-                    .build());
+                    .description("other description")
+                    .build();
+            ageGroupDictionary.markAsNew(true);
+
+            AgeGroupDictionary original = ageGroupDictionaryRepository.save(ageGroupDictionary);
 
             String updateRequest = """
-                {
-                    "id"            : %d,
-                    "name"          : "updated_ageGroup"
-                }
-                """.formatted(original.getId());
+                                    {
+                                             "name" : "%s",
+                                             "description" : "updated other description"
+                                    }
+                                    """.formatted(original.getId());
 
             String jsonResponse = mvc.perform(
                             put(API)
@@ -251,31 +267,31 @@ class AgeGroupDictionaryControllerIntegrationTest {
             JsonNode responseNode = objectMapper.readTree(jsonResponse);
 
             String expectedResponse = """
-                {
-                    "id"           : %d,
-                    "name"         : "updated_ageGroup
-                }
-                """.formatted(original.getId());
+                                       {
+                                             "name" : "%s",
+                                             "description" : "updated other description"
+                                        }
+                                       """.formatted(original.getId());
 
             JsonNode expectedNode = objectMapper.readTree(expectedResponse);
 
             assertEquals(expectedNode, responseNode);
 
             AgeGroupDictionary updated = ageGroupDictionaryRepository.findById(original.getId()).orElseThrow();
-            assertEquals("updated_ageGroup", updated.getName());
+            assertEquals("updated other description", updated.getDescription());
 
         }
 
         @Test
-        @DisplayName("PUT /ageGroupDictionarys with invalid id -> returns 404")
+        @DisplayName("PUT /age_group_dictionarys with invalid id -> returns 404")
         void updateValidationError() throws Exception {
 
             String updateRequest = """
-                {
-                    "id"            : 999999,
-                    "name"          : "updated_ageGroup"
-                }
-                """;
+                                    {
+                                          "name" : "999999",
+                                          "description" : "updated other description"
+                                    }
+                                    """;
 
             String jsonResponse = mvc.perform(
                             put(API)
@@ -308,11 +324,16 @@ class AgeGroupDictionaryControllerIntegrationTest {
     class DeleteTests {
 
         @Test
-        @DisplayName("DELETE /ageGroupDictionarys/{id} -> deletes the AgeGroupDictionary")
+        @DisplayName("DELETE /age_group_dictionarys/{id} -> deletes the AgeGroupDictionary")
         void delete() throws Exception {
-            AgeGroupDictionary ageGroupDictionary = ageGroupDictionaryRepository.save(AgeGroupDictionary.builder()
+
+            AgeGroupDictionary ageGroupDictionary = AgeGroupDictionary.builder()
                     .name("ageGroup")
-                    .build());
+                    .description("other description")
+                    .build();
+            ageGroupDictionary.markAsNew(true);
+
+            AgeGroupDictionary original = ageGroupDictionaryRepository.save(ageGroupDictionary);
 
             String jsonResponse = mvc.perform(
                             MockMvcRequestBuilders.delete(API + "/" + ageGroupDictionary.getId())
@@ -337,7 +358,7 @@ class AgeGroupDictionaryControllerIntegrationTest {
         }
 
         @Test
-        @DisplayName("DELETE /ageGroupDictionarys/{id} with unknown ID -> returns 404")
+        @DisplayName("DELETE /age_group_dictionarys/{id} with unknown ID -> returns 404")
         void deleteValidationError() throws Exception {
             String jsonResponse = mvc.perform(
                             MockMvcRequestBuilders.delete(API + "/999999")

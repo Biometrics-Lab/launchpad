@@ -43,7 +43,7 @@ public class AgeGroupDictionaryController {
             return ageGroupDictionaryOptional.get();
         } else {
             log.warn("Could not find age_group_dictionary with id {}", id);
-            throw new NotFoundByException("Age_group_dictionary not found by id: %d", id);
+            throw new NotFoundByException("Age_group_dictionary not found by id: %s", id);
         }
     }
 

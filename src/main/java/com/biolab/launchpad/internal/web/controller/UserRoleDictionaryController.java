@@ -42,7 +42,7 @@ public class UserRoleDictionaryController {
             return userRoleDictionaryOptional.get();
         } else {
             log.warn("Could not find user_role_dictionary with id {}", id);
-            throw new NotFoundByException("User_role_dictionary not found by id: %d", id);
+            throw new NotFoundByException("User_role_dictionary not found by id: %s", id);
         }
     }
 

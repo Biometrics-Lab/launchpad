@@ -55,7 +55,7 @@ public class EntityServiceName<T extends Name> {
             if (repository.existsById(id)) {
                 repository.deleteById(id);
             } else {
-                throw new NotFoundByException("%s. Could not delete id: %s", "serviceName", id);
+                throw new NotFoundByException("%s. Could not delete id: %s", serviceName, id);
             }
         } catch (NotFoundByException ex) {
             log.warn("{}. Could not find by id: {}", serviceName, id);
