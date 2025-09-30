@@ -1,0 +1,397 @@
+package com.biolab.launchpad.internal.web.controller;
+
+import com.biolab.launchpad.internal.repository.DataSourceRepository;
+import com.biolab.launchpad.internal.repository.model.DataSource;
+import com.biolab.launchpad.internal.repository.model.DataSourceTypeDictionary;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+@ExtendWith(SpringExtension.class)
+@SpringBootTest
+@AutoConfigureMockMvc
+@DisplayName("DataSource Integration Tests")
+class DataSourceIntegrationTest {
+
+    private static final String API = "/api/v1/data_sources";
+
+    @Autowired
+    private MockMvc mvc;
+
+    @Autowired
+    ObjectMapper objectMapper;
+
+    @Autowired
+    DataSourceRepository dataSourceRepository;
+
+    @Autowired
+    EntityFactory factory;
+
+    DataSourceTypeDictionary dataSourceTypeDictionary;
+
+    @BeforeEach
+    void setUp() {
+        dataSourceTypeDictionary = factory.createDataSourceTypeDictionary("data");
+    }
+
+    @AfterEach
+    void tearDown() {
+        dataSourceRepository.deleteAll();
+    }
+
+    @Nested
+    @DisplayName("Create")
+    class CreateTests {
+        @Test
+        @DisplayName("POST /data_sources -> creates and returns the new DataSource")
+        void create() throws Exception {
+
+            String request =
+                    """ 
+                                {
+                                    "name"         : "avg_exit_velocity",
+                                    "type"         : "%s",
+                                    "description"  : "desc"
+                                }
+                            """.formatted(dataSourceTypeDictionary.getName());
+
+            String jsonResponse = mvc.perform(
+                            post(API)
+                                    .contentType(MediaType.APPLICATION_JSON)
+                                    .content(request)
+                                    .with(httpBasic("biolab", "biolab"))
+                    )
+                    .andExpect(status().isOk())
+                    .andReturn().getResponse().getContentAsString();
+
+
+            JsonNode responseNode = objectMapper.readTree(jsonResponse);
+
+            int dataSourceId = responseNode.get("id").asInt();
+            assertThat(dataSourceId).isPositive();
+
+
+            String expectedResponse =
+                    """ 
+                            {
+                                        "id"           : %d,
+                                        "name"         : "avg_exit_velocity",
+                                        "type"         : "%s",
+                                        "description"  : "desc"
+                                    }
+                            """.formatted(dataSourceId, dataSourceTypeDictionary.getId());
+
+            JsonNode expectedResponseNode = objectMapper.readTree(expectedResponse);
+
+            assertEquals(expectedResponseNode, responseNode);
+        }
+
+        @Test
+        @DisplayName("POST /data_sources with validation message -> returns 422")
+        void createValidationError() throws Exception {
+            String request =
+                            """
+                                {
+                                    "description" : "desc"
+                                }
+                            """;
+
+            String jsonResponse = mvc.perform(
+                            post(API)
+                                    .contentType(MediaType.APPLICATION_JSON)
+                                    .content(request)
+                                    .with(httpBasic("biolab", "biolab"))
+                    )
+                    .andExpect(status().isBadRequest())
+                    .andReturn().getResponse().getContentAsString();
+
+
+            JsonNode responseNode = objectMapper.readTree(jsonResponse);
+
+            String expectedResponse =
+                    """
+                            {
+                                "status"       : 422,
+                                "message"      : "Validation failed: name: Name cannot be blank, and type: Data_source type cannot be null"
+                            }
+                            """;
+
+            JsonNode expectedResponseNode = objectMapper.readTree(expectedResponse);
+
+            assertEquals(expectedResponseNode, responseNode);
+        }
+    }
+
+    @Nested
+    @DisplayName("Read")
+    class ReadTests {
+
+        @Test
+        @DisplayName("GET /data_sources -> returns all dataSources")
+        void getAll() throws Exception {
+
+            DataSource dataSource1 = dataSourceRepository.save(DataSource.builder()
+                    .name("avg_exit_velocity")
+                    .type(dataSourceTypeDictionary.getId())
+                    .description("desc")
+                    .build());
+
+            DataSource dataSource2 = dataSourceRepository.save(DataSource.builder()
+                    .name("max_entry_velocity")
+                    .type(dataSourceTypeDictionary.getId())
+                    .description("desc")
+                    .build());
+
+            String jsonResponse = mvc.perform(
+                            get(API)
+                                    .with(httpBasic("biolab", "biolab"))
+                    )
+                    .andExpect(status().isOk())
+                    .andReturn().getResponse().getContentAsString();
+
+            String expectedResponse = """
+                [
+                    {
+                        "id"           : %d,
+                        "name"         : "avg_exit_velocity",
+                        "type"         : "%s",
+                        "description"  : "desc"
+                        
+                    },
+                    {
+                        "id"           : %d,
+                        "name"         : "max_entry_velocity",
+                        "type"         : "%s",
+                        "description"  : "desc"
+                    }
+                ]
+                """.formatted(dataSource1.getId(), dataSourceTypeDictionary.getId(), dataSource2.getId(), dataSourceTypeDictionary.getId());
+
+            JsonNode expectedNode = objectMapper.readTree(expectedResponse);
+            JsonNode actualNode   = objectMapper.readTree(jsonResponse);
+
+            assertEquals(expectedNode, actualNode);
+        }
+
+        @Test
+        @DisplayName("GET /data_sources/{id} -> returns dataSource by ID")
+        void getById() throws Exception {
+
+            DataSource dataSource = dataSourceRepository.save(DataSource.builder()
+                    .name("avg_exit_velocity")
+                    .type(dataSourceTypeDictionary.getId())
+                    .description("desc")
+                    .build());
+
+            String jsonResponse = mvc.perform(
+                            get(API + "/" + dataSource.getId())
+                                    .with(httpBasic("biolab", "biolab"))
+                    )
+                    .andExpect(status().isOk())
+                    .andReturn().getResponse().getContentAsString();
+
+            String expectedResponse = """
+                {
+                    "id"           : %d,
+                    "name"         : "avg_exit_velocity",
+                    "type"         : "%s",
+                    "description"  : "desc"
+                }
+                """.formatted(dataSource.getId(), dataSourceTypeDictionary.getId());
+
+            JsonNode expectedNode = objectMapper.readTree(expectedResponse);
+            JsonNode actualNode   = objectMapper.readTree(jsonResponse);
+
+            assertEquals(expectedNode, actualNode);
+        }
+
+        @Test
+        @DisplayName("GET /data_sources/{id} with unknown ID -> returns 404")
+        void getByIdValidationError() throws Exception {
+            String jsonResponse = mvc.perform(
+                            get(API + "/999999")
+                                    .with(httpBasic("biolab", "biolab"))
+                    )
+                    .andExpect(status().isNotFound())
+                    .andReturn().getResponse().getContentAsString();
+
+            String expectedResponse = """
+                {
+                    "status" : 404,
+                    "message": "Data_source not found by id: 999999"
+                }
+                """;
+
+            JsonNode expectedNode = objectMapper.readTree(expectedResponse);
+            JsonNode actualNode   = objectMapper.readTree(jsonResponse);
+
+            assertEquals(expectedNode, actualNode);
+        }
+
+    }
+
+    @Nested
+    @DisplayName("Update")
+    class UpdateTests {
+
+        @Test
+        @DisplayName("PUT /data_sources -> updates and returns the DataSource")
+        void update() throws Exception {
+            DataSource original = dataSourceRepository.save(DataSource.builder()
+                    .name("avg_exit_velocity")
+                    .type(dataSourceTypeDictionary.getId())
+                    .build());
+
+            String updateRequest = """
+                {
+                    "id"            : %d,
+                    "name"          : "updated_velocity",
+                    "type"          : "%s",
+                    "description"   : "desc"
+                }
+                """.formatted(original.getId(), dataSourceTypeDictionary.getId());
+
+            String jsonResponse = mvc.perform(
+                            put(API)
+                                    .contentType(MediaType.APPLICATION_JSON)
+                                    .content(updateRequest)
+                                    .with(httpBasic("biolab", "biolab"))
+                    )
+                    .andExpect(status().isOk())
+                    .andReturn().getResponse().getContentAsString();
+
+            JsonNode responseNode = objectMapper.readTree(jsonResponse);
+
+            String expectedResponse = """
+                {
+                    "id"           : %d,
+                    "name"         : "updated_velocity",
+                    "type"         : "%s",
+                    "description"  : "desc"
+                }
+                """.formatted(original.getId(), dataSourceTypeDictionary.getId());
+
+            JsonNode expectedNode = objectMapper.readTree(expectedResponse);
+
+            assertEquals(expectedNode, responseNode);
+
+            DataSource updated = dataSourceRepository.findById(original.getId()).orElseThrow();
+            assertEquals("updated_velocity", updated.getName());
+
+        }
+
+        @Test
+        @DisplayName("PUT /data_sources with invalid id -> returns 404")
+        void updateValidationError() throws Exception {
+
+            String updateRequest = """
+                {
+                    "id"            : 999999,
+                    "name"          : "updated_velocity",
+                    "type"          : "%s",
+                    "description"   : "desc"
+                }
+                """.formatted(dataSourceTypeDictionary.getId());
+
+            String jsonResponse = mvc.perform(
+                            put(API)
+                                    .contentType(MediaType.APPLICATION_JSON)
+                                    .content(updateRequest)
+                                    .with(httpBasic("biolab", "biolab"))
+                    )
+                    .andExpect(status().isNotFound())
+                    .andReturn().getResponse().getContentAsString();
+
+
+            String expectedResponse = """
+                {
+                    "status" : 404,
+                    "message": "DataSourceService. Could not update DataSource by id: 999999"
+                }
+                """;
+
+            JsonNode expectedNode = objectMapper.readTree(expectedResponse);
+            JsonNode actualNode   = objectMapper.readTree(jsonResponse);
+
+            assertEquals(expectedNode, actualNode);
+
+        }
+
+    }
+
+    @Nested
+    @DisplayName("Delete")
+    class DeleteTests {
+
+
+        @Test
+        @DisplayName("DELETE /data_sources/{id} -> deletes the DataSource")
+        void delete() throws Exception {
+            DataSource dataSource = dataSourceRepository.save(DataSource.builder()
+                    .name("avg_exit_velocity")
+                    .type(dataSourceTypeDictionary.getId())
+                    .description("desc")
+                    .build());
+
+            String jsonResponse = mvc.perform(
+                            MockMvcRequestBuilders.delete(API + "/" + dataSource.getId())
+                                    .with(httpBasic("biolab", "biolab"))
+                    )
+                    .andExpect(status().isOk())
+                    .andReturn().getResponse().getContentAsString();
+
+            String expectedResponse = """
+                {
+                    "status" : 200,
+                    "message": "Success"
+                }
+                """;
+
+            JsonNode expectedNode = objectMapper.readTree(expectedResponse);
+            JsonNode actualNode   = objectMapper.readTree(jsonResponse);
+
+            assertEquals(expectedNode, actualNode);
+
+            assertFalse(dataSourceRepository.existsById(dataSource.getId()));
+        }
+
+        @Test
+        @DisplayName("DELETE /data_sources/{id} with unknown ID -> returns 404")
+        void deleteValidationError() throws Exception {
+            String jsonResponse = mvc.perform(
+                            MockMvcRequestBuilders.delete(API + "/999999")
+                                    .with(httpBasic("biolab", "biolab"))
+                    )
+                    .andExpect(status().isNotFound())
+                    .andReturn().getResponse().getContentAsString();
+
+            String expectedResponse = """
+                {
+                    "status" : 404,
+                    "message": "DataSourceService. Could not delete id: 999999"
+                }
+                """;
+
+            JsonNode expectedNode = objectMapper.readTree(expectedResponse);
+            JsonNode actualNode   = objectMapper.readTree(jsonResponse);
+
+            assertEquals(expectedNode, actualNode);
+        }
+    }
+
+}
