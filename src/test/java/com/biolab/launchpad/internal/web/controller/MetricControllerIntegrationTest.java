@@ -1,6 +1,5 @@
 package com.biolab.launchpad.internal.web.controller;
 
-import com.biolab.launchpad.internal.repository.MeasurementRepository;
 import com.biolab.launchpad.internal.repository.MetricRepository;
 import com.biolab.launchpad.internal.repository.model.Measurement;
 import com.biolab.launchpad.internal.repository.model.Metric;
@@ -28,7 +27,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @DisplayName("MetricController Integration Tests")
-class MetricControllerIntegrationTest {
+class MetricControllerIntegrationTest{
 
     private static final String API = "/api/v1/metrics";
 
@@ -39,25 +38,21 @@ class MetricControllerIntegrationTest {
     ObjectMapper objectMapper;
 
     @Autowired
-    MeasurementRepository measurementRepository;
-    @Autowired
     MetricRepository metricRepository;
+
+    @Autowired
+    EntityFactory factory;
 
     Measurement mph;
 
     @BeforeEach
     void setUp() {
-        mph = measurementRepository.save(
-                Measurement.builder()
-                        .name("Mph")
-                        .build()
-        );
+        mph = factory.createMeasurement("Mph");
     }
 
     @AfterEach
     void tearDown() {
         metricRepository.deleteAll();
-        measurementRepository.deleteAll();
     }
 
     @Nested
@@ -112,7 +107,7 @@ class MetricControllerIntegrationTest {
         void createValidationError() throws Exception {
 
             String request =
-                    """ 
+                    """
                                 {
                                     "negate"       : true
                                 }
@@ -131,7 +126,7 @@ class MetricControllerIntegrationTest {
             JsonNode responseNode = objectMapper.readTree(jsonResponse);
 
             String expectedResponse =
-                    """ 
+                    """
                             {
                                 "status"       : 422,
                                 "message"        : "Validation failed: measurementId: Measurement ID cannot be null, and name: Name cannot be blank"
