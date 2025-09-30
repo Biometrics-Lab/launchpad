@@ -15,5 +15,5 @@ import org.w3c.dom.Text;
 public class AssessmentTemplate extends IDName {
     @NotNull(message = "Assessment_template sport cannot be null")
     private String sport;
-    private Text description;
+    private String description;
 }

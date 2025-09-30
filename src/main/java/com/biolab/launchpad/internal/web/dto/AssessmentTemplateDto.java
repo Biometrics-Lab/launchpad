@@ -12,5 +12,5 @@ public record AssessmentTemplateDto(
         String name,
         @NotNull(message = "Assessment_template sport cannot be null")
         String sport,
-        Text description
+        String description
 ){}
