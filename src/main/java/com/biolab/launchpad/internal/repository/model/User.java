@@ -13,5 +13,5 @@ import org.springframework.data.relational.core.mapping.Table;
 @Table("user")
 public class User extends IDName {
     @NotNull(message = "User role cannot be null")
-    private Integer role;
+    private String role;
 }
