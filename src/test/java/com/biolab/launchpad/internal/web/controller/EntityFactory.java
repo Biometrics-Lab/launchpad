@@ -19,8 +19,9 @@ public class EntityFactory {
     private final UserRoleDictionaryRepository       userRoleDictionaryRepository;
     private final OrganisationRepository             organisationRepository;
     private final TeamRepository                     teamRepository;
+    private final ModelRepository                    modelRepository;
 
-    public EntityFactory(MeasurementRepository measurementRepository, MetricRepository metricRepository, AgeGroupDictionaryRepository ageGroupDictionaryRepository, DataSourceTypeDictionaryRepository dataSourceTypeDictionaryRepository, ResourceTypeDictionaryRepository resourceTypeDictionaryRepository, SportDictionaryRepository sportDictionaryRepository, UserRoleDictionaryRepository userRoleDictionaryRepository, OrganisationRepository organisationRepository, TeamRepository teamRepository) {
+    public EntityFactory(MeasurementRepository measurementRepository, MetricRepository metricRepository, AgeGroupDictionaryRepository ageGroupDictionaryRepository, DataSourceTypeDictionaryRepository dataSourceTypeDictionaryRepository, ResourceTypeDictionaryRepository resourceTypeDictionaryRepository, SportDictionaryRepository sportDictionaryRepository, UserRoleDictionaryRepository userRoleDictionaryRepository, OrganisationRepository organisationRepository, TeamRepository teamRepository, ModelRepository modelRepository) {
         this.measurementRepository = measurementRepository;
         this.metricRepository = metricRepository;
         this.ageGroupDictionaryRepository = ageGroupDictionaryRepository;
@@ -30,6 +31,7 @@ public class EntityFactory {
         this.userRoleDictionaryRepository = userRoleDictionaryRepository;
         this.organisationRepository = organisationRepository;
         this.teamRepository = teamRepository;
+        this.modelRepository = modelRepository;
     }
 
     public Measurement createMeasurement(String name) {
@@ -156,6 +158,18 @@ public class EntityFactory {
         );
     }
 
+    public Model createModel(String name) {
+        AgeGroupDictionary ageGroupDictionary = createAgeGroupDictionary("AutoAgeGroup_" + name);
+        SportDictionary sportDictionary       = createSportDictionary("AutoSport_" + name);
+        return modelRepository.save(
+                Model.builder()
+                        .age_group(ageGroupDictionary.getId())
+                        .sport(sportDictionary.getId())
+                        .description("AutoDescription_"+name)
+                        .build()
+        );
+    }
+
     @AfterEach
     void cleanup() {
         metricRepository.deleteAll();
@@ -167,6 +181,7 @@ public class EntityFactory {
         userRoleDictionaryRepository.deleteAll();
         organisationRepository.deleteAll();
         teamRepository.deleteAll();
+        modelRepository.deleteAll();
     }
 
 }
