@@ -1,11 +1,13 @@
 package com.biolab.launchpad.internal.web.controller;
 
-import com.biolab.launchpad.internal.repository.AssessmentTemplateRepository;
-import com.biolab.launchpad.internal.repository.model.SportDictionary;
-import com.biolab.launchpad.internal.repository.model.AssessmentTemplate;
+import com.biolab.launchpad.internal.repository.OrganisationRepository;
+import com.biolab.launchpad.internal.repository.model.Organisation;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -25,10 +27,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
 @AutoConfigureMockMvc
-@DisplayName("AssessmentTemplate Integration Tests")
-class AssessmentTemplateIntegrationTest {
+@DisplayName("OrganisationController Integration Tests")
+class OrganisationControllerIntegrationTest {
 
-    private static final String API = "/api/v1/assessment_templates";
+    private static final String API = "/api/v1/organisations";
 
     @Autowired
     private MockMvc mvc;
@@ -37,38 +39,26 @@ class AssessmentTemplateIntegrationTest {
     ObjectMapper objectMapper;
 
     @Autowired
-    AssessmentTemplateRepository assessmentTemplateRepository;
-
-    @Autowired
-    EntityFactory factory;
-
-    SportDictionary sportDictionary;
-
-    @BeforeEach
-    void setUp() {
-        sportDictionary = factory.createSportDictionary("coker");
-    }
+    OrganisationRepository organisationRepository;
 
     @AfterEach
     void tearDown() {
-        assessmentTemplateRepository.deleteAll();
+        organisationRepository.deleteAll();
     }
 
     @Nested
     @DisplayName("Create")
     class CreateTests {
         @Test
-        @DisplayName("POST /assessment_templates -> creates and returns the new AssessmentTemplate")
+        @DisplayName("POST /organisations -> creates and returns the new Organisation")
         void create() throws Exception {
 
             String request =
-                    """ 
+                    """
                                 {
-                                    "name"         : "avg_exit_velocity",
-                                    "sport"        : "%s",
-                                    "description"  : "desc"
+                                    "name" : "orga"
                                 }
-                            """.formatted(sportDictionary.getName());
+                            """;
 
             String jsonResponse = mvc.perform(
                             post(API)
@@ -79,22 +69,19 @@ class AssessmentTemplateIntegrationTest {
                     .andExpect(status().isOk())
                     .andReturn().getResponse().getContentAsString();
 
-
             JsonNode responseNode = objectMapper.readTree(jsonResponse);
 
-            int assessmentTemplateId = responseNode.get("id").asInt();
-            assertThat(assessmentTemplateId).isPositive();
+            int organisationId = responseNode.get("id").asInt();
+            assertThat(organisationId).isPositive();
 
 
             String expectedResponse =
-                    """ 
+                    """
                             {
                                         "id"           : %d,
-                                        "name"         : "avg_exit_velocity",
-                                        "sport"        : "%s",
-                                        "description"  : "desc"
+                                        "name"         : "orga"
                                     }
-                            """.formatted(assessmentTemplateId, sportDictionary.getId());
+                            """.formatted(organisationId);
 
             JsonNode expectedResponseNode = objectMapper.readTree(expectedResponse);
 
@@ -102,14 +89,15 @@ class AssessmentTemplateIntegrationTest {
         }
 
         @Test
-        @DisplayName("POST /assessment_templates with validation message -> returns 422")
+        @DisplayName("POST /organisations with validation message -> returns 422")
         void createValidationError() throws Exception {
+
             String request =
-                            """
-                                {
-                                    "description" : "desc"
-                                }
-                            """;
+                    """ 
+                         {
+                               "name" : ""
+                         }
+                    """;
 
             String jsonResponse = mvc.perform(
                             post(API)
@@ -124,10 +112,10 @@ class AssessmentTemplateIntegrationTest {
             JsonNode responseNode = objectMapper.readTree(jsonResponse);
 
             String expectedResponse =
-                    """
+                    """ 
                             {
-                                "status"       : 422,
-                                "message"      : "Validation failed: name: Name cannot be blank, and sport: Assessment_template sport cannot be null"
+                                "status"  : 422,
+                                "message" : "Validation failed: name: Name cannot be blank"
                             }
                             """;
 
@@ -142,23 +130,20 @@ class AssessmentTemplateIntegrationTest {
     class ReadTests {
 
         @Test
-        @DisplayName("GET /assessment_templates -> returns all assessmentTemplates")
+        @DisplayName("GET /organisations -> returns all organisations")
         void getAll() throws Exception {
 
-            AssessmentTemplate assessmentTemplate1 = assessmentTemplateRepository.save(AssessmentTemplate.builder()
-                    .name("avg_exit_velocity")
-                    .sport(sportDictionary.getId())
-                    .description("desc")
+            Organisation organisation1 = organisationRepository.save(Organisation.builder()
+                    .name("avg_orga")
                     .build());
 
-            AssessmentTemplate assessmentTemplate2 = assessmentTemplateRepository.save(AssessmentTemplate.builder()
-                    .name("max_entry_velocity")
-                    .sport(sportDictionary.getId())
-                    .description("desc")
+            Organisation organisation2 = organisationRepository.save(Organisation.builder()
+                    .name("max_orga")
                     .build());
 
             String jsonResponse = mvc.perform(
                             get(API)
+                                    .contentType(MediaType.APPLICATION_JSON)
                                     .with(httpBasic("biolab", "biolab"))
                     )
                     .andExpect(status().isOk())
@@ -168,19 +153,14 @@ class AssessmentTemplateIntegrationTest {
                 [
                     {
                         "id"           : %d,
-                        "name"         : "avg_exit_velocity",
-                        "sport"        : "%s",
-                        "description"  : "desc"
-                        
+                        "name"         : "avg_orga"
                     },
                     {
                         "id"           : %d,
-                        "name"         : "max_entry_velocity",
-                        "sport"        : "%s",
-                        "description"  : "desc"
+                        "name"         : "max_orga"
                     }
                 ]
-                """.formatted(assessmentTemplate1.getId(), sportDictionary.getId(), assessmentTemplate2.getId(), sportDictionary.getId());
+                """.formatted(organisation1.getId(), organisation2.getId());
 
             JsonNode expectedNode = objectMapper.readTree(expectedResponse);
             JsonNode actualNode   = objectMapper.readTree(jsonResponse);
@@ -189,17 +169,15 @@ class AssessmentTemplateIntegrationTest {
         }
 
         @Test
-        @DisplayName("GET /assessment_templates/{id} -> returns assessmentTemplate by ID")
+        @DisplayName("GET /organisations/{id} -> returns organisation by ID")
         void getById() throws Exception {
 
-            AssessmentTemplate assessmentTemplate = assessmentTemplateRepository.save(AssessmentTemplate.builder()
-                    .name("avg_exit_velocity")
-                    .sport(sportDictionary.getId())
-                    .description("desc")
+            Organisation organisation = organisationRepository.save(Organisation.builder()
+                    .name("orga")
                     .build());
 
             String jsonResponse = mvc.perform(
-                            get(API + "/" + assessmentTemplate.getId())
+                            get(API + "/" + organisation.getId())
                                     .with(httpBasic("biolab", "biolab"))
                     )
                     .andExpect(status().isOk())
@@ -208,11 +186,9 @@ class AssessmentTemplateIntegrationTest {
             String expectedResponse = """
                 {
                     "id"           : %d,
-                    "name"         : "avg_exit_velocity",
-                    "sport"        : "%s",
-                    "description"  : "desc"
+                    "name"         : "orga"
                 }
-                """.formatted(assessmentTemplate.getId(), sportDictionary.getId());
+                """.formatted(organisation.getId());
 
             JsonNode expectedNode = objectMapper.readTree(expectedResponse);
             JsonNode actualNode   = objectMapper.readTree(jsonResponse);
@@ -221,7 +197,7 @@ class AssessmentTemplateIntegrationTest {
         }
 
         @Test
-        @DisplayName("GET /assessment_templates/{id} with unknown ID -> returns 404")
+        @DisplayName("GET /organisations/{id} with unknown ID -> returns 404")
         void getByIdValidationError() throws Exception {
             String jsonResponse = mvc.perform(
                             get(API + "/999999")
@@ -233,7 +209,7 @@ class AssessmentTemplateIntegrationTest {
             String expectedResponse = """
                 {
                     "status" : 404,
-                    "message": "Assessment_template not found by id: 999999"
+                    "message": "Organisation not found by id: 999999"
                 }
                 """;
 
@@ -250,21 +226,18 @@ class AssessmentTemplateIntegrationTest {
     class UpdateTests {
 
         @Test
-        @DisplayName("PUT /assessment_templates -> updates and returns the AssessmentTemplate")
+        @DisplayName("PUT /organisations -> updates and returns the Organisation")
         void update() throws Exception {
-            AssessmentTemplate original = assessmentTemplateRepository.save(AssessmentTemplate.builder()
-                    .name("avg_exit_velocity")
-                    .sport(sportDictionary.getId())
+            Organisation original = organisationRepository.save(Organisation.builder()
+                    .name("orga")
                     .build());
 
             String updateRequest = """
                 {
                     "id"            : %d,
-                    "name"          : "updated_velocity",
-                    "sport"         : "%s",
-                    "description"  : "desc"
+                    "name"          : "updated_orga"
                 }
-                """.formatted(original.getId(), sportDictionary.getId());
+                """.formatted(original.getId());
 
             String jsonResponse = mvc.perform(
                             put(API)
@@ -280,33 +253,29 @@ class AssessmentTemplateIntegrationTest {
             String expectedResponse = """
                 {
                     "id"           : %d,
-                    "name"         : "updated_velocity",
-                    "sport"        : "%s",
-                    "description"  : "desc"
+                    "name"         : "updated_orga"
                 }
-                """.formatted(original.getId(), sportDictionary.getId());
+                """.formatted(original.getId());
 
             JsonNode expectedNode = objectMapper.readTree(expectedResponse);
 
             assertEquals(expectedNode, responseNode);
 
-            AssessmentTemplate updated = assessmentTemplateRepository.findById(original.getId()).orElseThrow();
-            assertEquals("updated_velocity", updated.getName());
+            Organisation updated = organisationRepository.findById(original.getId()).orElseThrow();
+            assertEquals("updated_orga", updated.getName());
 
         }
 
         @Test
-        @DisplayName("PUT /assessment_templates with invalid id -> returns 404")
+        @DisplayName("PUT /organisations with invalid id -> returns 404")
         void updateValidationError() throws Exception {
 
             String updateRequest = """
                 {
                     "id"            : 999999,
-                    "name"          : "updated_velocity",
-                    "sport"         : "%s",
-                    "description"  : "desc"
+                    "name"          : "updated_orga"
                 }
-                """.formatted(sportDictionary.getId());
+                """;
 
             String jsonResponse = mvc.perform(
                             put(API)
@@ -321,7 +290,7 @@ class AssessmentTemplateIntegrationTest {
             String expectedResponse = """
                 {
                     "status" : 404,
-                    "message": "AssessmentTemplateService. Could not update AssessmentTemplate by id: 999999"
+                    "message": "OrganisationService. Could not update Organisation by id: 999999"
                 }
                 """;
 
@@ -338,18 +307,15 @@ class AssessmentTemplateIntegrationTest {
     @DisplayName("Delete")
     class DeleteTests {
 
-
         @Test
-        @DisplayName("DELETE /assessment_templates/{id} -> deletes the AssessmentTemplate")
+        @DisplayName("DELETE /organisations/{id} -> deletes the Organisation")
         void delete() throws Exception {
-            AssessmentTemplate assessmentTemplate = assessmentTemplateRepository.save(AssessmentTemplate.builder()
-                    .name("avg_exit_velocity")
-                    .sport(sportDictionary.getId())
-                    .description("desc")
+            Organisation organisation = organisationRepository.save(Organisation.builder()
+                    .name("orga")
                     .build());
 
             String jsonResponse = mvc.perform(
-                            MockMvcRequestBuilders.delete(API + "/" + assessmentTemplate.getId())
+                            MockMvcRequestBuilders.delete(API + "/" + organisation.getId())
                                     .with(httpBasic("biolab", "biolab"))
                     )
                     .andExpect(status().isOk())
@@ -367,11 +333,11 @@ class AssessmentTemplateIntegrationTest {
 
             assertEquals(expectedNode, actualNode);
 
-            assertFalse(assessmentTemplateRepository.existsById(assessmentTemplate.getId()));
+            assertFalse(organisationRepository.existsById(organisation.getId()));
         }
 
         @Test
-        @DisplayName("DELETE /assessment_templates/{id} with unknown ID -> returns 404")
+        @DisplayName("DELETE /organisations/{id} with unknown ID -> returns 404")
         void deleteValidationError() throws Exception {
             String jsonResponse = mvc.perform(
                             MockMvcRequestBuilders.delete(API + "/999999")
@@ -383,7 +349,7 @@ class AssessmentTemplateIntegrationTest {
             String expectedResponse = """
                 {
                     "status" : 404,
-                    "message": "AssessmentTemplateService. Could not delete id: 999999"
+                    "message": "OrganisationService. Could not delete id: 999999"
                 }
                 """;
 
@@ -393,5 +359,4 @@ class AssessmentTemplateIntegrationTest {
             assertEquals(expectedNode, actualNode);
         }
     }
-
 }

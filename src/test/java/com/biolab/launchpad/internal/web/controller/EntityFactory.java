@@ -17,15 +17,19 @@ public class EntityFactory {
     private final ResourceTypeDictionaryRepository   resourceTypeDictionaryRepository;
     private final SportDictionaryRepository          sportDictionaryRepository;
     private final UserRoleDictionaryRepository       userRoleDictionaryRepository;
+    private final OrganisationRepository             organisationRepository;
+    private final TeamRepository                     teamRepository;
 
-    public EntityFactory(MeasurementRepository measurementRepository, MetricRepository metricRepository, AgeGroupDictionaryRepository ageGroupDictionaryRepository, DataSourceTypeDictionaryRepository dataSourceTypeDictionaryRepository, ResourceTypeDictionaryRepository resourceTypeDictionaryRepository, SportDictionaryRepository sportDictionaryRepository, UserRoleDictionaryRepository userRoleDictionaryRepository){
-        this.measurementRepository              = measurementRepository;
-        this.metricRepository                   = metricRepository;
-        this.ageGroupDictionaryRepository       = ageGroupDictionaryRepository;
+    public EntityFactory(MeasurementRepository measurementRepository, MetricRepository metricRepository, AgeGroupDictionaryRepository ageGroupDictionaryRepository, DataSourceTypeDictionaryRepository dataSourceTypeDictionaryRepository, ResourceTypeDictionaryRepository resourceTypeDictionaryRepository, SportDictionaryRepository sportDictionaryRepository, UserRoleDictionaryRepository userRoleDictionaryRepository, OrganisationRepository organisationRepository, TeamRepository teamRepository) {
+        this.measurementRepository = measurementRepository;
+        this.metricRepository = metricRepository;
+        this.ageGroupDictionaryRepository = ageGroupDictionaryRepository;
         this.dataSourceTypeDictionaryRepository = dataSourceTypeDictionaryRepository;
-        this.resourceTypeDictionaryRepository   = resourceTypeDictionaryRepository;
-        this.sportDictionaryRepository          = sportDictionaryRepository;
-        this.userRoleDictionaryRepository       = userRoleDictionaryRepository;
+        this.resourceTypeDictionaryRepository = resourceTypeDictionaryRepository;
+        this.sportDictionaryRepository = sportDictionaryRepository;
+        this.userRoleDictionaryRepository = userRoleDictionaryRepository;
+        this.organisationRepository = organisationRepository;
+        this.teamRepository = teamRepository;
     }
 
     public Measurement createMeasurement(String name) {
@@ -131,6 +135,27 @@ public class EntityFactory {
 
     }
 
+    public Organisation createOrganisation(String name) {
+        return organisationRepository.save(
+                Organisation.builder()
+                        .name(name)
+                        .build()
+        );
+    }
+
+    public Team createTeam(String name) {
+        Organisation organisation       = createOrganisation("AutoOrganisation_" + name);
+        SportDictionary sportDictionary = createSportDictionary("AutoSport_" + name);
+        return teamRepository.save(
+                Team.builder()
+                        .name(name)
+                        .organisation_id(organisation.getId())
+                        .sport(sportDictionary.getId())
+                        .description("AutoDescription_"+name)
+                        .build()
+        );
+    }
+
     @AfterEach
     void cleanup() {
         metricRepository.deleteAll();
@@ -140,6 +165,8 @@ public class EntityFactory {
         resourceTypeDictionaryRepository.deleteAll();
         sportDictionaryRepository.deleteAll();
         userRoleDictionaryRepository.deleteAll();
+        organisationRepository.deleteAll();
+        teamRepository.deleteAll();
     }
 
 }

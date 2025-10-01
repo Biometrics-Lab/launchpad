@@ -26,7 +26,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @DisplayName("DataSource Integration Tests")
-class DataSourceIntegrationTest {
+class DataSourceControllerIntegrationTest {
 
     private static final String API = "/api/v1/data_sources";
 
