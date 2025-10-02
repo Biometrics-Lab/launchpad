@@ -20,8 +20,13 @@ public class EntityFactory {
     private final OrganisationRepository             organisationRepository;
     private final TeamRepository                     teamRepository;
     private final ModelRepository                    modelRepository;
+    private final UserRepository                     userRepository;
+    private final PlayerRepository                   playerRepository;
+    private final AssessmentTemplateRepository       assessmentTemplateRepository;
+    private final DataSourceRepository               dataSourceRepository;
+    private final TemplateMetricRepository           templateMetricRepository;
 
-    public EntityFactory(MeasurementRepository measurementRepository, MetricRepository metricRepository, AgeGroupDictionaryRepository ageGroupDictionaryRepository, DataSourceTypeDictionaryRepository dataSourceTypeDictionaryRepository, ResourceTypeDictionaryRepository resourceTypeDictionaryRepository, SportDictionaryRepository sportDictionaryRepository, UserRoleDictionaryRepository userRoleDictionaryRepository, OrganisationRepository organisationRepository, TeamRepository teamRepository, ModelRepository modelRepository) {
+    public EntityFactory(MeasurementRepository measurementRepository, MetricRepository metricRepository, AgeGroupDictionaryRepository ageGroupDictionaryRepository, DataSourceTypeDictionaryRepository dataSourceTypeDictionaryRepository, ResourceTypeDictionaryRepository resourceTypeDictionaryRepository, SportDictionaryRepository sportDictionaryRepository, UserRoleDictionaryRepository userRoleDictionaryRepository, OrganisationRepository organisationRepository, TeamRepository teamRepository, ModelRepository modelRepository, UserRepository userRepository, PlayerRepository playerRepository, AssessmentTemplateRepository assessmentTemplateRepository, DataSourceRepository dataSourceRepository, TemplateMetricRepository templateMetricRepository) {
         this.measurementRepository = measurementRepository;
         this.metricRepository = metricRepository;
         this.ageGroupDictionaryRepository = ageGroupDictionaryRepository;
@@ -32,6 +37,11 @@ public class EntityFactory {
         this.organisationRepository = organisationRepository;
         this.teamRepository = teamRepository;
         this.modelRepository = modelRepository;
+        this.userRepository = userRepository;
+        this.playerRepository = playerRepository;
+        this.assessmentTemplateRepository = assessmentTemplateRepository;
+        this.dataSourceRepository = dataSourceRepository;
+        this.templateMetricRepository = templateMetricRepository;
     }
 
     public Measurement createMeasurement(String name) {
@@ -170,6 +180,60 @@ public class EntityFactory {
         );
     }
 
+    public User createUser(String name) {
+        UserRoleDictionary userRoleDictionary       = createUserRoleDictionary("AutoRole_" + name);
+        return userRepository.save(
+                User.builder()
+                        .role(userRoleDictionary.getId())
+                        .build()
+        );
+    }
+
+    public Player createPlayer(String name) {
+        Team team = createTeam("AutoTeam_" + name);
+        return playerRepository.save(
+                Player.builder()
+                        .name(name)
+                        .team_id(team.getId())
+                        .build()
+        );
+    }
+
+    public AssessmentTemplate createAssessmentTemplate(String name) {
+        SportDictionary sportDictionary       = createSportDictionary("AutoSport_" + name);
+        return assessmentTemplateRepository.save(
+                AssessmentTemplate.builder()
+                        .name(name)
+                        .sport(sportDictionary.getId())
+                        .description("AutoDescription_"+name)
+                        .build()
+        );
+    }
+
+    public DataSource createDataSource(String name) {
+        DataSourceTypeDictionary dataSourceTypeDictionary = createDataSourceTypeDictionary("AutoDataSours_" + name);
+        return dataSourceRepository.save(
+                DataSource.builder()
+                        .name(name)
+                        .type(dataSourceTypeDictionary.getId())
+                        .description("AutoDescription_"+name)
+                        .build()
+        );
+    }
+
+    public TemplateMetric createTemplateMetric(String name) {
+        AssessmentTemplate assessmentTemplate = createAssessmentTemplate("AutoAsTemp"+name);
+        Metric metric                         = createMetric("AutoMetric"+name);
+        DataSource dataSource                 = createDataSource("AutoDataSource"+name);
+        return templateMetricRepository.save(
+                TemplateMetric.builder()
+                        .template_id(assessmentTemplate.getId())
+                        .metric_id(metric.getId())
+                        .source_id(dataSource.getId())
+                        .build()
+        );
+    }
+
     @AfterEach
     void cleanup() {
         metricRepository.deleteAll();
@@ -182,6 +246,12 @@ public class EntityFactory {
         organisationRepository.deleteAll();
         teamRepository.deleteAll();
         modelRepository.deleteAll();
+        userRepository.deleteAll();
+        playerRepository.deleteAll();
+        assessmentTemplateRepository.deleteAll();
+        dataSourceRepository.deleteAll();
+        templateMetricRepository.deleteAll();
     }
+
 
 }

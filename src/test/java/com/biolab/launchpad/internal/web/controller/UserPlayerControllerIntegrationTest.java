@@ -1,9 +1,9 @@
 package com.biolab.launchpad.internal.web.controller;
 
-import com.biolab.launchpad.internal.repository.ModelMetricRepository;
-import com.biolab.launchpad.internal.repository.model.Metric;
-import com.biolab.launchpad.internal.repository.model.Model;
-import com.biolab.launchpad.internal.repository.model.ModelMetric;
+import com.biolab.launchpad.internal.repository.UserPlayerRepository;
+import com.biolab.launchpad.internal.repository.model.Player;
+import com.biolab.launchpad.internal.repository.model.User;
+import com.biolab.launchpad.internal.repository.model.UserPlayer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.*;
@@ -26,10 +26,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
 @AutoConfigureMockMvc
-@DisplayName("ModelMetric Integration Tests")
-class ModelMetricControllerIntegrationTest {
+@DisplayName("UserPlayerController Integration Tests")
+class UserPlayerControllerIntegrationTest {
 
-    private static final String API = "/api/v1/model_metrics";
+    private static final String API = "/api/v1/user_players";
 
     @Autowired
     private MockMvc mvc;
@@ -38,40 +38,39 @@ class ModelMetricControllerIntegrationTest {
     ObjectMapper objectMapper;
 
     @Autowired
-    ModelMetricRepository modelMetricRepository;
+    UserPlayerRepository userPlayerRepository;
 
     @Autowired
     EntityFactory factory;
 
-    Model model;
-    Metric metric;
+    User   user;
+    Player player;
 
     @BeforeEach
     void setUp() {
-        model  = factory.createModel("mod");
-        metric = factory.createMetric("metr");
+        user   = factory.createUser("Us");
+        player = factory.createPlayer("Pl1");
     }
 
     @AfterEach
     void tearDown() {
-        modelMetricRepository.deleteAll();
+        userPlayerRepository.deleteAll();
     }
 
     @Nested
     @DisplayName("Create")
     class CreateTests {
         @Test
-        @DisplayName("POST /modelMetrics -> creates and returns the new ModelMetric")
+        @DisplayName("POST /userPlayers -> creates and returns the new UserPlayer")
         void create() throws Exception {
 
             String request =
-                            """ 
+                    """ 
                                 {
-                                    "model_id"    : %d,
-                                    "metric_id"   : %d,
-                                    "value"       : 1
+                                    "user_id"         : %d,
+                                    "player_id"       : %d
                                 }
-                            """.formatted(model.getId(), metric.getId());
+                            """.formatted(user.getId(), player.getId());
 
             String jsonResponse = mvc.perform(
                             post(API)
@@ -85,19 +84,18 @@ class ModelMetricControllerIntegrationTest {
 
             JsonNode responseNode = objectMapper.readTree(jsonResponse);
 
-            int modelMetricId = responseNode.get("id").asInt();
-            assertThat(modelMetricId).isPositive();
+            int userPlayerId = responseNode.get("id").asInt();
+            assertThat(userPlayerId).isPositive();
 
 
             String expectedResponse =
-                    """ 
-                            {
-                                        "id"          : %d,
-                                        "model_id"    : %d,
-                                        "metric_id"   : %d,
-                                        "value"       : 1
+                                    """ 
+                                    {
+                                        "id"           : %d,
+                                        "user_id"      : %d,
+                                        "player_id"    : %d
                                     }
-                            """.formatted(modelMetricId, model.getId(), metric.getId());
+                                    """.formatted(userPlayerId, user.getId(), player.getId());
 
             JsonNode expectedResponseNode = objectMapper.readTree(expectedResponse);
 
@@ -105,12 +103,13 @@ class ModelMetricControllerIntegrationTest {
         }
 
         @Test
-        @DisplayName("POST /modelMetrics with validation message -> returns 422")
+        @DisplayName("POST /userPlayers with validation message -> returns 422")
         void createValidationError() throws Exception {
+
             String request =
                             """
                                 {
-                                    "value" : 1
+                                    "role" : null
                                 }
                             """;
 
@@ -130,7 +129,7 @@ class ModelMetricControllerIntegrationTest {
                     """
                             {
                                 "status"       : 422,
-                                "message"      : "Validation failed: metric_id: Model_metric metric_id cannot be null, and model_id: Model_metric model_id cannot be null"
+                                "message"      : "Validation failed: player_id: User_player player_id cannot be null, and user_id: User_player user_id cannot be null"
                             }
                             """;
 
@@ -145,19 +144,17 @@ class ModelMetricControllerIntegrationTest {
     class ReadTests {
 
         @Test
-        @DisplayName("GET /modelMetrics -> returns all modelMetrics")
+        @DisplayName("GET /userPlayers -> returns all userPlayers")
         void getAll() throws Exception {
 
-            ModelMetric modelMetric1 = modelMetricRepository.save(ModelMetric.builder()
-                    .model_id(model.getId())
-                    .metric_id(metric.getId())
-                    .value(1)
+            UserPlayer userPlayer1 = userPlayerRepository.save(UserPlayer.builder()
+                    .user_id(user.getId())
+                    .player_id(player.getId())
                     .build());
 
-            ModelMetric modelMetric2 = modelMetricRepository.save(ModelMetric.builder()
-                    .model_id(model.getId())
-                    .metric_id(metric.getId())
-                    .value(1)
+            UserPlayer userPlayer2 = userPlayerRepository.save(UserPlayer.builder()
+                    .user_id(user.getId())
+                    .player_id(player.getId())
                     .build());
 
             String jsonResponse = mvc.perform(
@@ -170,19 +167,17 @@ class ModelMetricControllerIntegrationTest {
             String expectedResponse = """
                 [
                     {
-                        "id"            : %d,
-                        "model_id"      : %d,
-                        "metric_id"     : %d,
-                        "value"         : 1
+                        "id"           : %d,
+                        "user_id"      : %d,
+                        "player_id"    : %d
                     },
                     {
-                        "id"             : %d,
-                        "model_id"       : %d,
-                        "metric_id"      : %d,
-                        "value"          : 1
+                        "id"           : %d,
+                        "user_id"      : %d,
+                        "player_id"    : %d
                     }
                 ]
-                """.formatted(modelMetric1.getId(), model.getId(), metric.getId(), modelMetric2.getId(), model.getId(), metric.getId());
+                """.formatted(userPlayer1.getId(), user.getId(), player.getId(), userPlayer2.getId(), user.getId(), player.getId());
 
             JsonNode expectedNode = objectMapper.readTree(expectedResponse);
             JsonNode actualNode   = objectMapper.readTree(jsonResponse);
@@ -191,30 +186,29 @@ class ModelMetricControllerIntegrationTest {
         }
 
         @Test
-        @DisplayName("GET /modelMetrics/{id} -> returns modelMetric by ID")
+        @DisplayName("GET /userPlayers/{id} -> returns userPlayer by ID")
         void getById() throws Exception {
 
-            ModelMetric modelMetric = modelMetricRepository.save(ModelMetric.builder()
-                    .model_id(model.getId())
-                    .metric_id(metric.getId())
-                    .value(1)
+            UserPlayer userPlayer = userPlayerRepository.save(UserPlayer.builder()
+                    .user_id(user.getId())
+                    .player_id(player.getId())
                     .build());
 
             String jsonResponse = mvc.perform(
-                            get(API + "/" + modelMetric.getId())
+                            get(API + "/" + userPlayer.getId())
                                     .with(httpBasic("biolab", "biolab"))
                     )
                     .andExpect(status().isOk())
                     .andReturn().getResponse().getContentAsString();
 
-            String expectedResponse = """
-                {
-                    "id"            : %d,
-                    "model_id"      : %d,
-                    "metric_id"     : %d,
-                    "value"         : 1
-                }
-                """.formatted(modelMetric.getId(), model.getId() ,metric.getId());
+            String expectedResponse =
+                    """ 
+                    {
+                        "id"           : %d,
+                        "user_id"      : %d,
+                        "player_id"    : %d
+                    }
+                    """.formatted(userPlayer.getId(), user.getId(), player.getId());
 
             JsonNode expectedNode = objectMapper.readTree(expectedResponse);
             JsonNode actualNode   = objectMapper.readTree(jsonResponse);
@@ -223,7 +217,7 @@ class ModelMetricControllerIntegrationTest {
         }
 
         @Test
-        @DisplayName("GET /modelMetrics/{id} with unknown ID -> returns 404")
+        @DisplayName("GET /userPlayers/{id} with unknown ID -> returns 404")
         void getByIdValidationError() throws Exception {
             String jsonResponse = mvc.perform(
                             get(API + "/999999")
@@ -235,7 +229,7 @@ class ModelMetricControllerIntegrationTest {
             String expectedResponse = """
                 {
                     "status" : 404,
-                    "message": "Model_metric not found by id: 999999"
+                    "message": "User_player not found by id: 999999"
                 }
                 """;
 
@@ -252,21 +246,22 @@ class ModelMetricControllerIntegrationTest {
     class UpdateTests {
 
         @Test
-        @DisplayName("PUT /modelMetrics -> updates and returns the ModelMetric")
+        @DisplayName("PUT /userPlayers -> updates and returns the UserPlayer")
         void update() throws Exception {
-            ModelMetric original = modelMetricRepository.save(ModelMetric.builder()
-                    .model_id(model.getId())
-                    .metric_id(metric.getId())
+            UserPlayer original = userPlayerRepository.save(UserPlayer.builder()
+                    .user_id(user.getId())
+                    .player_id(player.getId())
                     .build());
 
-            String updateRequest = """
-                {
-                    "id"          : %d,
-                    "model_id"    : %d,
-                    "metric_id"   : %d,
-                    "value"       : 1
-                }
-                """.formatted(original.getId(), model.getId(), metric.getId());
+            user.setName("UsUp");
+            String updateRequest =
+                    """ 
+                    {
+                        "id"           : %d,
+                        "user_id"      : %d,
+                        "player_id"    : %d
+                    }
+                    """.formatted(original.getId(), user.getId(), player.getId());
 
             String jsonResponse = mvc.perform(
                             put(API)
@@ -279,35 +274,36 @@ class ModelMetricControllerIntegrationTest {
 
             JsonNode responseNode = objectMapper.readTree(jsonResponse);
 
-            String expectedResponse = """
-                {
-                    "id"           : %d,
-                    "model_id"     : %d,
-                    "metric_id"    : %d,
-                    "value"        : 1
-                }
-                """.formatted(original.getId(), model.getId(), metric.getId());
+            String expectedResponse =
+                    """ 
+                    {
+                        "id"           : %d,
+                        "user_id"      : %d,
+                        "player_id"    : %d
+                    }
+                    """.formatted(original.getId(), user.getId(), player.getId());
 
             JsonNode expectedNode = objectMapper.readTree(expectedResponse);
 
             assertEquals(expectedNode, responseNode);
 
-            ModelMetric updated = modelMetricRepository.findById(original.getId()).orElseThrow();
+            UserPlayer updated = userPlayerRepository.findById(original.getId()).orElseThrow();
+
+            user.setName("Us");
 
         }
 
         @Test
-        @DisplayName("PUT /modelMetrics with invalid id -> returns 404")
+        @DisplayName("PUT /userPlayers with invalid id -> returns 404")
         void updateValidationError() throws Exception {
 
-            String updateRequest = """
-                {
-                    "id"            : 999999,
-                    "model_id"      : %d,
-                    "metric_id"     : %d,
-                    "value"         : 1
-                }
-                """.formatted(model.getId(), metric.getId());
+            String updateRequest =  """ 
+                    {
+                        "id"           : 999999,
+                        "user_id"      : %d,
+                        "player_id"    : %d
+                    }
+                    """.formatted(user.getId(), player.getId());
 
             String jsonResponse = mvc.perform(
                             put(API)
@@ -322,7 +318,7 @@ class ModelMetricControllerIntegrationTest {
             String expectedResponse = """
                 {
                     "status" : 404,
-                    "message": "ModelMetricService. Could not update ModelMetric by id: 999999"
+                    "message": "UserPlayerService. Could not update UserPlayer by id: 999999"
                 }
                 """;
 
@@ -339,18 +335,16 @@ class ModelMetricControllerIntegrationTest {
     @DisplayName("Delete")
     class DeleteTests {
 
-
         @Test
-        @DisplayName("DELETE /modelMetrics/{id} -> deletes the ModelMetric")
+        @DisplayName("DELETE /userPlayers/{id} -> deletes the UserPlayer")
         void delete() throws Exception {
-            ModelMetric modelMetric = modelMetricRepository.save(ModelMetric.builder()
-                    .model_id(model.getId())
-                    .metric_id(metric.getId())
-                    .value(1)
+            UserPlayer userPlayer = userPlayerRepository.save(UserPlayer.builder()
+                    .user_id(user.getId())
+                    .player_id(player.getId())
                     .build());
 
             String jsonResponse = mvc.perform(
-                            MockMvcRequestBuilders.delete(API + "/" + modelMetric.getId())
+                            MockMvcRequestBuilders.delete(API + "/" + userPlayer.getId())
                                     .with(httpBasic("biolab", "biolab"))
                     )
                     .andExpect(status().isOk())
@@ -368,11 +362,11 @@ class ModelMetricControllerIntegrationTest {
 
             assertEquals(expectedNode, actualNode);
 
-            assertFalse(modelMetricRepository.existsById(modelMetric.getId()));
+            assertFalse(userPlayerRepository.existsById(userPlayer.getId()));
         }
 
         @Test
-        @DisplayName("DELETE /modelMetrics/{id} with unknown ID -> returns 404")
+        @DisplayName("DELETE /userPlayers/{id} with unknown ID -> returns 404")
         void deleteValidationError() throws Exception {
             String jsonResponse = mvc.perform(
                             MockMvcRequestBuilders.delete(API + "/999999")
@@ -384,7 +378,7 @@ class ModelMetricControllerIntegrationTest {
             String expectedResponse = """
                 {
                     "status" : 404,
-                    "message": "ModelMetricService. Could not delete id: 999999"
+                    "message": "UserPlayerService. Could not delete id: 999999"
                 }
                 """;
 
@@ -394,5 +388,4 @@ class ModelMetricControllerIntegrationTest {
             assertEquals(expectedNode, actualNode);
         }
     }
-
 }

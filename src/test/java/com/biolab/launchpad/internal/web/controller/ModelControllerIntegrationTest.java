@@ -174,7 +174,6 @@ class ModelControllerIntegrationTest {
                         "age_group"      : "%s",
                         "sport"          : "%s",
                         "description"    : "desc"
-                        
                     },
                     {
                         "id"             : %d,
