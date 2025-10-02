@@ -148,12 +148,12 @@ class Session1ControllerIntegrationTest {
 
             Session1 session11 = session1Repository.save(Session1.builder()
                     .assessment_id(assessment.getId())
-                    .start_time(Timestamp.valueOf(LocalDateTime.of(2025, 10, 2, 14, 45, 00)))
+                    .start_time(Timestamp.valueOf(LocalDateTime.of(2025, 10, 2, 14, 45)))
                     .build());
 
             Session1 session12 = session1Repository.save(Session1.builder()
                     .assessment_id(assessment.getId())
-                    .start_time(Timestamp.valueOf(LocalDateTime.of(2025, 10, 2, 14, 45, 00)))
+                    .start_time(Timestamp.valueOf(LocalDateTime.of(2025, 10, 2, 14, 45)))
                     .build());
 
             String jsonResponse = mvc.perform(
@@ -190,7 +190,7 @@ class Session1ControllerIntegrationTest {
 
             Session1 session1 = session1Repository.save(Session1.builder()
                     .assessment_id(assessment.getId())
-                    .start_time(Timestamp.valueOf(LocalDateTime.of(2025, 10, 2, 15, 45, 00)))
+                    .start_time(Timestamp.valueOf(LocalDateTime.of(2025, 10, 2, 15, 45)))
                     .build());
 
             String jsonResponse = mvc.perform(
@@ -248,7 +248,7 @@ class Session1ControllerIntegrationTest {
         void update() throws Exception {
             Session1 original = session1Repository.save(Session1.builder()
                     .assessment_id(assessment.getId())
-                    .start_time(Timestamp.valueOf(LocalDateTime.of(2025, 10, 2, 14, 45, 00)))
+                    .start_time(Timestamp.valueOf(LocalDateTime.of(2025, 10, 2, 14, 45)))
                     .build());
 
             String updateRequest = """
@@ -281,8 +281,6 @@ class Session1ControllerIntegrationTest {
             JsonNode expectedNode = objectMapper.readTree(expectedResponse);
 
             assertEquals(expectedNode, responseNode);
-
-            Session1 updated = session1Repository.findById(original.getId()).orElseThrow();
 
         }
 
@@ -334,7 +332,7 @@ class Session1ControllerIntegrationTest {
         void delete() throws Exception {
             Session1 session1 = session1Repository.save(Session1.builder()
                     .assessment_id(assessment.getId())
-                    .start_time(Timestamp.valueOf(LocalDateTime.of(2025, 10, 2, 14, 45, 00)))
+                    .start_time(Timestamp.valueOf(LocalDateTime.of(2025, 10, 2, 14, 45)))
                     .build());
 
             String jsonResponse = mvc.perform(

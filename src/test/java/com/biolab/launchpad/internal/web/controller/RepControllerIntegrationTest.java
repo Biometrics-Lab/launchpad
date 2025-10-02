@@ -1,12 +1,10 @@
 package com.biolab.launchpad.internal.web.controller;
 
 import com.biolab.launchpad.internal.repository.RepRepository;
-import com.biolab.launchpad.internal.repository.model.Assessment;
 import com.biolab.launchpad.internal.repository.model.Rep;
 import com.biolab.launchpad.internal.repository.model.Session1;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jcraft.jsch.Session;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -150,12 +148,12 @@ class RepControllerIntegrationTest {
 
             Rep rep1 = repRepository.save(Rep.builder()
                     .session1_id(session1.getId())
-                    .start_time(Timestamp.valueOf(LocalDateTime.of(2025, 10, 2, 14, 45, 00)))
+                    .start_time(Timestamp.valueOf(LocalDateTime.of(2025, 10, 2, 14, 45)))
                     .build());
 
             Rep rep2 = repRepository.save(Rep.builder()
                     .session1_id(session1.getId())
-                    .start_time(Timestamp.valueOf(LocalDateTime.of(2025, 10, 2, 14, 45, 00)))
+                    .start_time(Timestamp.valueOf(LocalDateTime.of(2025, 10, 2, 14, 45)))
                     .build());
 
             String jsonResponse = mvc.perform(
@@ -192,7 +190,7 @@ class RepControllerIntegrationTest {
 
             Rep rep = repRepository.save(Rep.builder()
                     .session1_id(session1.getId())
-                    .start_time(Timestamp.valueOf(LocalDateTime.of(2025, 10, 2, 15, 45, 00)))
+                    .start_time(Timestamp.valueOf(LocalDateTime.of(2025, 10, 2, 15, 45)))
                     .build());
 
             String jsonResponse = mvc.perform(
@@ -250,7 +248,7 @@ class RepControllerIntegrationTest {
         void update() throws Exception {
             Rep original = repRepository.save(Rep.builder()
                     .session1_id(session1.getId())
-                    .start_time(Timestamp.valueOf(LocalDateTime.of(2025, 10, 2, 14, 45, 00)))
+                    .start_time(Timestamp.valueOf(LocalDateTime.of(2025, 10, 2, 14, 45)))
                     .build());
 
             String updateRequest = """
@@ -283,9 +281,6 @@ class RepControllerIntegrationTest {
             JsonNode expectedNode = objectMapper.readTree(expectedResponse);
 
             assertEquals(expectedNode, responseNode);
-
-            Rep updated = repRepository.findById(original.getId()).orElseThrow();
-
         }
 
         @Test
@@ -336,7 +331,7 @@ class RepControllerIntegrationTest {
         void delete() throws Exception {
             Rep rep = repRepository.save(Rep.builder()
                     .session1_id(session1.getId())
-                    .start_time(Timestamp.valueOf(LocalDateTime.of(2025, 10, 2, 14, 45, 00)))
+                    .start_time(Timestamp.valueOf(LocalDateTime.of(2025, 10, 2, 14, 45)))
                     .build());
 
             String jsonResponse = mvc.perform(
