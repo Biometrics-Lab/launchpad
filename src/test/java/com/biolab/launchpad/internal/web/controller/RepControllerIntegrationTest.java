@@ -148,12 +148,12 @@ class RepControllerIntegrationTest {
 
             Rep rep1 = repRepository.save(Rep.builder()
                     .session1_id(session1.getId())
-                    .start_time(Timestamp.valueOf(LocalDateTime.of(2025, 10, 2, 14, 45)))
+                    .start_time(Timestamp.valueOf(LocalDateTime.of(2025, 10, 2, 14, 45, 1)))
                     .build());
 
             Rep rep2 = repRepository.save(Rep.builder()
                     .session1_id(session1.getId())
-                    .start_time(Timestamp.valueOf(LocalDateTime.of(2025, 10, 2, 14, 45)))
+                    .start_time(Timestamp.valueOf(LocalDateTime.of(2025, 10, 2, 14, 45, 1)))
                     .build());
 
             String jsonResponse = mvc.perform(
@@ -248,7 +248,7 @@ class RepControllerIntegrationTest {
         void update() throws Exception {
             Rep original = repRepository.save(Rep.builder()
                     .session1_id(session1.getId())
-                    .start_time(Timestamp.valueOf(LocalDateTime.of(2025, 10, 2, 14, 45)))
+                    .start_time(Timestamp.valueOf(LocalDateTime.of(2025, 10, 2, 14, 45, 1)))
                     .build());
 
             String updateRequest = """
@@ -331,7 +331,7 @@ class RepControllerIntegrationTest {
         void delete() throws Exception {
             Rep rep = repRepository.save(Rep.builder()
                     .session1_id(session1.getId())
-                    .start_time(Timestamp.valueOf(LocalDateTime.of(2025, 10, 2, 14, 45)))
+                    .start_time(Timestamp.valueOf(LocalDateTime.of(2025, 10, 2, 14, 45, 1)))
                     .build());
 
             String jsonResponse = mvc.perform(

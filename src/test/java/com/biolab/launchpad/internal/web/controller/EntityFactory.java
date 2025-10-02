@@ -260,7 +260,7 @@ public class EntityFactory {
         return session1Repository.save(
                 Session1.builder()
                         .assessment_id(assessment.getId())
-                        .start_time(Timestamp.valueOf(LocalDateTime.of(2025, 10, 2, 14, 45)))
+                        .start_time(Timestamp.valueOf(LocalDateTime.of(2025, 10, 2, 14, 45, 1)))
                         .build()
         );
     }
@@ -270,7 +270,7 @@ public class EntityFactory {
         return repRepository.save(
                 Rep.builder()
                         .session1_id(session1.getId())
-                        .start_time(Timestamp.valueOf(LocalDateTime.of(2025, 10, 2, 14, 45)))
+                        .start_time(Timestamp.valueOf(LocalDateTime.of(2025, 10, 2, 14, 45, 1)))
                         .build()
         );
     }
