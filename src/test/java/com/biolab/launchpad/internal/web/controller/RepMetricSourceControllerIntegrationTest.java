@@ -1,9 +1,7 @@
 //package com.biolab.launchpad.internal.web.controller;
 //
-//import com.biolab.launchpad.internal.repository.RepMetricRepository;
-//import com.biolab.launchpad.internal.repository.model.Metric;
-//import com.biolab.launchpad.internal.repository.model.Rep;
-//import com.biolab.launchpad.internal.repository.model.RepMetric;
+//import com.biolab.launchpad.internal.repository.RepMetricSourceRepository;
+//import com.biolab.launchpad.internal.repository.model.*;
 //import com.fasterxml.jackson.databind.JsonNode;
 //import com.fasterxml.jackson.databind.ObjectMapper;
 //import org.junit.jupiter.api.*;
@@ -26,10 +24,10 @@
 //@ExtendWith(SpringExtension.class)
 //@SpringBootTest
 //@AutoConfigureMockMvc
-//@DisplayName("Rep metric Integration Tests")
-//class RepMetricControllerIntegrationTest {
+//@DisplayName("RepMetricSource Integration Tests")
+//class RepMetricSourceControllerIntegrationTest {
 //
-//    private static final String API = "/api/v1/rep_metrics";
+//    private static final String API = "/api/v1/rep_metric_sources";
 //
 //    @Autowired
 //    private MockMvc mvc;
@@ -38,40 +36,40 @@
 //    ObjectMapper objectMapper;
 //
 //    @Autowired
-//    RepMetricRepository repMetricRepository;
+//    RepMetricSourceRepository repMetricSourceRepository;
 //
 //    @Autowired
 //    EntityFactory factory;
 //
-//    Rep    rep;
-//    Metric metric;
+//    RepMetric  repMetric;
+//    DataSource dataSource;
 //
 //    @BeforeEach
 //    void setUp() {
-//        rep    = factory.createRep("eminem");
-//        metric = factory.createMetric("wide");
+//        repMetric   = factory.createRepMetric("rMetric");
+//        dataSource  = factory.createDataSource("dSource");
 //    }
 //
 //    @AfterEach
 //    void tearDown() {
-//        repMetricRepository.deleteAll();
+//        repMetricSourceRepository.deleteAll();
 //    }
 //
 //    @Nested
 //    @DisplayName("Create")
 //    class CreateTests {
 //        @Test
-//        @DisplayName("POST /rep_metrics -> creates and returns the new Session")
+//        @DisplayName("POST /repMetricSources -> creates and returns the new RepMetricSource")
 //        void create() throws Exception {
 //
 //            String request =
 //                            """
 //                                {
-//                                    "rep_id"       : %d,
-//                                    "metric_id"    : %d,
-//                                    "value"        : 3
+//                                    "rep_metric_id"  : %d,
+//                                    "data_source_id" : %d,
+//                                    "description"    : "desc"
 //                                }
-//                            """.formatted(rep.getId(), metric.getId());
+//                            """.formatted(repMetric.getId(), dataSource.getId());
 //
 //            String jsonResponse = mvc.perform(
 //                            post(API)
@@ -85,18 +83,19 @@
 //
 //            JsonNode responseNode = objectMapper.readTree(jsonResponse);
 //
-//            int sessionId = responseNode.get("id").asInt();
-//            assertThat(sessionId).isPositive();
+//            int repMetricSourceId = responseNode.get("id").asInt();
+//            assertThat(repMetricSourceId).isPositive();
+//
 //
 //            String expectedResponse =
-//                                    """
-//                                      {
-//                                        "id"           : %d,
-//                                        "rep_id"       : %d,
-//                                        "metric_id"    : %d,
-//                                        "value"        : 3
-//                                      }
-//                                    """.formatted(sessionId, rep.getId(), metric.getId());
+//                    """
+//                            {
+//                                        "id"             : %d,
+//                                        "rep_metric_id"  : %d,
+//                                        "data_source_id" : %d,
+//                                        "description"    : "desc"
+//                                    }
+//                            """.formatted(repMetricSourceId, repMetric.getId(), dataSource.getId());
 //
 //            JsonNode expectedResponseNode = objectMapper.readTree(expectedResponse);
 //
@@ -104,12 +103,12 @@
 //        }
 //
 //        @Test
-//        @DisplayName("POST /rep_metrics with validation message -> returns 422")
+//        @DisplayName("POST /repMetricSources with validation message -> returns 422")
 //        void createValidationError() throws Exception {
 //            String request =
 //                            """
 //                                {
-//                                    "description" : ""
+//                                    "description" : "desc"
 //                                }
 //                            """;
 //
@@ -129,7 +128,7 @@
 //                    """
 //                            {
 //                                "status"       : 422,
-//                                "message"      : "Validation failed: metric_id: session_metric metric_id cannot be null, and session1_id: session_metric session_id cannot be null"
+//                                "message"      : "Validation failed: name: Name cannot be blank, and rep_metric_id: RepMetricSource rep_metric_id cannot be null, and sport: RepMetricSource sport cannot be null"
 //                            }
 //                            """;
 //
@@ -144,19 +143,19 @@
 //    class ReadTests {
 //
 //        @Test
-//        @DisplayName("GET /rep_metrics -> returns all rep_metrics")
+//        @DisplayName("GET /repMetricSources -> returns all repMetricSources")
 //        void getAll() throws Exception {
 //
-//            RepMetric repMetric1 = repMetricRepository.save(RepMetric.builder()
-//                    .rep_id(rep.getId())
-//                    .metric_id(metric.getId())
-//                    .value(3)
+//            RepMetricSource repMetricSource1 = repMetricSourceRepository.save(RepMetricSource.builder()
+//                    .rep_metric_id(repMetric.getId())
+//                    .data_source_id(dataSource.getId())
+//                    .description("desc")
 //                    .build());
 //
-//            RepMetric repMetric2 = repMetricRepository.save(RepMetric.builder()
-//                    .rep_id(rep.getId())
-//                    .metric_id(metric.getId())
-//                    .value(7)
+//            RepMetricSource repMetricSource2 = repMetricSourceRepository.save(RepMetricSource.builder()
+//                    .rep_metric_id(repMetric.getId())
+//                    .data_source_id(dataSource.getId())
+//                    .description("desc")
 //                    .build());
 //
 //            String jsonResponse = mvc.perform(
@@ -169,19 +168,19 @@
 //            String expectedResponse = """
 //                [
 //                    {
-//                        "id"           : %d,
-//                        "rep_id"       : %d,
-//                        "metric_id"    : %d,
-//                        "value"        : 3
-//                   },
+//                        "id"             : %d,
+//                        "rep_metric_id"  : %d,
+//                        "data_source_id" : %d,
+//                        "description"    : "desc"
+//                    },
 //                    {
-//                        "id"           : %d,
-//                        "rep_id"       : %d,
-//                        "metric_id"    : %d,
-//                        "value"        : 7
+//                        "id"             : %d,
+//                        "rep_metric_id"  : %d,
+//                        "data_source_id" : %d,
+//                        "description"    : "desc"
 //                    }
 //                ]
-//                """.formatted(repMetric1.getId(), rep.getId(), metric.getId(), repMetric2.getId(),rep.getId(), metric.getId());
+//                """.formatted(repMetricSource1.getId(), repMetric.getId(), dataSource.getId(), repMetricSource2.getId(), repMetric.getId(), dataSource.getId());
 //
 //            JsonNode expectedNode = objectMapper.readTree(expectedResponse);
 //            JsonNode actualNode   = objectMapper.readTree(jsonResponse);
@@ -190,30 +189,30 @@
 //        }
 //
 //        @Test
-//        @DisplayName("GET /rep_metrics/{id} -> returns session by ID")
+//        @DisplayName("GET /repMetricSources/{id} -> returns repMetricSource by ID")
 //        void getById() throws Exception {
 //
-//            RepMetric repMetric = repMetricRepository.save(RepMetric.builder()
-//                    .rep_id(rep.getId())
-//                    .metric_id(metric.getId())
-//                    .value(3)
+//            RepMetricSource repMetricSource = repMetricSourceRepository.save(RepMetricSource.builder()
+//                    .rep_metric_id(repMetric.getId())
+//                    .data_source_id(dataSource.getId())
+//                    .description("desc")
 //                    .build());
 //
 //            String jsonResponse = mvc.perform(
-//                            get(API + "/" + repMetric.getId())
+//                            get(API + "/" + repMetricSource.getId())
 //                                    .with(httpBasic("biolab", "biolab"))
 //                    )
 //                    .andExpect(status().isOk())
 //                    .andReturn().getResponse().getContentAsString();
 //
 //            String expectedResponse = """
-//                                     {
-//                                        "id"            : %d,
-//                                         "rep_id"       : %d,
-//                                         "metric_id"    : %d,
-//                                         "value"        : 3
-//                                     }
-//                                    """.formatted(repMetric.getId(), rep.getId(), metric.getId());
+//                {
+//                    "id"             : %d,
+//                    "rep_metric_id"  : %d,
+//                    "data_source_id" : %d,
+//                    "description"    : "desc"
+//                }
+//                """.formatted(repMetricSource.getId(), repMetric.getId() ,dataSource.getId());
 //
 //            JsonNode expectedNode = objectMapper.readTree(expectedResponse);
 //            JsonNode actualNode   = objectMapper.readTree(jsonResponse);
@@ -222,7 +221,7 @@
 //        }
 //
 //        @Test
-//        @DisplayName("GET /rep_metrics/{id} with unknown ID -> returns 404")
+//        @DisplayName("GET /repMetricSources/{id} with unknown ID -> returns 404")
 //        void getByIdValidationError() throws Exception {
 //            String jsonResponse = mvc.perform(
 //                            get(API + "/999999")
@@ -234,7 +233,7 @@
 //            String expectedResponse = """
 //                {
 //                    "status" : 404,
-//                    "message": "Rep_metric not found by id: 999999"
+//                    "message": "RepMetricSource not found by id: 999999"
 //                }
 //                """;
 //
@@ -243,7 +242,6 @@
 //
 //            assertEquals(expectedNode, actualNode);
 //        }
-//
 //    }
 //
 //    @Nested
@@ -251,22 +249,22 @@
 //    class UpdateTests {
 //
 //        @Test
-//        @DisplayName("PUT /rep_metrics -> updates and returns the Session")
+//        @DisplayName("PUT /repMetricSources -> updates and returns the RepMetricSource")
 //        void update() throws Exception {
-//            RepMetric original = repMetricRepository.save(RepMetric.builder()
-//                    .rep_id(rep.getId())
-//                    .metric_id(metric.getId())
-//                    .value(3)
+//            RepMetricSource original = repMetricSourceRepository.save(RepMetricSource.builder()
+//                    .rep_metric_id(repMetric.getId())
+//                    .data_source_id(dataSource.getId())
+//                    .description("desc")
 //                    .build());
 //
-//           String updateRequest = """
-//                                {
-//                                   "id"           : %d,
-//                                   "rep_id"       : %d,
-//                                   "metric_id"    : %d,
-//                                   "value"        : 6
-//                                }
-//                                """.formatted(original.getId(), rep.getId(), metric.getId());
+//            String updateRequest = """
+//                {
+//                    "id"             : %d,
+//                    "rep_metric_id"  : %d,
+//                    "data_source_id" : %d,
+//                    "description"    : "descUPD"
+//                }
+//                """.formatted(original.getId(), repMetric.getId(), dataSource.getId());
 //
 //            String jsonResponse = mvc.perform(
 //                            put(API)
@@ -280,30 +278,34 @@
 //            JsonNode responseNode = objectMapper.readTree(jsonResponse);
 //
 //            String expectedResponse = """
-//                                {
-//                                    "id"           : %d,
-//                                    "rep_id"       : %d,
-//                                    "metric_id"    : %d,
-//                                    "value"        : 6
-//                                 }
-//                                """.formatted(original.getId(), rep.getId(), metric.getId());
+//                {
+//                    "id"             : %d,
+//                    "rep_metric_id"  : %d,
+//                    "data_source_id" : %d,
+//                    "description"    : "desc"
+//                }
+//                """.formatted(original.getId(), repMetric.getId(), dataSource.getId());
 //
 //            JsonNode expectedNode = objectMapper.readTree(expectedResponse);
 //
 //            assertEquals(expectedNode, responseNode);
+//
+//            RepMetricSource updated = repMetricSourceRepository.findById(original.getId()).orElseThrow();
+//            assertEquals("descUPD", updated.getDescription());
 //        }
 //
 //        @Test
-//        @DisplayName("PUT /rep_metrics with invalid id -> returns 404")
+//        @DisplayName("PUT /repMetricSources with invalid id -> returns 404")
 //        void updateValidationError() throws Exception {
 //
 //            String updateRequest = """
-//                                 {
-//                                     "id"           : 999999,
-//                                     "rep_id"       : %d,
-//                                     "metric_id"    : %d
-//                                 }
-//                                 """.formatted(rep.getId(), metric.getId());
+//                {
+//                    "id"             : 999999,
+//                    "rep_metric_id"  : %d,
+//                    "data_source_id" : %d,
+//                    "description"    : "desc"
+//                }
+//                """.formatted(repMetric.getId(), dataSource.getId());
 //
 //            String jsonResponse = mvc.perform(
 //                            put(API)
@@ -318,7 +320,7 @@
 //            String expectedResponse = """
 //                {
 //                    "status" : 404,
-//                    "message": "RepMetricService. Could not update RepMetric by id: 999999"
+//                    "message": "RepMetricSourceService. Could not update RepMetricSource by id: 999999"
 //                }
 //                """;
 //
@@ -326,9 +328,7 @@
 //            JsonNode actualNode   = objectMapper.readTree(jsonResponse);
 //
 //            assertEquals(expectedNode, actualNode);
-//
 //        }
-//
 //    }
 //
 //    @Nested
@@ -337,15 +337,16 @@
 //
 //
 //        @Test
-//        @DisplayName("DELETE /rep_metrics/{id} -> deletes the Session")
+//        @DisplayName("DELETE /repMetricSources/{id} -> deletes the RepMetricSource")
 //        void delete() throws Exception {
-//            RepMetric repMetric = repMetricRepository.save(RepMetric.builder()
-//                    .rep_id(rep.getId())
-//                    .metric_id(metric.getId())
+//            RepMetricSource repMetricSource = repMetricSourceRepository.save(RepMetricSource.builder()
+//                    .rep_metric_id(repMetric.getId())
+//                    .data_source_id(dataSource.getId())
+//                    .description("desc")
 //                    .build());
 //
 //            String jsonResponse = mvc.perform(
-//                            MockMvcRequestBuilders.delete(API + "/" + repMetric.getId())
+//                            MockMvcRequestBuilders.delete(API + "/" + repMetricSource.getId())
 //                                    .with(httpBasic("biolab", "biolab"))
 //                    )
 //                    .andExpect(status().isOk())
@@ -363,11 +364,11 @@
 //
 //            assertEquals(expectedNode, actualNode);
 //
-//            assertFalse(repMetricRepository.existsById(repMetric.getId()));
+//            assertFalse(repMetricSourceRepository.existsById(repMetricSource.getId()));
 //        }
 //
 //        @Test
-//        @DisplayName("DELETE /rep_metrics/{id} with unknown ID -> returns 404")
+//        @DisplayName("DELETE /repMetricSources/{id} with unknown ID -> returns 404")
 //        void deleteValidationError() throws Exception {
 //            String jsonResponse = mvc.perform(
 //                            MockMvcRequestBuilders.delete(API + "/999999")
@@ -379,7 +380,7 @@
 //            String expectedResponse = """
 //                {
 //                    "status" : 404,
-//                    "message": "RepMetricService. Could not delete id: 999999"
+//                    "message": "RepMetricSourceService. Could not delete id: 999999"
 //                }
 //                """;
 //

@@ -30,8 +30,10 @@ public class EntityFactory {
     private final AssessmentRepository               assessmentRepository;
     private final Session1Repository                 session1Repository;
     private final RepRepository                      repRepository;
+    private final RepMetricRepository                repMetricRepository;
+    private final RepMetricSourceRepository          repMetricSourceRepository;
 
-    public EntityFactory(MeasurementRepository measurementRepository, MetricRepository metricRepository, AgeGroupDictionaryRepository ageGroupDictionaryRepository, DataSourceTypeDictionaryRepository dataSourceTypeDictionaryRepository, ResourceTypeDictionaryRepository resourceTypeDictionaryRepository, SportDictionaryRepository sportDictionaryRepository, UserRoleDictionaryRepository userRoleDictionaryRepository, OrganisationRepository organisationRepository, TeamRepository teamRepository, ModelRepository modelRepository, UserRepository userRepository, PlayerRepository playerRepository, AssessmentTemplateRepository assessmentTemplateRepository, DataSourceRepository dataSourceRepository, TemplateMetricRepository templateMetricRepository, AssessmentRepository assessmentRepository, Session1Repository session1Repository, RepRepository repRepository) {
+    public EntityFactory(MeasurementRepository measurementRepository, MetricRepository metricRepository, AgeGroupDictionaryRepository ageGroupDictionaryRepository, DataSourceTypeDictionaryRepository dataSourceTypeDictionaryRepository, ResourceTypeDictionaryRepository resourceTypeDictionaryRepository, SportDictionaryRepository sportDictionaryRepository, UserRoleDictionaryRepository userRoleDictionaryRepository, OrganisationRepository organisationRepository, TeamRepository teamRepository, ModelRepository modelRepository, UserRepository userRepository, PlayerRepository playerRepository, AssessmentTemplateRepository assessmentTemplateRepository, DataSourceRepository dataSourceRepository, TemplateMetricRepository templateMetricRepository, AssessmentRepository assessmentRepository, Session1Repository session1Repository, RepRepository repRepository, RepMetricRepository repMetricRepository, RepMetricSourceRepository repMetricSourceRepository) {
         this.measurementRepository = measurementRepository;
         this.metricRepository = metricRepository;
         this.ageGroupDictionaryRepository = ageGroupDictionaryRepository;
@@ -50,6 +52,8 @@ public class EntityFactory {
         this.assessmentRepository = assessmentRepository;
         this.session1Repository = session1Repository;
         this.repRepository = repRepository;
+        this.repMetricRepository = repMetricRepository;
+        this.repMetricSourceRepository = repMetricSourceRepository;
     }
 
     public Measurement createMeasurement(String name) {
@@ -275,26 +279,51 @@ public class EntityFactory {
         );
     }
 
+    public RepMetric createRepMetric(String name) {
+        Rep rep       = createRep("AutoRep_" + name);
+        Metric metric = createMetric("AutoMetric_" + name);
+        return repMetricRepository.save(
+                RepMetric.builder()
+                        .rep_id(rep.getId())
+                        .metric_id(metric.getId())
+                        .build()
+        );
+    }
+
+    public RepMetricSource createRepMetricSource(String name) {
+        Metric metric         = createMetric("AutoMetric_" + name);
+        DataSource dataSource = createDataSource("AutoDataSource_" + name);
+        return repMetricSourceRepository.save(
+                RepMetricSource.builder()
+                        .rep_metric_id(dataSource.getId())
+                        .data_source_id(metric.getId())
+                        .description("AutoDescription_"+name)
+                        .build()
+        );
+    }
+
     @AfterEach
     void cleanup() {
-        metricRepository.deleteAll();
-        measurementRepository.deleteAll();
-        ageGroupDictionaryRepository.deleteAll();
-        dataSourceTypeDictionaryRepository.deleteAll();
-        resourceTypeDictionaryRepository.deleteAll();
-        sportDictionaryRepository.deleteAll();
-        userRoleDictionaryRepository.deleteAll();
-        organisationRepository.deleteAll();
-        teamRepository.deleteAll();
-        modelRepository.deleteAll();
-        userRepository.deleteAll();
-        playerRepository.deleteAll();
-        assessmentTemplateRepository.deleteAll();
-        dataSourceRepository.deleteAll();
-        templateMetricRepository.deleteAll();
-        assessmentRepository.deleteAll();
-        session1Repository.deleteAll();
-        repRepository.deleteAll();
+//        metricRepository.deleteAll();
+//        measurementRepository.deleteAll();
+//        ageGroupDictionaryRepository.deleteAll();
+//        dataSourceTypeDictionaryRepository.deleteAll();
+//        resourceTypeDictionaryRepository.deleteAll();
+//        sportDictionaryRepository.deleteAll();
+//        userRoleDictionaryRepository.deleteAll();
+//        organisationRepository.deleteAll();
+//        teamRepository.deleteAll();
+//        modelRepository.deleteAll();
+//        userRepository.deleteAll();
+//        playerRepository.deleteAll();
+//        assessmentTemplateRepository.deleteAll();
+//        dataSourceRepository.deleteAll();
+//        templateMetricRepository.deleteAll();
+//        assessmentRepository.deleteAll();
+//        session1Repository.deleteAll();
+//        repRepository.deleteAll();
+//        repMetricRepository.deleteAll();
+//        repMetricSourceRepository.deleteAll();
     }
 
 
