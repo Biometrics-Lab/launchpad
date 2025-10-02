@@ -171,7 +171,6 @@ class AssessmentTemplateControllerIntegrationTest {
                         "name"         : "avg_exit_velocity",
                         "sport"        : "%s",
                         "description"  : "desc"
-                        
                     },
                     {
                         "id"           : %d,

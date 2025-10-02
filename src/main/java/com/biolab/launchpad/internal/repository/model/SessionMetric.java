@@ -12,7 +12,7 @@ import org.springframework.data.relational.core.mapping.Table;
 @Table("session_metric")
 public class SessionMetric extends ID {
     @NotNull(message = "session_metric session_id cannot be null")
-    private Integer session_id;
+    private Integer session1_id;
     @NotNull(message = "session_metric metric_id cannot be null")
     private Integer metric_id;
     private Number min_value;

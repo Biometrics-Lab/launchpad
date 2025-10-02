@@ -5,6 +5,8 @@ import com.biolab.launchpad.internal.repository.model.*;
 import org.junit.jupiter.api.AfterEach;
 import org.springframework.stereotype.Component;
 
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Component
@@ -25,8 +27,11 @@ public class EntityFactory {
     private final AssessmentTemplateRepository       assessmentTemplateRepository;
     private final DataSourceRepository               dataSourceRepository;
     private final TemplateMetricRepository           templateMetricRepository;
+    private final AssessmentRepository               assessmentRepository;
+    private final Session1Repository                 session1Repository;
+    private final RepRepository                      repRepository;
 
-    public EntityFactory(MeasurementRepository measurementRepository, MetricRepository metricRepository, AgeGroupDictionaryRepository ageGroupDictionaryRepository, DataSourceTypeDictionaryRepository dataSourceTypeDictionaryRepository, ResourceTypeDictionaryRepository resourceTypeDictionaryRepository, SportDictionaryRepository sportDictionaryRepository, UserRoleDictionaryRepository userRoleDictionaryRepository, OrganisationRepository organisationRepository, TeamRepository teamRepository, ModelRepository modelRepository, UserRepository userRepository, PlayerRepository playerRepository, AssessmentTemplateRepository assessmentTemplateRepository, DataSourceRepository dataSourceRepository, TemplateMetricRepository templateMetricRepository) {
+    public EntityFactory(MeasurementRepository measurementRepository, MetricRepository metricRepository, AgeGroupDictionaryRepository ageGroupDictionaryRepository, DataSourceTypeDictionaryRepository dataSourceTypeDictionaryRepository, ResourceTypeDictionaryRepository resourceTypeDictionaryRepository, SportDictionaryRepository sportDictionaryRepository, UserRoleDictionaryRepository userRoleDictionaryRepository, OrganisationRepository organisationRepository, TeamRepository teamRepository, ModelRepository modelRepository, UserRepository userRepository, PlayerRepository playerRepository, AssessmentTemplateRepository assessmentTemplateRepository, DataSourceRepository dataSourceRepository, TemplateMetricRepository templateMetricRepository, AssessmentRepository assessmentRepository, Session1Repository session1Repository, RepRepository repRepository) {
         this.measurementRepository = measurementRepository;
         this.metricRepository = metricRepository;
         this.ageGroupDictionaryRepository = ageGroupDictionaryRepository;
@@ -42,6 +47,9 @@ public class EntityFactory {
         this.assessmentTemplateRepository = assessmentTemplateRepository;
         this.dataSourceRepository = dataSourceRepository;
         this.templateMetricRepository = templateMetricRepository;
+        this.assessmentRepository = assessmentRepository;
+        this.session1Repository = session1Repository;
+        this.repRepository = repRepository;
     }
 
     public Measurement createMeasurement(String name) {
@@ -234,6 +242,39 @@ public class EntityFactory {
         );
     }
 
+    public Assessment createAssessment(String name) {
+        SportDictionary sportDictionary       = createSportDictionary("AutoSport"+name);
+        Player player                         = createPlayer("AutoPlayer"+name);
+        AssessmentTemplate assessmentTemplate = createAssessmentTemplate("AutoAsTemp"+name);
+        return assessmentRepository.save(
+                Assessment.builder()
+                        .sport(sportDictionary.getId())
+                        .player_id (player.getId())
+                        .template_id(assessmentTemplate.getId())
+                        .build()
+        );
+    }
+
+    public Session1 createSession1(String name) {
+        Assessment assessment = createAssessment("AutoAss_" + name);
+        return session1Repository.save(
+                Session1.builder()
+                        .assessment_id(assessment.getId())
+                        .start_time(Timestamp.valueOf(LocalDateTime.of(2025, 10, 2, 14, 45, 00)))
+                        .build()
+        );
+    }
+
+    public Rep createRep(String name) {
+        Session1 session1 = createSession1("AutoSes_" + name);
+        return repRepository.save(
+                Rep.builder()
+                        .session1_id(session1.getId())
+                        .start_time(Timestamp.valueOf(LocalDateTime.of(2025, 10, 2, 14, 45, 00)))
+                        .build()
+        );
+    }
+
     @AfterEach
     void cleanup() {
         metricRepository.deleteAll();
@@ -251,6 +292,9 @@ public class EntityFactory {
         assessmentTemplateRepository.deleteAll();
         dataSourceRepository.deleteAll();
         templateMetricRepository.deleteAll();
+        assessmentRepository.deleteAll();
+        session1Repository.deleteAll();
+        repRepository.deleteAll();
     }
 
 

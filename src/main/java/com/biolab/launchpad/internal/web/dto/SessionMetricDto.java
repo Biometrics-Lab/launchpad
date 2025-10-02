@@ -7,7 +7,7 @@ import lombok.Builder;
 public record SessionMetricDto(
         Integer id,
         @NotNull(message = "session_metric session_id cannot be null")
-        Integer session_id,
+        Integer session1_id,
         @NotNull(message = "session_metric metric_id cannot be null")
         Integer metric_id,
         Number min_value,

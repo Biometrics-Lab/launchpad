@@ -1,6 +1,6 @@
 package com.biolab.launchpad.internal.web.controller;
 
-import com.biolab.launchpad.internal.repository.TemplateMetricRepository;
+import com.biolab.launchpad.internal.repository.SessionMetricRepository;
 import com.biolab.launchpad.internal.repository.model.*;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -24,10 +24,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
 @AutoConfigureMockMvc
-@DisplayName("TemplateMetric Integration Tests")
-class TemplateMetricControllerIntegrationTest {
+@DisplayName("Session metric Integration Tests")
+class SessionMetricControllerIntegrationTest {
 
-    private static final String API = "/api/v1/template_metrics";
+    private static final String API = "/api/v1/session_metrics";
 
     @Autowired
     private MockMvc mvc;
@@ -36,42 +36,42 @@ class TemplateMetricControllerIntegrationTest {
     ObjectMapper objectMapper;
 
     @Autowired
-    TemplateMetricRepository templateMetricRepository;
+    SessionMetricRepository sessionMetricRepository;
 
     @Autowired
     EntityFactory factory;
 
-    AssessmentTemplate template;
-    Metric         metric;
-    DataSource     source;
+    Session1 session1;
+    Metric   metric;
 
     @BeforeEach
     void setUp() {
-        template = factory.createAssessmentTemplate("template");
-        metric   = factory.createMetric("metric");
-        source   = factory.createDataSource("source");
+        session1 = factory.createSession1("conec");
+        metric   = factory.createMetric("weight");
     }
 
     @AfterEach
     void tearDown() {
-        templateMetricRepository.deleteAll();
+        sessionMetricRepository.deleteAll();
     }
 
     @Nested
     @DisplayName("Create")
     class CreateTests {
         @Test
-        @DisplayName("POST /templateMetrics -> creates and returns the new TemplateMetric")
+        @DisplayName("POST /session_metrics -> creates and returns the new Session")
         void create() throws Exception {
 
             String request =
                             """ 
                                 {
-                                    "template_id": %d,
-                                    "metric_id"  : %d,
-                                    "source_id"  : %d
+                                    "session1_id"  : %d,
+                                    "metric_id"    : %d,
+                                    "min_value"    : 1,
+                                    "max_value"    : 2,
+                                    "avg_value"    : 3
                                 }
-                            """.formatted(template.getId(), metric.getId(), source.getId());
+                            """.formatted(session1.getId(), metric.getId());
 
             String jsonResponse = mvc.perform(
                             post(API)
@@ -85,19 +85,20 @@ class TemplateMetricControllerIntegrationTest {
 
             JsonNode responseNode = objectMapper.readTree(jsonResponse);
 
-            int templateMetricId = responseNode.get("id").asInt();
-            assertThat(templateMetricId).isPositive();
-
+            int sessionId = responseNode.get("id").asInt();
+            assertThat(sessionId).isPositive();
 
             String expectedResponse =
                                     """
                                       {
-                                        "id"         : %d,
-                                        "template_id": %d,
-                                        "metric_id"  : %d,
-                                        "source_id"  : %d
+                                        "id"           : %d,
+                                        "session1_id"  : %d,
+                                        "metric_id"    : %d,
+                                        "min_value"    : 1,
+                                        "max_value"    : 2,
+                                        "avg_value"    : 3
                                       }
-                                    """.formatted(templateMetricId, template.getId(), metric.getId(), source.getId());
+                                    """.formatted(sessionId, session1.getId(), metric.getId());
 
             JsonNode expectedResponseNode = objectMapper.readTree(expectedResponse);
 
@@ -105,7 +106,7 @@ class TemplateMetricControllerIntegrationTest {
         }
 
         @Test
-        @DisplayName("POST /templateMetrics with validation message -> returns 422")
+        @DisplayName("POST /session_metrics with validation message -> returns 422")
         void createValidationError() throws Exception {
             String request =
                             """
@@ -130,7 +131,7 @@ class TemplateMetricControllerIntegrationTest {
                     """
                             {
                                 "status"       : 422,
-                                "message"      : "Validation failed: metric_id: Template_metric metric_id cannot be null, and source_id: Template_metric source_id cannot be null, and template_id: Template_metric template_id cannot be null"
+                                "message"      : "Validation failed: metric_id: session_metric metric_id cannot be null, and session1_id: session_metric session_id cannot be null"
                             }
                             """;
 
@@ -145,21 +146,25 @@ class TemplateMetricControllerIntegrationTest {
     class ReadTests {
 
         @Test
-        @DisplayName("GET /templateMetrics -> returns all templateMetrics")
+        @DisplayName("GET /session_metrics -> returns all session_metrics")
         void getAll() throws Exception {
 
-            TemplateMetric templateMetric1 = templateMetricRepository.save(TemplateMetric.builder()
-                    .template_id(template.getId())
+            SessionMetric sessionMetric1 = sessionMetricRepository.save(SessionMetric.builder()
+                    .session1_id(session1.getId())
                     .metric_id(metric.getId())
-                    .source_id(source.getId())
+                    .min_value(1)
+                    .max_value(2)
+                    .avg_value(3)
                     .build());
 
-            TemplateMetric templateMetric2 = templateMetricRepository.save(TemplateMetric.builder()
-                    .template_id(template.getId())
+            SessionMetric sessionMetric2 = sessionMetricRepository.save(SessionMetric.builder()
+                    .session1_id(session1.getId())
                     .metric_id(metric.getId())
-                    .source_id(source.getId())
+                    .min_value(5)
+                    .max_value(6)
+                    .avg_value(7)
                     .build());
-
+            
             String jsonResponse = mvc.perform(
                             get(API)
                                     .with(httpBasic("biolab", "biolab"))
@@ -170,19 +175,23 @@ class TemplateMetricControllerIntegrationTest {
             String expectedResponse = """
                 [
                     {
-                        "id"         : %d,
-                        "template_id": %d,
-                        "metric_id"  : %d,
-                        "source_id"  : %d
-                    },
+                        "id"           : %d,
+                        "session1_id"  : %d,
+                        "metric_id"    : %d,
+                        "min_value"    : 1,
+                        "max_value"    : 2,
+                        "avg_value"    : 3
+                   },
                     {
-                        "id"         : %d,
-                        "template_id": %d,
-                        "metric_id"  : %d,
-                        "source_id"  : %d
+                        "id"           : %d,
+                        "session1_id"  : %d,
+                        "metric_id"    : %d,
+                        "min_value"    : 5,
+                        "max_value"    : 6,
+                        "avg_value"    : 7
                     }
                 ]
-                """.formatted(templateMetric1.getId(), template.getId(), metric.getId(), source.getId(), templateMetric2.getId(),template.getId(), metric.getId(), source.getId());
+                """.formatted(sessionMetric1.getId(), session1.getId(), metric.getId(), sessionMetric2.getId(),session1.getId(), metric.getId());
 
             JsonNode expectedNode = objectMapper.readTree(expectedResponse);
             JsonNode actualNode   = objectMapper.readTree(jsonResponse);
@@ -191,17 +200,19 @@ class TemplateMetricControllerIntegrationTest {
         }
 
         @Test
-        @DisplayName("GET /templateMetrics/{id} -> returns templateMetric by ID")
+        @DisplayName("GET /session_metrics/{id} -> returns session by ID")
         void getById() throws Exception {
 
-            TemplateMetric templateMetric = templateMetricRepository.save(TemplateMetric.builder()
-                    .template_id(template.getId())
+            SessionMetric sessionMetric = sessionMetricRepository.save(SessionMetric.builder()
+                    .session1_id(session1.getId())
                     .metric_id(metric.getId())
-                    .source_id(source.getId())
+                    .min_value(1)
+                    .max_value(2)
+                    .avg_value(3)
                     .build());
 
             String jsonResponse = mvc.perform(
-                            get(API + "/" + templateMetric.getId())
+                            get(API + "/" + sessionMetric.getId())
                                     .with(httpBasic("biolab", "biolab"))
                     )
                     .andExpect(status().isOk())
@@ -209,12 +220,14 @@ class TemplateMetricControllerIntegrationTest {
 
             String expectedResponse = """
                                      {
-                                        "id"          : %d,
-                                         "template_id": %d,
-                                         "metric_id"  : %d,
-                                         "source_id"  : %d
+                                        "id"            : %d,
+                                         "session1_id"  : %d,
+                                         "metric_id"    : %d,
+                                         "min_value"    : 1,
+                                         "max_value"    : 2,
+                                         "avg_value"    : 3
                                      }
-                                    """.formatted(templateMetric.getId(), template.getId(), metric.getId(), source.getId());
+                                    """.formatted(sessionMetric.getId(), session1.getId(), metric.getId());
 
             JsonNode expectedNode = objectMapper.readTree(expectedResponse);
             JsonNode actualNode   = objectMapper.readTree(jsonResponse);
@@ -223,7 +236,7 @@ class TemplateMetricControllerIntegrationTest {
         }
 
         @Test
-        @DisplayName("GET /templateMetrics/{id} with unknown ID -> returns 404")
+        @DisplayName("GET /session_metrics/{id} with unknown ID -> returns 404")
         void getByIdValidationError() throws Exception {
             String jsonResponse = mvc.perform(
                             get(API + "/999999")
@@ -235,7 +248,7 @@ class TemplateMetricControllerIntegrationTest {
             String expectedResponse = """
                 {
                     "status" : 404,
-                    "message": "Template_metric not found by id: 999999"
+                    "message": "Session_metric not found by id: 999999"
                 }
                 """;
 
@@ -252,23 +265,26 @@ class TemplateMetricControllerIntegrationTest {
     class UpdateTests {
 
         @Test
-        @DisplayName("PUT /templateMetrics -> updates and returns the TemplateMetric")
+        @DisplayName("PUT /session_metrics -> updates and returns the Session")
         void update() throws Exception {
-            TemplateMetric original = templateMetricRepository.save(TemplateMetric.builder()
-                    .template_id(template.getId())
+            SessionMetric original = sessionMetricRepository.save(SessionMetric.builder()
+                    .session1_id(session1.getId())
                     .metric_id(metric.getId())
-                    .source_id(source.getId())
+                    .min_value(1)
+                    .max_value(2)
+                    .avg_value(3)
                     .build());
 
-            metric = factory.createMetric("updated");
-            String updateRequest = """
+           String updateRequest = """
                                 {
-                                    "id"          : %d,
-                                    "template_id" : %d,
-                                    "metric_id"   : %d,
-                                    "source_id"   : %d
-                                 }
-                                """.formatted(original.getId(), template.getId(), metric.getId(), source.getId());
+                                   "id"           : %d,
+                                   "session1_id"  : %d,
+                                   "metric_id"    : %d,
+                                   "min_value"    : 4,
+                                   "max_value"    : 5,
+                                   "avg_value"    : 6
+                                }
+                                """.formatted(original.getId(), session1.getId(), metric.getId());
 
             String jsonResponse = mvc.perform(
                             put(API)
@@ -283,34 +299,31 @@ class TemplateMetricControllerIntegrationTest {
 
             String expectedResponse = """
                                 {
-                                    "id"          : %d,
-                                    "template_id" : %d,
-                                    "metric_id"   : %d,
-                                    "source_id"   : %d
+                                    "id"           : %d,
+                                    "session1_id"  : %d,
+                                    "metric_id"    : %d,
+                                    "min_value"    : 4,
+                                    "max_value"    : 5,
+                                    "avg_value"    : 6
                                  }
-                                """.formatted(original.getId(), template.getId(), metric.getId(), source.getId());
+                                """.formatted(original.getId(), session1.getId(), metric.getId());
 
             JsonNode expectedNode = objectMapper.readTree(expectedResponse);
 
             assertEquals(expectedNode, responseNode);
-
-            TemplateMetric updated = templateMetricRepository.findById(original.getId()).orElseThrow();
-            assertEquals(updated.getMetric_id(), metric.getId());
-
         }
 
         @Test
-        @DisplayName("PUT /templateMetrics with invalid id -> returns 404")
+        @DisplayName("PUT /session_metrics with invalid id -> returns 404")
         void updateValidationError() throws Exception {
 
             String updateRequest = """
                                  {
-                                     "id"             : 999999,
-                                     "template_id" : %d,
-                                     "metric_id"   : %d,
-                                     "source_id"   : %d
+                                     "id"           : 999999,
+                                     "session1_id"  : %d,
+                                     "metric_id"    : %d
                                  }
-                                 """.formatted(template.getId(), metric.getId(), source.getId());
+                                 """.formatted(session1.getId(), metric.getId());
 
             String jsonResponse = mvc.perform(
                             put(API)
@@ -325,7 +338,7 @@ class TemplateMetricControllerIntegrationTest {
             String expectedResponse = """
                 {
                     "status" : 404,
-                    "message": "TemplateMetricService. Could not update TemplateMetric by id: 999999"
+                    "message": "SessionMetricService. Could not update SessionMetric by id: 999999"
                 }
                 """;
 
@@ -344,16 +357,15 @@ class TemplateMetricControllerIntegrationTest {
 
 
         @Test
-        @DisplayName("DELETE /templateMetrics/{id} -> deletes the TemplateMetric")
+        @DisplayName("DELETE /session_metrics/{id} -> deletes the Session")
         void delete() throws Exception {
-            TemplateMetric templateMetric = templateMetricRepository.save(TemplateMetric.builder()
-                    .template_id(template.getId())
+            SessionMetric sessionMetric = sessionMetricRepository.save(SessionMetric.builder()
+                    .session1_id(session1.getId())
                     .metric_id(metric.getId())
-                    .source_id(source.getId())
                     .build());
 
             String jsonResponse = mvc.perform(
-                            MockMvcRequestBuilders.delete(API + "/" + templateMetric.getId())
+                            MockMvcRequestBuilders.delete(API + "/" + sessionMetric.getId())
                                     .with(httpBasic("biolab", "biolab"))
                     )
                     .andExpect(status().isOk())
@@ -371,11 +383,11 @@ class TemplateMetricControllerIntegrationTest {
 
             assertEquals(expectedNode, actualNode);
 
-            assertFalse(templateMetricRepository.existsById(templateMetric.getId()));
+            assertFalse(sessionMetricRepository.existsById(sessionMetric.getId()));
         }
 
         @Test
-        @DisplayName("DELETE /templateMetrics/{id} with unknown ID -> returns 404")
+        @DisplayName("DELETE /session_metrics/{id} with unknown ID -> returns 404")
         void deleteValidationError() throws Exception {
             String jsonResponse = mvc.perform(
                             MockMvcRequestBuilders.delete(API + "/999999")
@@ -387,7 +399,7 @@ class TemplateMetricControllerIntegrationTest {
             String expectedResponse = """
                 {
                     "status" : 404,
-                    "message": "TemplateMetricService. Could not delete id: 999999"
+                    "message": "SessionMetricService. Could not delete id: 999999"
                 }
                 """;
 
