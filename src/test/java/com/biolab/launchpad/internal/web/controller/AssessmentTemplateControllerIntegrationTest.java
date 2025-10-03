@@ -124,12 +124,12 @@ class AssessmentTemplateControllerIntegrationTest {
             JsonNode responseNode = objectMapper.readTree(jsonResponse);
 
             String expectedResponse =
-                    """
-                            {
-                                "status"       : 422,
-                                "message"      : "Validation failed: name: Name cannot be blank, and sport: Assessment_template sport cannot be null"
-                            }
-                            """;
+                                    """
+                                        {
+                                            "status"   : 422,
+                                            "message"  : "Validation failed: name: Name cannot be blank, and sport: Assessment_template sport cannot be null"
+                                        }
+                                    """;
 
             JsonNode expectedResponseNode = objectMapper.readTree(expectedResponse);
 
@@ -165,21 +165,21 @@ class AssessmentTemplateControllerIntegrationTest {
                     .andReturn().getResponse().getContentAsString();
 
             String expectedResponse = """
-                [
-                    {
-                        "id"           : %d,
-                        "name"         : "avg_exit_velocity",
-                        "sport"        : "%s",
-                        "description"  : "desc"
-                    },
-                    {
-                        "id"           : %d,
-                        "name"         : "max_entry_velocity",
-                        "sport"        : "%s",
-                        "description"  : "desc"
-                    }
-                ]
-                """.formatted(assessmentTemplate1.getId(), sportDictionary.getId(), assessmentTemplate2.getId(), sportDictionary.getId());
+                    [
+                        {
+                            "id"           : %d,
+                            "name"         : "avg_exit_velocity",
+                            "sport"        : "%s",
+                            "description"  : "desc"
+                        },
+                        {
+                            "id"           : %d,
+                            "name"         : "max_entry_velocity",
+                            "sport"        : "%s",
+                            "description"  : "desc"
+                        }
+                    ]
+                    """.formatted(assessmentTemplate1.getId(), sportDictionary.getId(), assessmentTemplate2.getId(), sportDictionary.getId());
 
             JsonNode expectedNode = objectMapper.readTree(expectedResponse);
             JsonNode actualNode   = objectMapper.readTree(jsonResponse);

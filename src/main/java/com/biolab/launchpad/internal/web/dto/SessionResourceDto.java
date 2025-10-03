@@ -7,7 +7,7 @@ import lombok.Builder;
 public record SessionResourceDto(
         Integer id,
         @NotNull(message = "Session_resource session_id cannot be null")
-        Integer session_id,
+        Integer session1_id,
         @NotNull(message = "Session_resource type cannot be null")
         String type,
         @NotNull(message = "Session_resource url cannot be null")

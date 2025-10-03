@@ -56,7 +56,7 @@ class DataSourceTypeDictionaryControllerIntegrationTest {
             String request =
                     """
                         {
-                            "name" : "AgeGroup",
+                            "name"        : "AgeGroup",
                             "description" : "other description"
                         }
                     """;
@@ -78,7 +78,7 @@ class DataSourceTypeDictionaryControllerIntegrationTest {
             String expectedResponse =
                     """
                        {
-                            "name" : "AgeGroup",
+                            "name"        : "AgeGroup",
                             "description" : "other description"
                         }
    """.formatted(dataSourceTypeDictionaryId);
@@ -93,11 +93,11 @@ class DataSourceTypeDictionaryControllerIntegrationTest {
         void createValidationError() throws Exception {
 
             String request =
-                    """
-                         {
-                               "name" : ""
-                         }
-                    """;
+                            """
+                                 {
+                                       "name" : ""
+                                 }
+                            """;
 
             String jsonResponse = mvc.perform(
                             post(API)
@@ -112,7 +112,7 @@ class DataSourceTypeDictionaryControllerIntegrationTest {
             JsonNode responseNode = objectMapper.readTree(jsonResponse);
 
             String expectedResponse =
-                    """
+                            """
                             {
                                 "status"  : 422,
                                 "message" : "Validation failed: name: Name cannot be blank"
@@ -157,17 +157,17 @@ class DataSourceTypeDictionaryControllerIntegrationTest {
                     .andReturn().getResponse().getContentAsString();
 
             String expectedResponse = """
-                [
-                    {
-                        "name"           : "%s",
-                        "description" : "other description"
-                    },
-                    {
-                        "name"           : "%s",
-                        "description" : "other description"
-                    }
-                ]
-                """.formatted(dataSourceTypeDictionary1.getName(), dataSourceTypeDictionary2.getName());
+                    [
+                        {
+                            "name"        : "%s",
+                            "description" : "other description"
+                        },
+                        {
+                            "name"        : "%s",
+                            "description" : "other description"
+                        }
+                    ]
+                    """.formatted(dataSourceTypeDictionary1.getName(), dataSourceTypeDictionary2.getName());
 
             JsonNode expectedNode = objectMapper.readTree(expectedResponse);
             JsonNode actualNode   = objectMapper.readTree(jsonResponse);
@@ -196,7 +196,7 @@ class DataSourceTypeDictionaryControllerIntegrationTest {
 
             String expectedResponse = """
                                         {
-                                             "name" : "%s",
+                                             "name"        : "%s",
                                              "description" : "other description"
                                          }
                                         """.formatted(dataSourceTypeDictionary.getName());
@@ -218,11 +218,11 @@ class DataSourceTypeDictionaryControllerIntegrationTest {
                     .andReturn().getResponse().getContentAsString();
 
             String expectedResponse = """
-                {
-                    "status" : 404,
-                    "message": "Data_source_type_dictionary not found by id: 999999"
-                }
-                """;
+                    {
+                        "status" : 404,
+                        "message": "Data_source_type_dictionary not found by id: 999999"
+                    }
+                    """;
 
             JsonNode expectedNode = objectMapper.readTree(expectedResponse);
             JsonNode actualNode   = objectMapper.readTree(jsonResponse);
@@ -250,7 +250,7 @@ class DataSourceTypeDictionaryControllerIntegrationTest {
 
             String updateRequest = """
                                     {
-                                             "name" : "%s",
+                                             "name"        : "%s",
                                              "description" : "updated other description"
                                     }
                                     """.formatted(original.getId());
@@ -268,7 +268,7 @@ class DataSourceTypeDictionaryControllerIntegrationTest {
 
             String expectedResponse = """
                                        {
-                                             "name" : "%s",
+                                             "name"        : "%s",
                                              "description" : "updated other description"
                                         }
                                        """.formatted(original.getId());
@@ -288,7 +288,7 @@ class DataSourceTypeDictionaryControllerIntegrationTest {
 
             String updateRequest = """
                                     {
-                                          "name" : "999999",
+                                          "name"        : "999999",
                                           "description" : "updated other description"
                                     }
                                     """;
@@ -304,11 +304,11 @@ class DataSourceTypeDictionaryControllerIntegrationTest {
 
 
             String expectedResponse = """
-                {
-                    "status" : 404,
-                    "message": "DataSourceTypeDictionaryService. Could not update DataSourceTypeDictionary by id: 999999"
-                }
-                """;
+                    {
+                        "status" : 404,
+                        "message": "DataSourceTypeDictionaryService. Could not update DataSourceTypeDictionary by id: 999999"
+                    }
+                    """;
 
             JsonNode expectedNode = objectMapper.readTree(expectedResponse);
             JsonNode actualNode   = objectMapper.readTree(jsonResponse);
@@ -343,11 +343,11 @@ class DataSourceTypeDictionaryControllerIntegrationTest {
                     .andReturn().getResponse().getContentAsString();
 
             String expectedResponse = """
-                {
-                    "status" : 200,
-                    "message": "Success"
-                }
-                """;
+                    {
+                        "status" : 200,
+                        "message": "Success"
+                    }
+                    """;
 
             JsonNode expectedNode = objectMapper.readTree(expectedResponse);
             JsonNode actualNode   = objectMapper.readTree(jsonResponse);

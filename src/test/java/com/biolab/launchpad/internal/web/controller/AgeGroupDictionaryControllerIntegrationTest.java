@@ -56,7 +56,7 @@ class AgeGroupDictionaryControllerIntegrationTest {
             String request =
                             """
                                 {
-                                    "name" : "AgeGroup",
+                                    "name"        : "AgeGroup",
                                     "description" : "other description"
                                 }
                             """;
@@ -78,7 +78,7 @@ class AgeGroupDictionaryControllerIntegrationTest {
             String expectedResponse =
                                      """
                                         {
-                                             "name" : "AgeGroup",
+                                             "name"        : "AgeGroup",
                                              "description" : "other description"
                                          }
                     """.formatted(ageGroupDictionaryId);
@@ -159,11 +159,11 @@ class AgeGroupDictionaryControllerIntegrationTest {
             String expectedResponse = """
                 [
                     {
-                        "name"           : "%s",
+                        "name"        : "%s",
                         "description" : "other description"
                     },
                     {
-                        "name"           : "%s",
+                        "name"        : "%s",
                         "description" : "other description"
                     }
                 ]
@@ -196,7 +196,7 @@ class AgeGroupDictionaryControllerIntegrationTest {
 
             String expectedResponse = """
                                         {
-                                             "name" : "%s",
+                                             "name"        : "%s",
                                              "description" : "other description"
                                          }
                                         """.formatted(ageGroupDictionary.getName());
@@ -250,7 +250,7 @@ class AgeGroupDictionaryControllerIntegrationTest {
 
             String updateRequest = """
                                     {
-                                             "name" : "%s",
+                                             "name"        : "%s",
                                              "description" : "updated other description"
                                     }
                                     """.formatted(original.getId());
@@ -268,7 +268,7 @@ class AgeGroupDictionaryControllerIntegrationTest {
 
             String expectedResponse = """
                                        {
-                                             "name" : "%s",
+                                             "name"        : "%s",
                                              "description" : "updated other description"
                                         }
                                        """.formatted(original.getId());
@@ -288,7 +288,7 @@ class AgeGroupDictionaryControllerIntegrationTest {
 
             String updateRequest = """
                                     {
-                                          "name" : "999999",
+                                          "name"        : "999999",
                                           "description" : "updated other description"
                                     }
                                     """;

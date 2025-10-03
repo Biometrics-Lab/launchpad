@@ -1,8 +1,10 @@
 package com.biolab.launchpad.internal.web.controller;
 
-import com.biolab.launchpad.internal.repository.MetricRepository;
-import com.biolab.launchpad.internal.repository.model.Measurement;
-import com.biolab.launchpad.internal.repository.model.Metric;
+import com.biolab.launchpad.internal.repository.RepResourceRepository;
+import com.biolab.launchpad.internal.repository.model.Rep;
+import com.biolab.launchpad.internal.repository.model.ResourceTypeDictionary;
+import com.biolab.launchpad.internal.repository.model.Session1;
+import com.biolab.launchpad.internal.repository.model.RepResource;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.*;
@@ -16,20 +18,19 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
 @AutoConfigureMockMvc
-@DisplayName("MetricController Integration Tests")
-class MetricControllerIntegrationTest{
+@DisplayName("RepResource Integration Tests")
+class RepResourceControllerIntegrationTest {
 
-    private static final String API = "/api/v1/metrics";
+    private static final String API = "/api/v1/rep_resources";
 
     @Autowired
     private MockMvc mvc;
@@ -38,38 +39,40 @@ class MetricControllerIntegrationTest{
     ObjectMapper objectMapper;
 
     @Autowired
-    MetricRepository metricRepository;
+    RepResourceRepository repResourceRepository;
 
     @Autowired
     EntityFactory factory;
 
-    Measurement mph;
+    Rep rep;
+    ResourceTypeDictionary resourceTypeDictionary;
 
     @BeforeEach
     void setUp() {
-        mph = factory.createMeasurement("Mph");
+        rep                     = factory.createRep("Jay-Z");
+        resourceTypeDictionary  = factory.createResourceTypeDictionary("rTypeDictionary");
     }
 
     @AfterEach
     void tearDown() {
-        metricRepository.deleteAll();
+        repResourceRepository.deleteAll();
     }
 
     @Nested
     @DisplayName("Create")
     class CreateTests {
         @Test
-        @DisplayName("POST /metrics -> creates and returns the new Metric")
+        @DisplayName("POST /repResource -> creates and returns the new RepResource")
         void create() throws Exception {
 
             String request =
-                            """ 
+                            """
                                 {
-                                    "name"         : "avg_exit_velocity",
-                                    "measurementId": %d,
-                                    "negate"       : false
+                                    "rep_id"         : %d,
+                                    "type"           : "%s",
+                                    "url"            : "desc"
                                 }
-                            """.formatted(mph.getId());
+                            """.formatted(rep.getId(), resourceTypeDictionary.getId());
 
             String jsonResponse = mvc.perform(
                             post(API)
@@ -83,33 +86,32 @@ class MetricControllerIntegrationTest{
 
             JsonNode responseNode = objectMapper.readTree(jsonResponse);
 
-            int metricId = responseNode.get("id").asInt();
-            assertThat(metricId).isPositive();
+            int repResourceId = responseNode.get("id").asInt();
+            assertThat(repResourceId).isPositive();
 
 
             String expectedResponse =
-                                    """ 
-                                    {
-                                        "id"           : %d,
-                                        "name"         : "avg_exit_velocity",
-                                        "measurementId": %d,
-                                        "negate"       : false
+                    """
+                            {
+                                        "id"             : %d,
+                                        "rep_id"         : %d,
+                                        "type"           : "%s",
+                                        "url"            :"desc"
                                     }
-                                    """.formatted(metricId, mph.getId());
+                            """.formatted(repResourceId, rep.getId(), resourceTypeDictionary.getId());
 
             JsonNode expectedResponseNode = objectMapper.readTree(expectedResponse);
 
-            assertEquals(expectedResponseNode, responseNode); // deep comparison without order
+            assertEquals(expectedResponseNode, responseNode);
         }
 
         @Test
-        @DisplayName("POST /metrics with validation message -> returns 422")
+        @DisplayName("POST /repResource with validation message -> returns 422")
         void createValidationError() throws Exception {
-
             String request =
                             """
                                 {
-                                    "negate" : true
+                                    "url" : "desc"
                                 }
                             """;
 
@@ -126,10 +128,10 @@ class MetricControllerIntegrationTest{
             JsonNode responseNode = objectMapper.readTree(jsonResponse);
 
             String expectedResponse =
-                            """
+                    """
                             {
-                                "status"  : 422,
-                                "message" : "Validation failed: measurementId: Measurement ID cannot be null, and name: Name cannot be blank"
+                                "status"       : 422,
+                                "message"      : "Validation failed: rep_id: Rep_resource rep_id cannot be null, and type: Rep_resource type cannot be null"
                             }
                             """;
 
@@ -144,19 +146,19 @@ class MetricControllerIntegrationTest{
     class ReadTests {
 
         @Test
-        @DisplayName("GET /metrics -> returns all metrics")
+        @DisplayName("GET /repResource -> returns all repResource")
         void getAll() throws Exception {
 
-            Metric metric1 = metricRepository.save(Metric.builder()
-                    .name("avg_exit_velocity")
-                    .measurementId(mph.getId())
-                    .negate(false)
+            RepResource repResource1 = repResourceRepository.save(RepResource.builder()
+                    .rep_id(rep.getId())
+                    .type(resourceTypeDictionary.getId())
+                    .url("desc")
                     .build());
 
-            Metric metric2 = metricRepository.save(Metric.builder()
-                    .name("max_entry_velocity")
-                    .measurementId(mph.getId())
-                    .negate(true)
+            RepResource repResource2 = repResourceRepository.save(RepResource.builder()
+                    .rep_id(rep.getId())
+                    .type(resourceTypeDictionary.getId())
+                    .url("desc")
                     .build());
 
             String jsonResponse = mvc.perform(
@@ -167,21 +169,21 @@ class MetricControllerIntegrationTest{
                     .andReturn().getResponse().getContentAsString();
 
             String expectedResponse = """
-                    [
-                        {
-                            "id"           : %d,
-                            "name"         : "avg_exit_velocity",
-                            "measurementId": %d,
-                            "negate"       : false
-                        },
-                        {
-                            "id"           : %d,
-                            "name"         : "max_entry_velocity",
-                            "measurementId": %d,
-                            "negate"       : true
-                        }
-                    ]
-                    """.formatted(metric1.getId(), mph.getId(), metric2.getId(), mph.getId());
+                [
+                    {
+                        "id"             : %d,
+                        "rep_id"         : %d,
+                        "type"           : "%s",
+                        "url"            :"desc"
+                    },
+                    {
+                        "id"             : %d,
+                        "rep_id"         : %d,
+                        "type"           : "%s",
+                        "url"            :"desc"
+                    }
+                ]
+                """.formatted(repResource1.getId(), rep.getId(), resourceTypeDictionary.getId(), repResource2.getId(), rep.getId(), resourceTypeDictionary.getId());
 
             JsonNode expectedNode = objectMapper.readTree(expectedResponse);
             JsonNode actualNode   = objectMapper.readTree(jsonResponse);
@@ -190,30 +192,30 @@ class MetricControllerIntegrationTest{
         }
 
         @Test
-        @DisplayName("GET /metrics/{id} -> returns metric by ID")
+        @DisplayName("GET /repResource/{id} -> returns repResource by ID")
         void getById() throws Exception {
 
-            Metric metric = metricRepository.save(Metric.builder()
-                    .name("avg_exit_velocity")
-                    .measurementId(mph.getId())
-                    .negate(false)
+            RepResource repResource = repResourceRepository.save(RepResource.builder()
+                    .rep_id(rep.getId())
+                    .type(resourceTypeDictionary.getId())
+                    .url("desc")
                     .build());
 
             String jsonResponse = mvc.perform(
-                            get(API + "/" + metric.getId())
+                            get(API + "/" + repResource.getId())
                                     .with(httpBasic("biolab", "biolab"))
                     )
                     .andExpect(status().isOk())
                     .andReturn().getResponse().getContentAsString();
 
             String expectedResponse = """
-                    {
-                        "id"           : %d,
-                        "name"         : "avg_exit_velocity",
-                        "measurementId": %d,
-                        "negate"       : false
-                    }
-                    """.formatted(metric.getId(), mph.getId());
+                {
+                    "id"             : %d,
+                    "rep_id"         : %d,
+                    "type"           : "%s",
+                    "url"            :"desc"
+                }
+                """.formatted(repResource.getId(), rep.getId() ,resourceTypeDictionary.getId());
 
             JsonNode expectedNode = objectMapper.readTree(expectedResponse);
             JsonNode actualNode   = objectMapper.readTree(jsonResponse);
@@ -222,7 +224,7 @@ class MetricControllerIntegrationTest{
         }
 
         @Test
-        @DisplayName("GET /metrics/{id} with unknown ID -> returns 404")
+        @DisplayName("GET /repResource/{id} with unknown ID -> returns 404")
         void getByIdValidationError() throws Exception {
             String jsonResponse = mvc.perform(
                             get(API + "/999999")
@@ -232,18 +234,17 @@ class MetricControllerIntegrationTest{
                     .andReturn().getResponse().getContentAsString();
 
             String expectedResponse = """
-                    {
-                        "status" : 404,
-                        "message": "Metric not found by id: 999999"
-                    }
-                    """;
+                {
+                    "status" : 404,
+                    "message": "Rep_resource not found by id: 999999"
+                }
+                """;
 
             JsonNode expectedNode = objectMapper.readTree(expectedResponse);
             JsonNode actualNode   = objectMapper.readTree(jsonResponse);
 
             assertEquals(expectedNode, actualNode);
         }
-
     }
 
     @Nested
@@ -251,22 +252,22 @@ class MetricControllerIntegrationTest{
     class UpdateTests {
 
         @Test
-        @DisplayName("PUT /metrics -> updates and returns the Metric")
+        @DisplayName("PUT /repResource -> updates and returns the RepResource")
         void update() throws Exception {
-            Metric original = metricRepository.save(Metric.builder()
-                    .name("avg_exit_velocity")
-                    .measurementId(mph.getId())
-                    .negate(true)
+            RepResource original = repResourceRepository.save(RepResource.builder()
+                    .rep_id(rep.getId())
+                    .type(resourceTypeDictionary.getId())
+                    .url("desc")
                     .build());
 
             String updateRequest = """
-                    {
-                        "id"            : %d,
-                        "name"          : "updated_velocity",
-                        "measurementId" : %d,
-                        "negate"        : false
-                    }
-                    """.formatted(original.getId(), mph.getId());
+                {
+                    "id"             : %d,
+                    "rep_id"         : %d,
+                    "type"           : "%s",
+                    "url"            : "descUPD"
+                }
+                """.formatted(original.getId(), rep.getId(), resourceTypeDictionary.getId());
 
             String jsonResponse = mvc.perform(
                             put(API)
@@ -280,35 +281,34 @@ class MetricControllerIntegrationTest{
             JsonNode responseNode = objectMapper.readTree(jsonResponse);
 
             String expectedResponse = """
-                    {
-                        "id"           : %d,
-                        "name"         : "updated_velocity",
-                        "measurementId": %d,
-                        "negate"       : false
-                    }
-                    """.formatted(original.getId(), mph.getId());
+                {
+                    "id"             : %d,
+                    "rep_id"         : %d,
+                    "type"           : "%s",
+                    "url"            :"descUPD"
+                }
+                """.formatted(original.getId(), rep.getId(), resourceTypeDictionary.getId());
 
             JsonNode expectedNode = objectMapper.readTree(expectedResponse);
 
             assertEquals(expectedNode, responseNode);
 
-            Metric updated = metricRepository.findById(original.getId()).orElseThrow();
-            assertEquals("updated_velocity", updated.getName());
-            assertFalse(updated.isNegate());
-
+            RepResource updated = repResourceRepository.findById(original.getId()).orElseThrow();
+            assertEquals("descUPD", updated.getUrl());
         }
 
         @Test
-        @DisplayName("PUT /metrics with invalid id -> returns 404")
+        @DisplayName("PUT /repResource with invalid id -> returns 404")
         void updateValidationError() throws Exception {
 
             String updateRequest = """
-                    {
-                        "id"            : 999999,
-                        "name"          : "updated_velocity",
-                        "measurementId": %d
-                    }
-                    """.formatted(mph.getId());
+                {
+                    "id"             : 999999,
+                    "rep_id"         : %d,
+                    "type"           : "%s",
+                    "url"            :"desc"
+                }
+                """.formatted(rep.getId(), resourceTypeDictionary.getId());
 
             String jsonResponse = mvc.perform(
                             put(API)
@@ -321,58 +321,57 @@ class MetricControllerIntegrationTest{
 
 
             String expectedResponse = """
-                    {
-                        "status" : 404,
-                        "message": "MetricService. Could not update Metric by id: 999999"
-                    }
-                    """;
+                {
+                    "status" : 404,
+                    "message": "RepResourceService. Could not update RepResource by id: 999999"
+                }
+                """;
 
             JsonNode expectedNode = objectMapper.readTree(expectedResponse);
             JsonNode actualNode   = objectMapper.readTree(jsonResponse);
 
             assertEquals(expectedNode, actualNode);
-
         }
-
     }
 
     @Nested
     @DisplayName("Delete")
     class DeleteTests {
 
+
         @Test
-        @DisplayName("DELETE /metrics/{id} -> deletes the Metric")
+        @DisplayName("DELETE /repResource/{id} -> deletes the RepResource")
         void delete() throws Exception {
-            Metric metric = metricRepository.save(Metric.builder()
-                    .name("avg_exit_velocity")
-                    .measurementId(mph.getId())
-                    .negate(false)
+            RepResource repResource = repResourceRepository.save(RepResource.builder()
+                    .rep_id(rep.getId())
+                    .type(resourceTypeDictionary.getId())
+                    .url("desc")
                     .build());
 
             String jsonResponse = mvc.perform(
-                            MockMvcRequestBuilders.delete(API + "/" + metric.getId())
+                            MockMvcRequestBuilders.delete(API + "/" + repResource.getId())
                                     .with(httpBasic("biolab", "biolab"))
                     )
                     .andExpect(status().isOk())
                     .andReturn().getResponse().getContentAsString();
 
             String expectedResponse = """
-                    {
-                        "status" : 200,
-                        "message": "Success"
-                    }
-                    """;
+                {
+                    "status" : 200,
+                    "message": "Success"
+                }
+                """;
 
             JsonNode expectedNode = objectMapper.readTree(expectedResponse);
             JsonNode actualNode   = objectMapper.readTree(jsonResponse);
 
             assertEquals(expectedNode, actualNode);
 
-            assertFalse(metricRepository.existsById(metric.getId()));
+            assertFalse(repResourceRepository.existsById(repResource.getId()));
         }
 
         @Test
-        @DisplayName("DELETE /metrics/{id} with unknown ID -> returns 404")
+        @DisplayName("DELETE /repResource/{id} with unknown ID -> returns 404")
         void deleteValidationError() throws Exception {
             String jsonResponse = mvc.perform(
                             MockMvcRequestBuilders.delete(API + "/999999")
@@ -382,11 +381,11 @@ class MetricControllerIntegrationTest{
                     .andReturn().getResponse().getContentAsString();
 
             String expectedResponse = """
-                    {
-                        "status" : 404,
-                        "message": "MetricService. Could not delete id: 999999"
-                    }
-                    """;
+                {
+                    "status" : 404,
+                    "message": "RepResourceService. Could not delete id: 999999"
+                }
+                """;
 
             JsonNode expectedNode = objectMapper.readTree(expectedResponse);
             JsonNode actualNode   = objectMapper.readTree(jsonResponse);
@@ -394,4 +393,5 @@ class MetricControllerIntegrationTest{
             assertEquals(expectedNode, actualNode);
         }
     }
+
 }

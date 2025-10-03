@@ -34,29 +34,30 @@ public class EntityFactory {
     private final RepMetricSourceRepository          repMetricSourceRepository;
 
     public EntityFactory(MeasurementRepository measurementRepository, MetricRepository metricRepository, AgeGroupDictionaryRepository ageGroupDictionaryRepository, DataSourceTypeDictionaryRepository dataSourceTypeDictionaryRepository, ResourceTypeDictionaryRepository resourceTypeDictionaryRepository, SportDictionaryRepository sportDictionaryRepository, UserRoleDictionaryRepository userRoleDictionaryRepository, OrganisationRepository organisationRepository, TeamRepository teamRepository, ModelRepository modelRepository, UserRepository userRepository, PlayerRepository playerRepository, AssessmentTemplateRepository assessmentTemplateRepository, DataSourceRepository dataSourceRepository, TemplateMetricRepository templateMetricRepository, AssessmentRepository assessmentRepository, Session1Repository session1Repository, RepRepository repRepository, RepMetricRepository repMetricRepository, RepMetricSourceRepository repMetricSourceRepository) {
-        this.measurementRepository = measurementRepository;
-        this.metricRepository = metricRepository;
-        this.ageGroupDictionaryRepository = ageGroupDictionaryRepository;
+        this.measurementRepository              = measurementRepository;
+        this.metricRepository                   = metricRepository;
+        this.ageGroupDictionaryRepository       = ageGroupDictionaryRepository;
         this.dataSourceTypeDictionaryRepository = dataSourceTypeDictionaryRepository;
-        this.resourceTypeDictionaryRepository = resourceTypeDictionaryRepository;
-        this.sportDictionaryRepository = sportDictionaryRepository;
-        this.userRoleDictionaryRepository = userRoleDictionaryRepository;
-        this.organisationRepository = organisationRepository;
-        this.teamRepository = teamRepository;
-        this.modelRepository = modelRepository;
-        this.userRepository = userRepository;
-        this.playerRepository = playerRepository;
-        this.assessmentTemplateRepository = assessmentTemplateRepository;
-        this.dataSourceRepository = dataSourceRepository;
-        this.templateMetricRepository = templateMetricRepository;
-        this.assessmentRepository = assessmentRepository;
-        this.session1Repository = session1Repository;
-        this.repRepository = repRepository;
-        this.repMetricRepository = repMetricRepository;
-        this.repMetricSourceRepository = repMetricSourceRepository;
+        this.resourceTypeDictionaryRepository   = resourceTypeDictionaryRepository;
+        this.sportDictionaryRepository          = sportDictionaryRepository;
+        this.userRoleDictionaryRepository       = userRoleDictionaryRepository;
+        this.organisationRepository             = organisationRepository;
+        this.teamRepository                     = teamRepository;
+        this.modelRepository                    = modelRepository;
+        this.userRepository                     = userRepository;
+        this.playerRepository                   = playerRepository;
+        this.assessmentTemplateRepository       = assessmentTemplateRepository;
+        this.dataSourceRepository               = dataSourceRepository;
+        this.templateMetricRepository           = templateMetricRepository;
+        this.assessmentRepository               = assessmentRepository;
+        this.session1Repository                 = session1Repository;
+        this.repRepository                      = repRepository;
+        this.repMetricRepository                = repMetricRepository;
+        this.repMetricSourceRepository          = repMetricSourceRepository;
     }
 
     public Measurement createMeasurement(String name) {
+
         return measurementRepository.save(
                 Measurement.builder()
                         .name(name)
@@ -65,7 +66,8 @@ public class EntityFactory {
     }
 
     public Metric createMetric(String name) {
-        Measurement measurement = createMeasurement("AutoMeasurement_" + name);
+
+        Measurement measurement = createMeasurement("AutoMeasurement");
         return metricRepository.save(
                 Metric.builder()
                         .name(name)
@@ -168,8 +170,8 @@ public class EntityFactory {
     }
 
     public Team createTeam(String name) {
-        Organisation organisation       = createOrganisation("AutoOrganisation_" + name);
-        SportDictionary sportDictionary = createSportDictionary("AutoSport_" + name);
+        Organisation organisation       = createOrganisation("AutoOrganisation");
+        SportDictionary sportDictionary = createSportDictionary("AutoSport");
         return teamRepository.save(
                 Team.builder()
                         .name(name)
@@ -181,8 +183,8 @@ public class EntityFactory {
     }
 
     public Model createModel(String name) {
-        AgeGroupDictionary ageGroupDictionary = createAgeGroupDictionary("AutoAgeGroup_" + name);
-        SportDictionary sportDictionary       = createSportDictionary("AutoSport_" + name);
+        AgeGroupDictionary ageGroupDictionary = createAgeGroupDictionary("AutoAgeGroup");
+        SportDictionary sportDictionary       = createSportDictionary("AutoSport");
         return modelRepository.save(
                 Model.builder()
                         .age_group(ageGroupDictionary.getId())
@@ -193,7 +195,7 @@ public class EntityFactory {
     }
 
     public User createUser(String name) {
-        UserRoleDictionary userRoleDictionary       = createUserRoleDictionary("AutoRole_" + name);
+        UserRoleDictionary userRoleDictionary = createUserRoleDictionary("AutoRole");
         return userRepository.save(
                 User.builder()
                         .role(userRoleDictionary.getId())
@@ -202,7 +204,7 @@ public class EntityFactory {
     }
 
     public Player createPlayer(String name) {
-        Team team = createTeam("AutoTeam_" + name);
+        Team team = createTeam("AutoTeam");
         return playerRepository.save(
                 Player.builder()
                         .name(name)
@@ -212,7 +214,7 @@ public class EntityFactory {
     }
 
     public AssessmentTemplate createAssessmentTemplate(String name) {
-        SportDictionary sportDictionary       = createSportDictionary("AutoSport_" + name);
+        SportDictionary sportDictionary = createSportDictionary("AutoSport");
         return assessmentTemplateRepository.save(
                 AssessmentTemplate.builder()
                         .name(name)
@@ -223,7 +225,7 @@ public class EntityFactory {
     }
 
     public DataSource createDataSource(String name) {
-        DataSourceTypeDictionary dataSourceTypeDictionary = createDataSourceTypeDictionary("AutoDataSours_" + name);
+        DataSourceTypeDictionary dataSourceTypeDictionary = createDataSourceTypeDictionary("AutoDataSours");
         return dataSourceRepository.save(
                 DataSource.builder()
                         .name(name)
@@ -260,7 +262,7 @@ public class EntityFactory {
     }
 
     public Session1 createSession1(String name) {
-        Assessment assessment = createAssessment("AutoAss_" + name);
+        Assessment assessment = createAssessment("AutoAss");
         return session1Repository.save(
                 Session1.builder()
                         .assessment_id(assessment.getId())
@@ -270,7 +272,7 @@ public class EntityFactory {
     }
 
     public Rep createRep(String name) {
-        Session1 session1 = createSession1("AutoSes_" + name);
+        Session1 session1 = createSession1("AutoSes");
         return repRepository.save(
                 Rep.builder()
                         .session1_id(session1.getId())
@@ -280,8 +282,8 @@ public class EntityFactory {
     }
 
     public RepMetric createRepMetric(String name) {
-        Rep rep       = createRep("AutoRep_" + name);
-        Metric metric = createMetric("AutoMetric_" + name);
+        Rep rep       = createRep("AutoRep");
+        Metric metric = createMetric("AutoMetric");
         return repMetricRepository.save(
                 RepMetric.builder()
                         .rep_id(rep.getId())
@@ -291,8 +293,8 @@ public class EntityFactory {
     }
 
     public RepMetricSource createRepMetricSource(String name) {
-        Metric metric         = createMetric("AutoMetric_" + name);
-        DataSource dataSource = createDataSource("AutoDataSource_" + name);
+        Metric metric         = createMetric("AutoMetric");
+        DataSource dataSource = createDataSource("AutoDataSource");
         return repMetricSourceRepository.save(
                 RepMetricSource.builder()
                         .rep_metric_id(dataSource.getId())
@@ -304,27 +306,25 @@ public class EntityFactory {
 
     @AfterEach
     void cleanup() {
-//        metricRepository.deleteAll();
-//        measurementRepository.deleteAll();
-//        ageGroupDictionaryRepository.deleteAll();
-//        dataSourceTypeDictionaryRepository.deleteAll();
-//        resourceTypeDictionaryRepository.deleteAll();
-//        sportDictionaryRepository.deleteAll();
-//        userRoleDictionaryRepository.deleteAll();
-//        organisationRepository.deleteAll();
-//        teamRepository.deleteAll();
-//        modelRepository.deleteAll();
-//        userRepository.deleteAll();
-//        playerRepository.deleteAll();
-//        assessmentTemplateRepository.deleteAll();
-//        dataSourceRepository.deleteAll();
-//        templateMetricRepository.deleteAll();
-//        assessmentRepository.deleteAll();
-//        session1Repository.deleteAll();
-//        repRepository.deleteAll();
-//        repMetricRepository.deleteAll();
-//        repMetricSourceRepository.deleteAll();
+        metricRepository.deleteAll();
+        measurementRepository.deleteAll();
+        ageGroupDictionaryRepository.deleteAll();
+        dataSourceTypeDictionaryRepository.deleteAll();
+        resourceTypeDictionaryRepository.deleteAll();
+        sportDictionaryRepository.deleteAll();
+        userRoleDictionaryRepository.deleteAll();
+        organisationRepository.deleteAll();
+        teamRepository.deleteAll();
+        modelRepository.deleteAll();
+        userRepository.deleteAll();
+        playerRepository.deleteAll();
+        assessmentTemplateRepository.deleteAll();
+        dataSourceRepository.deleteAll();
+        templateMetricRepository.deleteAll();
+        assessmentRepository.deleteAll();
+        session1Repository.deleteAll();
+        repRepository.deleteAll();
+        repMetricRepository.deleteAll();
+        repMetricSourceRepository.deleteAll();
     }
-
-
 }
