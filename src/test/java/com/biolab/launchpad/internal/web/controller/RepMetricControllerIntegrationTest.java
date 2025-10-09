@@ -29,7 +29,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @DisplayName("Rep metric Integration Tests")
 class RepMetricControllerIntegrationTest {
 
-    private static final String API = "/api/v1/rep_metrics";
+    private static final String API = "/api/v1/repMetrics";
 
     @Autowired
     private MockMvc mvc;
@@ -67,8 +67,8 @@ class RepMetricControllerIntegrationTest {
             String request =
                             """
                                 {
-                                    "rep_id"       : %d,
-                                    "metric_id"    : %d,
+                                    "repId"        : %d,
+                                    "metricId"     : %d,
                                     "value"        : 3
                                 }
                             """.formatted(rep.getId(), metric.getId());
@@ -92,8 +92,8 @@ class RepMetricControllerIntegrationTest {
                                     """
                                       {
                                         "id"           : %d,
-                                        "rep_id"       : %d,
-                                        "metric_id"    : %d,
+                                        "repId"        : %d,
+                                        "metricId"     : %d,
                                         "value"        : 3
                                       }
                                     """.formatted(sessionId, rep.getId(), metric.getId());
@@ -129,7 +129,7 @@ class RepMetricControllerIntegrationTest {
                     """
                             {
                                 "status"       : 422,
-                                "message"      : "Validation failed: metric_id: Rep_metric metric_id cannot be null, and rep_id: Rep_metric rep_id cannot be null"
+                                "message"      : "Validation failed: metricId: RepMetric metricId cannot be null, and repId: RepMetric repId cannot be null"
                             }
                             """;
 
@@ -148,14 +148,14 @@ class RepMetricControllerIntegrationTest {
         void getAll() throws Exception {
 
             RepMetric repMetric1 = repMetricRepository.save(RepMetric.builder()
-                    .rep_id(rep.getId())
-                    .metric_id(metric.getId())
+                    .repId(rep.getId())
+                    .metricId(metric.getId())
                     .value(3)
                     .build());
 
             RepMetric repMetric2 = repMetricRepository.save(RepMetric.builder()
-                    .rep_id(rep.getId())
-                    .metric_id(metric.getId())
+                    .repId(rep.getId())
+                    .metricId(metric.getId())
                     .value(7)
                     .build());
 
@@ -170,14 +170,14 @@ class RepMetricControllerIntegrationTest {
                 [
                     {
                         "id"           : %d,
-                        "rep_id"       : %d,
-                        "metric_id"    : %d,
+                        "repId"        : %d,
+                        "metricId"     : %d,
                         "value"        : 3
                    },
                     {
                         "id"           : %d,
-                        "rep_id"       : %d,
-                        "metric_id"    : %d,
+                        "repId"        : %d,
+                        "metricId"     : %d,
                         "value"        : 7
                     }
                 ]
@@ -194,8 +194,8 @@ class RepMetricControllerIntegrationTest {
         void getById() throws Exception {
 
             RepMetric repMetric = repMetricRepository.save(RepMetric.builder()
-                    .rep_id(rep.getId())
-                    .metric_id(metric.getId())
+                    .repId(rep.getId())
+                    .metricId(metric.getId())
                     .value(3)
                     .build());
 
@@ -209,8 +209,8 @@ class RepMetricControllerIntegrationTest {
             String expectedResponse = """
                                      {
                                         "id"            : %d,
-                                         "rep_id"       : %d,
-                                         "metric_id"    : %d,
+                                         "repId"        : %d,
+                                         "metricId"     : %d,
                                          "value"        : 3
                                      }
                                     """.formatted(repMetric.getId(), rep.getId(), metric.getId());
@@ -234,7 +234,7 @@ class RepMetricControllerIntegrationTest {
             String expectedResponse = """
                 {
                     "status" : 404,
-                    "message": "Rep_metric not found by id: 999999"
+                    "message": "RepMetric not found by id: 999999"
                 }
                 """;
 
@@ -254,16 +254,16 @@ class RepMetricControllerIntegrationTest {
         @DisplayName("PUT /rep_metrics -> updates and returns the Session")
         void update() throws Exception {
             RepMetric original = repMetricRepository.save(RepMetric.builder()
-                    .rep_id(rep.getId())
-                    .metric_id(metric.getId())
+                    .repId(rep.getId())
+                    .metricId(metric.getId())
                     .value(3)
                     .build());
 
            String updateRequest = """
                                 {
                                    "id"           : %d,
-                                   "rep_id"       : %d,
-                                   "metric_id"    : %d,
+                                   "repId"        : %d,
+                                   "metricId"     : %d,
                                    "value"        : 6
                                 }
                                 """.formatted(original.getId(), rep.getId(), metric.getId());
@@ -282,8 +282,8 @@ class RepMetricControllerIntegrationTest {
             String expectedResponse = """
                                 {
                                     "id"           : %d,
-                                    "rep_id"       : %d,
-                                    "metric_id"    : %d,
+                                    "repId"        : %d,
+                                    "metricId"     : %d,
                                     "value"        : 6
                                  }
                                 """.formatted(original.getId(), rep.getId(), metric.getId());
@@ -300,8 +300,8 @@ class RepMetricControllerIntegrationTest {
             String updateRequest = """
                                  {
                                      "id"           : 999999,
-                                     "rep_id"       : %d,
-                                     "metric_id"    : %d
+                                     "repId"        : %d,
+                                     "metricId"     : %d
                                  }
                                  """.formatted(rep.getId(), metric.getId());
 
@@ -340,8 +340,8 @@ class RepMetricControllerIntegrationTest {
         @DisplayName("DELETE /rep_metrics/{id} -> deletes the Session")
         void delete() throws Exception {
             RepMetric repMetric = repMetricRepository.save(RepMetric.builder()
-                    .rep_id(rep.getId())
-                    .metric_id(metric.getId())
+                    .repId(rep.getId())
+                    .metricId(metric.getId())
                     .build());
 
             String jsonResponse = mvc.perform(

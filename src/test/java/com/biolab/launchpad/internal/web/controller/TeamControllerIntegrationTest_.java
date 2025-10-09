@@ -1,13 +1,12 @@
 package com.biolab.launchpad.internal.web.controller;
 
-import com.biolab.launchpad.internal.repository.model.UserRoleDictionary;
-import com.biolab.launchpad.internal.repository.UserRoleDictionaryRepository;
+import com.biolab.launchpad.internal.repository.TeamRepository;
+import com.biolab.launchpad.internal.repository.model.Organisation;
+import com.biolab.launchpad.internal.repository.model.Team;
+import com.biolab.launchpad.internal.repository.model.SportDictionary;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -17,9 +16,9 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
-import static graphql.Assert.assertFalse;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -27,10 +26,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
 @AutoConfigureMockMvc
-@DisplayName("UserRoleDictionaryController Integration Tests")
-class UserRoleDictionaryControllerIntegrationTest {
+@DisplayName("Team Integration Tests")
+class TeamControllerIntegrationTest_ {
 
-    private static final String API = "/api/v1/user_role_dictionarys";
+    private static final String API = "/api/v1/teams";
 
     @Autowired
     private MockMvc mvc;
@@ -39,27 +38,41 @@ class UserRoleDictionaryControllerIntegrationTest {
     ObjectMapper objectMapper;
 
     @Autowired
-    UserRoleDictionaryRepository userRoleDictionaryRepository;
+    TeamRepository teamRepository;
+
+    @Autowired
+    EntityFactory factory;
+
+    SportDictionary sportDictionary;
+    Organisation organisation;
+
+    @BeforeEach
+    void setUp() {
+        sportDictionary = factory.createSportDictionary("coker");
+        organisation    = factory.createOrganisation("org");
+    }
 
     @AfterEach
     void tearDown() {
-        userRoleDictionaryRepository.deleteAll();
+        teamRepository.deleteAll();
     }
 
     @Nested
     @DisplayName("Create")
     class CreateTests {
         @Test
-        @DisplayName("POST /age_group_dictionarys -> creates and returns the new UserRoleDictionary")
+        @DisplayName("POST /teams -> creates and returns the new Team")
         void create() throws Exception {
 
             String request =
-                    """
-                        {
-                            "name" : "AgeGroup",
-                            "description" : "other description"
-                        }
-                    """;
+                            """ 
+                                {
+                                    "name"           : "avg_team",
+                                    "organisationId" : %d,
+                                    "sport"          : "%s",
+                                    "description"    : "desc"
+                                }
+                            """.formatted(organisation.getId(), sportDictionary.getName());
 
             String jsonResponse = mvc.perform(
                             post(API)
@@ -70,18 +83,23 @@ class UserRoleDictionaryControllerIntegrationTest {
                     .andExpect(status().isOk())
                     .andReturn().getResponse().getContentAsString();
 
+
             JsonNode responseNode = objectMapper.readTree(jsonResponse);
 
-            String userRoleDictionaryId = responseNode.get("name").asText();
-            assertThat(userRoleDictionaryId).isNotBlank();
+            int teamId = responseNode.get("id").asInt();
+            assertThat(teamId).isPositive();
+
 
             String expectedResponse =
-                    """
-                       {
-                            "name" : "AgeGroup",
-                            "description" : "other description"
-                        }
-   """.formatted(userRoleDictionaryId);
+                    """ 
+                            {
+                                        "id"             : %d,
+                                        "name"           : "avg_team",
+                                        "organisationId" : %d,
+                                        "sport"          : "%s",
+                                        "description"    : "desc"
+                                    }
+                            """.formatted(teamId, organisation.getId(), sportDictionary.getName());
 
             JsonNode expectedResponseNode = objectMapper.readTree(expectedResponse);
 
@@ -89,15 +107,14 @@ class UserRoleDictionaryControllerIntegrationTest {
         }
 
         @Test
-        @DisplayName("POST /age_group_dictionarys with validation message -> returns 422")
+        @DisplayName("POST /teams with validation message -> returns 422")
         void createValidationError() throws Exception {
-
             String request =
-                    """
-                         {
-                               "name" : ""
-                         }
-                    """;
+                            """
+                                {
+                                    "description" : "desc"
+                                }
+                            """;
 
             String jsonResponse = mvc.perform(
                             post(API)
@@ -114,8 +131,8 @@ class UserRoleDictionaryControllerIntegrationTest {
             String expectedResponse =
                     """
                             {
-                                "status"  : 422,
-                                "message" : "Validation failed: name: Name cannot be blank"
+                                "status"       : 422,
+                                "message"      : "Validation failed: name: Name cannot be blank, and organisationId: Team organisationId cannot be null, and sport: Team sport cannot be null"
                             }
                             """;
 
@@ -130,27 +147,25 @@ class UserRoleDictionaryControllerIntegrationTest {
     class ReadTests {
 
         @Test
-        @DisplayName("GET /age_group_dictionarys -> returns all userRoleDictionarys")
+        @DisplayName("GET /teams -> returns all teams")
         void getAll() throws Exception {
 
-            UserRoleDictionary userRoleDictionary1 = UserRoleDictionary.builder()
-                    .name("avg_launch_angle")
-                    .description("other description")
-                    .build();
-            UserRoleDictionary userRoleDictionary2 = UserRoleDictionary.builder()
-                    .name("max_launch_angle")
-                    .description("other description")
-                    .build();
+            Team team1 = teamRepository.save(Team.builder()
+                    .name("avg_team")
+                    .organisationId(organisation.getId())
+                    .sport(sportDictionary.getId())
+                    .description("desc")
+                    .build());
 
-            userRoleDictionary1.markAsNew(true);
-            userRoleDictionary2.markAsNew(true);
-
-            userRoleDictionaryRepository.save(userRoleDictionary1);
-            userRoleDictionaryRepository.save(userRoleDictionary2);
+            Team team2 = teamRepository.save(Team.builder()
+                    .name("max_team")
+                    .organisationId(organisation.getId())
+                    .sport(sportDictionary.getId())
+                    .description("desc")
+                    .build());
 
             String jsonResponse = mvc.perform(
                             get(API)
-                                    .contentType(MediaType.APPLICATION_JSON)
                                     .with(httpBasic("biolab", "biolab"))
                     )
                     .andExpect(status().isOk())
@@ -159,15 +174,22 @@ class UserRoleDictionaryControllerIntegrationTest {
             String expectedResponse = """
                 [
                     {
-                        "name"           : "%s",
-                        "description" : "other description"
+                        "id"             : %d,
+                        "name"           : "avg_team",
+                        "organisationId" : %d,
+                        "sport"          : "%s",
+                        "description"    : "desc"
+                        
                     },
                     {
-                        "name"           : "%s",
-                        "description" : "other description"
+                        "id"             : %d,
+                        "name"           : "max_team",
+                        "organisationId" : %d,
+                        "sport"          : "%s",
+                        "description"    : "desc"
                     }
                 ]
-                """.formatted(userRoleDictionary1.getName(), userRoleDictionary2.getName());
+                """.formatted(team1.getId(), organisation.getId(), sportDictionary.getId(), team2.getId(), organisation.getId(), sportDictionary.getId());
 
             JsonNode expectedNode = objectMapper.readTree(expectedResponse);
             JsonNode actualNode   = objectMapper.readTree(jsonResponse);
@@ -176,30 +198,32 @@ class UserRoleDictionaryControllerIntegrationTest {
         }
 
         @Test
-        @DisplayName("GET /age_group_dictionarys/{id} -> returns userRoleDictionary by ID")
+        @DisplayName("GET /teams/{id} -> returns team by ID")
         void getById() throws Exception {
 
-            UserRoleDictionary userRoleDictionary = UserRoleDictionary.builder()
-                    .name("ageGroup")
-                    .description("other description")
-                    .build();
-            userRoleDictionary.markAsNew(true);
-
-            userRoleDictionaryRepository.save(userRoleDictionary);
+            Team team = teamRepository.save(Team.builder()
+                    .name("avg_team")
+                    .organisationId(organisation.getId())
+                    .sport(sportDictionary.getId())
+                    .description("desc")
+                    .build());
 
             String jsonResponse = mvc.perform(
-                            get(API + "/" + userRoleDictionary.getId())
+                            get(API + "/" + team.getId())
                                     .with(httpBasic("biolab", "biolab"))
                     )
                     .andExpect(status().isOk())
                     .andReturn().getResponse().getContentAsString();
 
             String expectedResponse = """
-                                        {
-                                             "name" : "%s",
-                                             "description" : "other description"
-                                         }
-                                        """.formatted(userRoleDictionary.getName());
+                {
+                    "id"             : %d,
+                    "name"           : "avg_team",
+                    "organisationId" : %d,
+                    "sport"          : "%s",
+                    "description"    : "desc"
+                }
+                """.formatted(team.getId(), organisation.getId() ,sportDictionary.getId());
 
             JsonNode expectedNode = objectMapper.readTree(expectedResponse);
             JsonNode actualNode   = objectMapper.readTree(jsonResponse);
@@ -208,7 +232,7 @@ class UserRoleDictionaryControllerIntegrationTest {
         }
 
         @Test
-        @DisplayName("GET /age_group_dictionarys/{id} with unknown ID -> returns 404")
+        @DisplayName("GET /teams/{id} with unknown ID -> returns 404")
         void getByIdValidationError() throws Exception {
             String jsonResponse = mvc.perform(
                             get(API + "/999999")
@@ -220,7 +244,7 @@ class UserRoleDictionaryControllerIntegrationTest {
             String expectedResponse = """
                 {
                     "status" : 404,
-                    "message": "User_role_dictionary not found by id: 999999"
+                    "message": "Team not found by id: 999999"
                 }
                 """;
 
@@ -237,23 +261,23 @@ class UserRoleDictionaryControllerIntegrationTest {
     class UpdateTests {
 
         @Test
-        @DisplayName("PUT /age_group_dictionarys -> updates and returns the UserRoleDictionary")
+        @DisplayName("PUT /teams -> updates and returns the Team")
         void update() throws Exception {
-
-            UserRoleDictionary userRoleDictionary = UserRoleDictionary.builder()
-                    .name("ageGroup")
-                    .description("other description")
-                    .build();
-            userRoleDictionary.markAsNew(true);
-
-            UserRoleDictionary original = userRoleDictionaryRepository.save(userRoleDictionary);
+            Team original = teamRepository.save(Team.builder()
+                    .name("avg_team")
+                    .organisationId(organisation.getId())
+                    .sport(sportDictionary.getId())
+                    .build());
 
             String updateRequest = """
-                                    {
-                                             "name" : "%s",
-                                             "description" : "updated other description"
-                                    }
-                                    """.formatted(original.getId());
+                {
+                    "id"             : %d,
+                    "name"           : "updated_velocity",
+                    "organisationId" : %d,
+                    "sport"          : "%s",
+                    "description"    : "desc"
+                }
+                """.formatted(original.getId(), organisation.getId(), sportDictionary.getId());
 
             String jsonResponse = mvc.perform(
                             put(API)
@@ -267,31 +291,37 @@ class UserRoleDictionaryControllerIntegrationTest {
             JsonNode responseNode = objectMapper.readTree(jsonResponse);
 
             String expectedResponse = """
-                                       {
-                                             "name" : "%s",
-                                             "description" : "updated other description"
-                                        }
-                                       """.formatted(original.getId());
+                {
+                    "id"             : %d,
+                    "name"           : "updated_velocity",
+                    "organisationId" : %d,
+                    "sport"          : "%s",
+                    "description"    : "desc"
+                }
+                """.formatted(original.getId(), organisation.getId(), sportDictionary.getId());
 
             JsonNode expectedNode = objectMapper.readTree(expectedResponse);
 
             assertEquals(expectedNode, responseNode);
 
-            UserRoleDictionary updated = userRoleDictionaryRepository.findById(original.getId()).orElseThrow();
-            assertEquals("updated other description", updated.getDescription());
+            Team updated = teamRepository.findById(original.getId()).orElseThrow();
+            assertEquals("updated_velocity", updated.getName());
 
         }
 
         @Test
-        @DisplayName("PUT /age_group_dictionarys with invalid id -> returns 404")
+        @DisplayName("PUT /teams with invalid id -> returns 404")
         void updateValidationError() throws Exception {
 
             String updateRequest = """
-                                    {
-                                          "name" : "999999",
-                                          "description" : "updated other description"
-                                    }
-                                    """;
+                {
+                    "id"             : 999999,
+                    "name"           : "updated_velocity",
+                    "organisationId" : %d,
+                    "sport"          : "%s",
+                    "description"    : "desc"
+                }
+                """.formatted(organisation.getId(), sportDictionary.getId());
 
             String jsonResponse = mvc.perform(
                             put(API)
@@ -306,7 +336,7 @@ class UserRoleDictionaryControllerIntegrationTest {
             String expectedResponse = """
                 {
                     "status" : 404,
-                    "message": "UserRoleDictionaryService. Could not update UserRoleDictionary by id: 999999"
+                    "message": "TeamService. Could not update Team by id: 999999"
                 }
                 """;
 
@@ -323,20 +353,19 @@ class UserRoleDictionaryControllerIntegrationTest {
     @DisplayName("Delete")
     class DeleteTests {
 
+
         @Test
-        @DisplayName("DELETE /age_group_dictionarys/{id} -> deletes the UserRoleDictionary")
+        @DisplayName("DELETE /teams/{id} -> deletes the Team")
         void delete() throws Exception {
-
-            UserRoleDictionary userRoleDictionary = UserRoleDictionary.builder()
-                    .name("ageGroup")
-                    .description("other description")
-                    .build();
-            userRoleDictionary.markAsNew(true);
-
-            UserRoleDictionary original = userRoleDictionaryRepository.save(userRoleDictionary);
+            Team team = teamRepository.save(Team.builder()
+                    .name("avg_team")
+                    .organisationId(organisation.getId())
+                    .sport(sportDictionary.getId())
+                    .description("desc")
+                    .build());
 
             String jsonResponse = mvc.perform(
-                            MockMvcRequestBuilders.delete(API + "/" + userRoleDictionary.getId())
+                            MockMvcRequestBuilders.delete(API + "/" + team.getId())
                                     .with(httpBasic("biolab", "biolab"))
                     )
                     .andExpect(status().isOk())
@@ -354,11 +383,11 @@ class UserRoleDictionaryControllerIntegrationTest {
 
             assertEquals(expectedNode, actualNode);
 
-            assertFalse(userRoleDictionaryRepository.existsById(userRoleDictionary.getId()));
+            assertFalse(teamRepository.existsById(team.getId()));
         }
 
         @Test
-        @DisplayName("DELETE /age_group_dictionarys/{id} with unknown ID -> returns 404")
+        @DisplayName("DELETE /teams/{id} with unknown ID -> returns 404")
         void deleteValidationError() throws Exception {
             String jsonResponse = mvc.perform(
                             MockMvcRequestBuilders.delete(API + "/999999")
@@ -370,7 +399,7 @@ class UserRoleDictionaryControllerIntegrationTest {
             String expectedResponse = """
                 {
                     "status" : 404,
-                    "message": "UserRoleDictionaryService. Could not delete id: 999999"
+                    "message": "TeamService. Could not delete id: 999999"
                 }
                 """;
 

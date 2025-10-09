@@ -27,7 +27,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @DisplayName("Session metric Integration Tests")
 class SessionMetricControllerIntegrationTest {
 
-    private static final String API = "/api/v1/session_metrics";
+    private static final String API = "/api/v1/sessionMetrics";
 
     @Autowired
     private MockMvc mvc;
@@ -59,17 +59,17 @@ class SessionMetricControllerIntegrationTest {
     @DisplayName("Create")
     class CreateTests {
         @Test
-        @DisplayName("POST /session_metrics -> creates and returns the new Session")
+        @DisplayName("POST /sessionMetrics -> creates and returns the new Session")
         void create() throws Exception {
 
             String request =
                             """ 
                                 {
-                                    "session1_id"  : %d,
-                                    "metric_id"    : %d,
-                                    "min_value"    : 1,
-                                    "max_value"    : 2,
-                                    "avg_value"    : 3
+                                    "session1Id"   : %d,
+                                    "metricId"     : %d,
+                                    "minValue"     : 1,
+                                    "maxValue"     : 2,
+                                    "avgValue"     : 3
                                 }
                             """.formatted(session1.getId(), metric.getId());
 
@@ -92,11 +92,11 @@ class SessionMetricControllerIntegrationTest {
                                     """
                                       {
                                         "id"           : %d,
-                                        "session1_id"  : %d,
-                                        "metric_id"    : %d,
-                                        "min_value"    : 1,
-                                        "max_value"    : 2,
-                                        "avg_value"    : 3
+                                        "session1Id"   : %d,
+                                        "metricId"     : %d,
+                                        "minValue"     : 1,
+                                        "maxValue"     : 2,
+                                        "avgValue"     : 3
                                       }
                                     """.formatted(sessionId, session1.getId(), metric.getId());
 
@@ -106,7 +106,7 @@ class SessionMetricControllerIntegrationTest {
         }
 
         @Test
-        @DisplayName("POST /session_metrics with validation message -> returns 422")
+        @DisplayName("POST /sessionMetrics with validation message -> returns 422")
         void createValidationError() throws Exception {
             String request =
                             """
@@ -131,7 +131,7 @@ class SessionMetricControllerIntegrationTest {
                     """
                             {
                                 "status"       : 422,
-                                "message"      : "Validation failed: metric_id: session_metric metric_id cannot be null, and session1_id: session_metric session_id cannot be null"
+                                "message"      : "Validation failed: metricId: SessionMetric metricId cannot be null, and session1Id: SessionMetric sessionId cannot be null"
                             }
                             """;
 
@@ -146,23 +146,23 @@ class SessionMetricControllerIntegrationTest {
     class ReadTests {
 
         @Test
-        @DisplayName("GET /session_metrics -> returns all session_metrics")
+        @DisplayName("GET /sessionMetrics -> returns all sessionMetrics")
         void getAll() throws Exception {
 
             SessionMetric sessionMetric1 = sessionMetricRepository.save(SessionMetric.builder()
-                    .session1_id(session1.getId())
-                    .metric_id(metric.getId())
-                    .min_value(1)
-                    .max_value(2)
-                    .avg_value(3)
+                    .session1Id(session1.getId())
+                    .metricId(metric.getId())
+                    .minValue(1)
+                    .maxValue(2)
+                    .avgValue(3)
                     .build());
 
             SessionMetric sessionMetric2 = sessionMetricRepository.save(SessionMetric.builder()
-                    .session1_id(session1.getId())
-                    .metric_id(metric.getId())
-                    .min_value(5)
-                    .max_value(6)
-                    .avg_value(7)
+                    .session1Id(session1.getId())
+                    .metricId(metric.getId())
+                    .minValue(5)
+                    .maxValue(6)
+                    .avgValue(7)
                     .build());
             
             String jsonResponse = mvc.perform(
@@ -176,19 +176,19 @@ class SessionMetricControllerIntegrationTest {
                 [
                     {
                         "id"           : %d,
-                        "session1_id"  : %d,
-                        "metric_id"    : %d,
-                        "min_value"    : 1,
-                        "max_value"    : 2,
-                        "avg_value"    : 3
+                        "session1Id"   : %d,
+                        "metricId"     : %d,
+                        "minValue"     : 1,
+                        "maxValue"     : 2,
+                        "avgValue"     : 3
                    },
                     {
                         "id"           : %d,
-                        "session1_id"  : %d,
-                        "metric_id"    : %d,
-                        "min_value"    : 5,
-                        "max_value"    : 6,
-                        "avg_value"    : 7
+                        "session1Id"   : %d,
+                        "metricId"     : %d,
+                        "minValue"     : 5,
+                        "maxValue"     : 6,
+                        "avgValue"     : 7
                     }
                 ]
                 """.formatted(sessionMetric1.getId(), session1.getId(), metric.getId(), sessionMetric2.getId(),session1.getId(), metric.getId());
@@ -200,15 +200,15 @@ class SessionMetricControllerIntegrationTest {
         }
 
         @Test
-        @DisplayName("GET /session_metrics/{id} -> returns session by ID")
+        @DisplayName("GET /sessionMetrics/{id} -> returns session by ID")
         void getById() throws Exception {
 
             SessionMetric sessionMetric = sessionMetricRepository.save(SessionMetric.builder()
-                    .session1_id(session1.getId())
-                    .metric_id(metric.getId())
-                    .min_value(1)
-                    .max_value(2)
-                    .avg_value(3)
+                    .session1Id(session1.getId())
+                    .metricId(metric.getId())
+                    .minValue(1)
+                    .maxValue(2)
+                    .avgValue(3)
                     .build());
 
             String jsonResponse = mvc.perform(
@@ -221,11 +221,11 @@ class SessionMetricControllerIntegrationTest {
             String expectedResponse = """
                                      {
                                         "id"            : %d,
-                                         "session1_id"  : %d,
-                                         "metric_id"    : %d,
-                                         "min_value"    : 1,
-                                         "max_value"    : 2,
-                                         "avg_value"    : 3
+                                         "session1Id"   : %d,
+                                         "metricId"     : %d,
+                                         "minValue"     : 1,
+                                         "maxValue"     : 2,
+                                         "avgValue"     : 3
                                      }
                                     """.formatted(sessionMetric.getId(), session1.getId(), metric.getId());
 
@@ -236,7 +236,7 @@ class SessionMetricControllerIntegrationTest {
         }
 
         @Test
-        @DisplayName("GET /session_metrics/{id} with unknown ID -> returns 404")
+        @DisplayName("GET /sessionMetrics/{id} with unknown ID -> returns 404")
         void getByIdValidationError() throws Exception {
             String jsonResponse = mvc.perform(
                             get(API + "/999999")
@@ -248,7 +248,7 @@ class SessionMetricControllerIntegrationTest {
             String expectedResponse = """
                 {
                     "status" : 404,
-                    "message": "Session_metric not found by id: 999999"
+                    "message": "SessionMetric not found by id: 999999"
                 }
                 """;
 
@@ -265,24 +265,24 @@ class SessionMetricControllerIntegrationTest {
     class UpdateTests {
 
         @Test
-        @DisplayName("PUT /session_metrics -> updates and returns the Session")
+        @DisplayName("PUT /sessionMetrics -> updates and returns the Session")
         void update() throws Exception {
             SessionMetric original = sessionMetricRepository.save(SessionMetric.builder()
-                    .session1_id(session1.getId())
-                    .metric_id(metric.getId())
-                    .min_value(1)
-                    .max_value(2)
-                    .avg_value(3)
+                    .session1Id(session1.getId())
+                    .metricId(metric.getId())
+                    .minValue(1)
+                    .maxValue(2)
+                    .avgValue(3)
                     .build());
 
            String updateRequest = """
                                 {
                                    "id"           : %d,
-                                   "session1_id"  : %d,
-                                   "metric_id"    : %d,
-                                   "min_value"    : 4,
-                                   "max_value"    : 5,
-                                   "avg_value"    : 6
+                                   "session1Id"   : %d,
+                                   "metricId"     : %d,
+                                   "minValue"     : 4,
+                                   "maxValue"     : 5,
+                                   "avgValue"     : 6
                                 }
                                 """.formatted(original.getId(), session1.getId(), metric.getId());
 
@@ -300,11 +300,11 @@ class SessionMetricControllerIntegrationTest {
             String expectedResponse = """
                                 {
                                     "id"           : %d,
-                                    "session1_id"  : %d,
-                                    "metric_id"    : %d,
-                                    "min_value"    : 4,
-                                    "max_value"    : 5,
-                                    "avg_value"    : 6
+                                    "session1Id"   : %d,
+                                    "metricId"     : %d,
+                                    "minValue"     : 4,
+                                    "maxValue"     : 5,
+                                    "avgValue"     : 6
                                  }
                                 """.formatted(original.getId(), session1.getId(), metric.getId());
 
@@ -314,14 +314,14 @@ class SessionMetricControllerIntegrationTest {
         }
 
         @Test
-        @DisplayName("PUT /session_metrics with invalid id -> returns 404")
+        @DisplayName("PUT /sessionMetrics with invalid id -> returns 404")
         void updateValidationError() throws Exception {
 
             String updateRequest = """
                                  {
                                      "id"           : 999999,
-                                     "session1_id"  : %d,
-                                     "metric_id"    : %d
+                                     "session1Id"   : %d,
+                                     "metricId"     : %d
                                  }
                                  """.formatted(session1.getId(), metric.getId());
 
@@ -357,11 +357,11 @@ class SessionMetricControllerIntegrationTest {
 
 
         @Test
-        @DisplayName("DELETE /session_metrics/{id} -> deletes the Session")
+        @DisplayName("DELETE /sessionMetrics/{id} -> deletes the Session")
         void delete() throws Exception {
             SessionMetric sessionMetric = sessionMetricRepository.save(SessionMetric.builder()
-                    .session1_id(session1.getId())
-                    .metric_id(metric.getId())
+                    .session1Id(session1.getId())
+                    .metricId(metric.getId())
                     .build());
 
             String jsonResponse = mvc.perform(
@@ -387,7 +387,7 @@ class SessionMetricControllerIntegrationTest {
         }
 
         @Test
-        @DisplayName("DELETE /session_metrics/{id} with unknown ID -> returns 404")
+        @DisplayName("DELETE /sessionMetrics/{id} with unknown ID -> returns 404")
         void deleteValidationError() throws Exception {
             String jsonResponse = mvc.perform(
                             MockMvcRequestBuilders.delete(API + "/999999")

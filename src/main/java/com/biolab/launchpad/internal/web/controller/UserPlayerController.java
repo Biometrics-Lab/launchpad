@@ -41,8 +41,8 @@ public class UserPlayerController {
         if (user_playerOptional.isPresent()) {
             return user_playerOptional.get();
         } else {
-            log.warn("Could not find user_player with id {}", id);
-            throw new NotFoundByException("User_player not found by id: %d", id);
+            log.warn("Could not find userPlayer with id {}", id);
+            throw new NotFoundByException("UserPlayer not found by id: %d", id);
         }
     }
 

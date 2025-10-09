@@ -30,7 +30,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @DisplayName("DataSourceTypeDictionaryController Integration Tests")
 class DataSourceTypeDictionaryControllerIntegrationTest {
 
-    private static final String API = "/api/v1/data_source_type_dictionarys";
+    private static final String API = "/api/v1/dataSourceTypeDictionarys";
 
     @Autowired
     private MockMvc mvc;
@@ -50,7 +50,7 @@ class DataSourceTypeDictionaryControllerIntegrationTest {
     @DisplayName("Create")
     class CreateTests {
         @Test
-        @DisplayName("POST /age_group_dictionarys -> creates and returns the new DataSourceTypeDictionary")
+        @DisplayName("POST /dataSourceTypeDictionarys -> creates and returns the new DataSourceTypeDictionary")
         void create() throws Exception {
 
             String request =
@@ -89,7 +89,7 @@ class DataSourceTypeDictionaryControllerIntegrationTest {
         }
 
         @Test
-        @DisplayName("POST /age_group_dictionarys with validation message -> returns 422")
+        @DisplayName("POST /dataSourceTypeDictionarys with validation message -> returns 422")
         void createValidationError() throws Exception {
 
             String request =
@@ -130,7 +130,7 @@ class DataSourceTypeDictionaryControllerIntegrationTest {
     class ReadTests {
 
         @Test
-        @DisplayName("GET /age_group_dictionarys -> returns all dataSourceTypeDictionarys")
+        @DisplayName("GET /dataSourceTypeDictionarys -> returns all dataSourceTypeDictionarys")
         void getAll() throws Exception {
 
             DataSourceTypeDictionary dataSourceTypeDictionary1 = DataSourceTypeDictionary.builder()
@@ -176,7 +176,7 @@ class DataSourceTypeDictionaryControllerIntegrationTest {
         }
 
         @Test
-        @DisplayName("GET /age_group_dictionarys/{id} -> returns dataSourceTypeDictionary by ID")
+        @DisplayName("GET /dataSourceTypeDictionarys/{id} -> returns dataSourceTypeDictionary by ID")
         void getById() throws Exception {
 
             DataSourceTypeDictionary dataSourceTypeDictionary = DataSourceTypeDictionary.builder()
@@ -208,7 +208,7 @@ class DataSourceTypeDictionaryControllerIntegrationTest {
         }
 
         @Test
-        @DisplayName("GET /age_group_dictionarys/{id} with unknown ID -> returns 404")
+        @DisplayName("GET /dataSourceTypeDictionarys/{id} with unknown ID -> returns 404")
         void getByIdValidationError() throws Exception {
             String jsonResponse = mvc.perform(
                             get(API + "/999999")
@@ -220,7 +220,7 @@ class DataSourceTypeDictionaryControllerIntegrationTest {
             String expectedResponse = """
                     {
                         "status" : 404,
-                        "message": "Data_source_type_dictionary not found by id: 999999"
+                        "message": "DataSourceTypeDictionary not found by id: 999999"
                     }
                     """;
 
@@ -237,7 +237,7 @@ class DataSourceTypeDictionaryControllerIntegrationTest {
     class UpdateTests {
 
         @Test
-        @DisplayName("PUT /age_group_dictionarys -> updates and returns the DataSourceTypeDictionary")
+        @DisplayName("PUT /dataSourceTypeDictionarys -> updates and returns the DataSourceTypeDictionary")
         void update() throws Exception {
 
             DataSourceTypeDictionary dataSourceTypeDictionary = DataSourceTypeDictionary.builder()
@@ -283,7 +283,7 @@ class DataSourceTypeDictionaryControllerIntegrationTest {
         }
 
         @Test
-        @DisplayName("PUT /age_group_dictionarys with invalid id -> returns 404")
+        @DisplayName("PUT /dataSourceTypeDictionarys with invalid id -> returns 404")
         void updateValidationError() throws Exception {
 
             String updateRequest = """
@@ -324,7 +324,7 @@ class DataSourceTypeDictionaryControllerIntegrationTest {
     class DeleteTests {
 
         @Test
-        @DisplayName("DELETE /age_group_dictionarys/{id} -> deletes the DataSourceTypeDictionary")
+        @DisplayName("DELETE /dataSourceTypeDictionarys/{id} -> deletes the DataSourceTypeDictionary")
         void delete() throws Exception {
 
             DataSourceTypeDictionary dataSourceTypeDictionary = DataSourceTypeDictionary.builder()
@@ -358,7 +358,7 @@ class DataSourceTypeDictionaryControllerIntegrationTest {
         }
 
         @Test
-        @DisplayName("DELETE /age_group_dictionarys/{id} with unknown ID -> returns 404")
+        @DisplayName("DELETE /dataSourceTypeDictionarys/{id} with unknown ID -> returns 404")
         void deleteValidationError() throws Exception {
             String jsonResponse = mvc.perform(
                             MockMvcRequestBuilders.delete(API + "/999999")

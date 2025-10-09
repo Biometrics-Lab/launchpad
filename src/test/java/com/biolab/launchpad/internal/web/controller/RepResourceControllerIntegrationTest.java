@@ -30,7 +30,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @DisplayName("RepResource Integration Tests")
 class RepResourceControllerIntegrationTest {
 
-    private static final String API = "/api/v1/rep_resources";
+    private static final String API = "/api/v1/repResources";
 
     @Autowired
     private MockMvc mvc;
@@ -68,7 +68,7 @@ class RepResourceControllerIntegrationTest {
             String request =
                             """
                                 {
-                                    "rep_id"         : %d,
+                                    "repId"          : %d,
                                     "type"           : "%s",
                                     "url"            : "desc"
                                 }
@@ -94,7 +94,7 @@ class RepResourceControllerIntegrationTest {
                     """
                             {
                                         "id"             : %d,
-                                        "rep_id"         : %d,
+                                        "repId"          : %d,
                                         "type"           : "%s",
                                         "url"            :"desc"
                                     }
@@ -131,7 +131,7 @@ class RepResourceControllerIntegrationTest {
                     """
                             {
                                 "status"       : 422,
-                                "message"      : "Validation failed: rep_id: Rep_resource rep_id cannot be null, and type: Rep_resource type cannot be null"
+                                "message"      : "Validation failed: repId: RepResource repId cannot be null, and type: RepResource type cannot be null"
                             }
                             """;
 
@@ -150,13 +150,13 @@ class RepResourceControllerIntegrationTest {
         void getAll() throws Exception {
 
             RepResource repResource1 = repResourceRepository.save(RepResource.builder()
-                    .rep_id(rep.getId())
+                    .repId(rep.getId())
                     .type(resourceTypeDictionary.getId())
                     .url("desc")
                     .build());
 
             RepResource repResource2 = repResourceRepository.save(RepResource.builder()
-                    .rep_id(rep.getId())
+                    .repId(rep.getId())
                     .type(resourceTypeDictionary.getId())
                     .url("desc")
                     .build());
@@ -172,13 +172,13 @@ class RepResourceControllerIntegrationTest {
                 [
                     {
                         "id"             : %d,
-                        "rep_id"         : %d,
+                        "repId"          : %d,
                         "type"           : "%s",
                         "url"            :"desc"
                     },
                     {
                         "id"             : %d,
-                        "rep_id"         : %d,
+                        "repId"          : %d,
                         "type"           : "%s",
                         "url"            :"desc"
                     }
@@ -196,7 +196,7 @@ class RepResourceControllerIntegrationTest {
         void getById() throws Exception {
 
             RepResource repResource = repResourceRepository.save(RepResource.builder()
-                    .rep_id(rep.getId())
+                    .repId(rep.getId())
                     .type(resourceTypeDictionary.getId())
                     .url("desc")
                     .build());
@@ -211,7 +211,7 @@ class RepResourceControllerIntegrationTest {
             String expectedResponse = """
                 {
                     "id"             : %d,
-                    "rep_id"         : %d,
+                    "repId"          : %d,
                     "type"           : "%s",
                     "url"            :"desc"
                 }
@@ -236,7 +236,7 @@ class RepResourceControllerIntegrationTest {
             String expectedResponse = """
                 {
                     "status" : 404,
-                    "message": "Rep_resource not found by id: 999999"
+                    "message": "RepResource not found by id: 999999"
                 }
                 """;
 
@@ -255,7 +255,7 @@ class RepResourceControllerIntegrationTest {
         @DisplayName("PUT /repResource -> updates and returns the RepResource")
         void update() throws Exception {
             RepResource original = repResourceRepository.save(RepResource.builder()
-                    .rep_id(rep.getId())
+                    .repId(rep.getId())
                     .type(resourceTypeDictionary.getId())
                     .url("desc")
                     .build());
@@ -263,7 +263,7 @@ class RepResourceControllerIntegrationTest {
             String updateRequest = """
                 {
                     "id"             : %d,
-                    "rep_id"         : %d,
+                    "repId"          : %d,
                     "type"           : "%s",
                     "url"            : "descUPD"
                 }
@@ -283,7 +283,7 @@ class RepResourceControllerIntegrationTest {
             String expectedResponse = """
                 {
                     "id"             : %d,
-                    "rep_id"         : %d,
+                    "repId"          : %d,
                     "type"           : "%s",
                     "url"            :"descUPD"
                 }
@@ -304,7 +304,7 @@ class RepResourceControllerIntegrationTest {
             String updateRequest = """
                 {
                     "id"             : 999999,
-                    "rep_id"         : %d,
+                    "repId"          : %d,
                     "type"           : "%s",
                     "url"            :"desc"
                 }
@@ -343,7 +343,7 @@ class RepResourceControllerIntegrationTest {
         @DisplayName("DELETE /repResource/{id} -> deletes the RepResource")
         void delete() throws Exception {
             RepResource repResource = repResourceRepository.save(RepResource.builder()
-                    .rep_id(rep.getId())
+                    .repId(rep.getId())
                     .type(resourceTypeDictionary.getId())
                     .url("desc")
                     .build());

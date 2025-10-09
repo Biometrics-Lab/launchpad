@@ -18,7 +18,7 @@ import static com.biolab.launchpad.internal.web.mapper.SessionMetricMapper.sessi
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/session_metrics")
+@RequestMapping("/api/v1/sessionMetrics")
 @Log4j2
 public class SessionMetricController {
 
@@ -41,8 +41,8 @@ public class SessionMetricController {
         if (session_metricOptional.isPresent()) {
             return session_metricOptional.get();
         } else {
-            log.warn("Could not find session_metric with id {}", id);
-            throw new NotFoundByException("Session_metric not found by id: %d", id);
+            log.warn("Could not find sessionMetric with id {}", id);
+            throw new NotFoundByException("SessionMetric not found by id: %d", id);
         }
     }
 

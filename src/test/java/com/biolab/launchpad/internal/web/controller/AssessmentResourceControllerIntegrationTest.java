@@ -27,7 +27,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @DisplayName("AssessmentResource Integration Tests")
 class AssessmentResourceControllerIntegrationTest {
 
-    private static final String API = "/api/v1/assessment_resources";
+    private static final String API = "/api/v1/assessmentResources";
 
     @Autowired
     private MockMvc mvc;
@@ -53,6 +53,7 @@ class AssessmentResourceControllerIntegrationTest {
     @AfterEach
     void tearDown() {
         assessmentResourceRepository.deleteAll();
+        factory.cleanup();
     }
 
     @Nested
@@ -65,7 +66,7 @@ class AssessmentResourceControllerIntegrationTest {
             String request =
                             """
                                 {
-                                    "assessment_id"  : %d,
+                                    "assessmentId"   : %d,
                                     "type"           : "%s",
                                     "url"            : "desc"
                                 }
@@ -91,7 +92,7 @@ class AssessmentResourceControllerIntegrationTest {
                     """
                             {
                                         "id"             : %d,
-                                        "assessment_id"  : %d,
+                                        "assessmentId"   : %d,
                                         "type"           : "%s",
                                         "url"            :"desc"
                                     }
@@ -128,7 +129,7 @@ class AssessmentResourceControllerIntegrationTest {
                     """
                             {
                                 "status"       : 422,
-                                "message"      : "Validation failed: assessment_id: Assessment_resource assessment_id cannot be null, and type: Assessment_resource type cannot be null"
+                                "message"      : "Validation failed: assessmentId: AssessmentResource assessmentId cannot be null, and type: AssessmentResource type cannot be null"
                             }
                             """;
 
@@ -147,13 +148,13 @@ class AssessmentResourceControllerIntegrationTest {
         void getAll() throws Exception {
 
             AssessmentResource assessmentResource1 = assessmentResourceRepository.save(AssessmentResource.builder()
-                    .assessment_id(assessment.getId())
+                    .assessmentId(assessment.getId())
                     .type(resourceTypeDictionary.getId())
                     .url("desc")
                     .build());
 
             AssessmentResource assessmentResource2 = assessmentResourceRepository.save(AssessmentResource.builder()
-                    .assessment_id(assessment.getId())
+                    .assessmentId(assessment.getId())
                     .type(resourceTypeDictionary.getId())
                     .url("desc")
                     .build());
@@ -169,13 +170,13 @@ class AssessmentResourceControllerIntegrationTest {
                 [
                     {
                         "id"             : %d,
-                        "assessment_id"  : %d,
+                        "assessmentId"   : %d,
                         "type"           : "%s",
                         "url"            :"desc"
                     },
                     {
                         "id"             : %d,
-                        "assessment_id"  : %d,
+                        "assessmentId"   : %d,
                         "type"           : "%s",
                         "url"            :"desc"
                     }
@@ -193,7 +194,7 @@ class AssessmentResourceControllerIntegrationTest {
         void getById() throws Exception {
 
             AssessmentResource assessmentResource = assessmentResourceRepository.save(AssessmentResource.builder()
-                    .assessment_id(assessment.getId())
+                    .assessmentId(assessment.getId())
                     .type(resourceTypeDictionary.getId())
                     .url("desc")
                     .build());
@@ -208,7 +209,7 @@ class AssessmentResourceControllerIntegrationTest {
             String expectedResponse = """
                 {
                     "id"             : %d,
-                    "assessment_id"  : %d,
+                    "assessmentId"   : %d,
                     "type"           : "%s",
                     "url"            :"desc"
                 }
@@ -233,7 +234,7 @@ class AssessmentResourceControllerIntegrationTest {
             String expectedResponse = """
                 {
                     "status" : 404,
-                    "message": "Assessment_resource not found by id: 999999"
+                    "message": "AssessmentResource not found by id: 999999"
                 }
                 """;
 
@@ -252,7 +253,7 @@ class AssessmentResourceControllerIntegrationTest {
         @DisplayName("PUT /assessmentResources -> updates and returns the AssessmentResource")
         void update() throws Exception {
             AssessmentResource original = assessmentResourceRepository.save(AssessmentResource.builder()
-                    .assessment_id(assessment.getId())
+                    .assessmentId(assessment.getId())
                     .type(resourceTypeDictionary.getId())
                     .url("desc")
                     .build());
@@ -260,7 +261,7 @@ class AssessmentResourceControllerIntegrationTest {
             String updateRequest = """
                 {
                     "id"             : %d,
-                    "assessment_id"  : %d,
+                    "assessmentId"   : %d,
                     "type"           : "%s",
                     "url"            : "descUPD"
                 }
@@ -280,7 +281,7 @@ class AssessmentResourceControllerIntegrationTest {
             String expectedResponse = """
                 {
                     "id"             : %d,
-                    "assessment_id"  : %d,
+                    "assessmentId"   : %d,
                     "type"           : "%s",
                     "url"            :"descUPD"
                 }
@@ -301,7 +302,7 @@ class AssessmentResourceControllerIntegrationTest {
             String updateRequest = """
                 {
                     "id"             : 999999,
-                    "assessment_id"  : %d,
+                    "assessmentId"   : %d,
                     "type"           : "%s",
                     "url"            :"desc"
                 }
@@ -340,7 +341,7 @@ class AssessmentResourceControllerIntegrationTest {
         @DisplayName("DELETE /assessmentResources/{id} -> deletes the AssessmentResource")
         void delete() throws Exception {
             AssessmentResource assessmentResource = assessmentResourceRepository.save(AssessmentResource.builder()
-                    .assessment_id(assessment.getId())
+                    .assessmentId(assessment.getId())
                     .type(resourceTypeDictionary.getId())
                     .url("desc")
                     .build());

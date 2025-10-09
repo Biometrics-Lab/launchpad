@@ -57,7 +57,7 @@ class ReportControllerIntegrationTest {
                     """
                                 {
                                     "name"    : "launch_angle",
-                                    "ext_ref" : "ex"
+                                    "extRef"  : "ex"
                                 }
                             """;
 
@@ -81,7 +81,7 @@ class ReportControllerIntegrationTest {
                             {
                                         "id"           : %d,
                                         "name"         : "launch_angle",
-                                        "ext_ref"      : "ex"
+                                        "extRef"       : "ex"
                                     }
                             """.formatted(reportId);
 
@@ -137,12 +137,12 @@ class ReportControllerIntegrationTest {
 
             Report report1 = reportRepository.save(Report.builder()
                     .name("avg_launch_angle")
-                    .ext_ref("ex")
+                    .extRef("ex")
                     .build());
 
             Report report2 = reportRepository.save(Report.builder()
                     .name("max_launch_angle")
-                    .ext_ref("ex")
+                    .extRef("ex")
                     .build());
 
             String jsonResponse = mvc.perform(
@@ -158,12 +158,12 @@ class ReportControllerIntegrationTest {
                     {
                         "id"           : %d,
                         "name"         : "avg_launch_angle",
-                        "ext_ref"      : "ex"
+                        "extRef"       : "ex"
                     },
                     {
                         "id"           : %d,
                         "name"         : "max_launch_angle",
-                        "ext_ref"      : "ex"
+                        "extRef"       : "ex"
                     }
                 ]
                 """.formatted(report1.getId(), report2.getId());
@@ -180,7 +180,7 @@ class ReportControllerIntegrationTest {
 
             Report report = reportRepository.save(Report.builder()
                     .name("launch_angle")
-                    .ext_ref("ex")
+                    .extRef("ex")
                     .build());
 
             String jsonResponse = mvc.perform(
@@ -194,7 +194,7 @@ class ReportControllerIntegrationTest {
                 {
                     "id"           : %d,
                     "name"         : "launch_angle",
-                    "ext_ref"      : "ex"
+                    "extRef"       : "ex"
                 }
                 """.formatted(report.getId());
 
@@ -244,7 +244,7 @@ class ReportControllerIntegrationTest {
                 {
                     "id"            : %d,
                     "name"          : "updated_launch_angle",
-                    "ext_ref"       : "ex"
+                    "extRef"        : "ex"
                 }
                 """.formatted(original.getId());
 
@@ -263,7 +263,7 @@ class ReportControllerIntegrationTest {
                 {
                     "id"           : %d,
                     "name"         : "updated_launch_angle",
-                    "ext_ref"      : "ex"
+                    "extRef"       : "ex"
                 }
                 """.formatted(original.getId());
 
@@ -284,7 +284,7 @@ class ReportControllerIntegrationTest {
                 {
                     "id"            : 999999,
                     "name"          : "updated_launch_angle",
-                    "ext_ref"       : "ex"
+                    "extRef"        : "ex"
                 }
                 """;
 

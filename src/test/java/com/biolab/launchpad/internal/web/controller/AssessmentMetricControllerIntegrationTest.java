@@ -55,6 +55,7 @@ class AssessmentMetricControllerIntegrationTest {
     @AfterEach
     void tearDown() {
         assessmentMetricRepository.deleteAll();
+        factory.cleanup();
     }
 
     @Nested

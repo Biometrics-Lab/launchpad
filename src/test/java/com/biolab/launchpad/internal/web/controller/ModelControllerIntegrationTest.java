@@ -67,7 +67,7 @@ class ModelControllerIntegrationTest {
             String request =
                             """ 
                                 {
-                                    "age_group"         : "%s",
+                                    "ageGroup"          : "%s",
                                     "sport"             : "%s",
                                     "description"       : "desc"
                                 }
@@ -93,7 +93,7 @@ class ModelControllerIntegrationTest {
                     """ 
                             {
                                         "id"                : %d,
-                                        "age_group"         : "%s",
+                                        "ageGroup"          : "%s",
                                         "sport"             : "%s",
                                         "description"       : "desc"
                                     }
@@ -130,7 +130,7 @@ class ModelControllerIntegrationTest {
                     """
                             {
                                 "status"       : 422,
-                                "message"      : "Validation failed: age_group: Model age_group cannot be null, and sport: Model sport cannot be null"
+                                "message"      : "Validation failed: ageGroup: Model ageGroup cannot be null, and sport: Model sport cannot be null"
                             }
                             """;
 
@@ -149,13 +149,13 @@ class ModelControllerIntegrationTest {
         void getAll() throws Exception {
 
             Model model1 = modelRepository.save(Model.builder()
-                    .age_group(ageGroupDictionary.getId())
+                    .ageGroup(ageGroupDictionary.getId())
                     .sport(sportDictionary.getId())
                     .description("desc")
                     .build());
 
             Model model2 = modelRepository.save(Model.builder()
-                    .age_group(ageGroupDictionary.getId())
+                    .ageGroup(ageGroupDictionary.getId())
                     .sport(sportDictionary.getId())
                     .description("desc")
                     .build());
@@ -171,13 +171,13 @@ class ModelControllerIntegrationTest {
                 [
                     {
                         "id"             : %d,
-                        "age_group"      : "%s",
+                        "ageGroup"       : "%s",
                         "sport"          : "%s",
                         "description"    : "desc"
                     },
                     {
                         "id"             : %d,
-                        "age_group"      : "%s",
+                        "ageGroup"       : "%s",
                         "sport"          : "%s",
                         "description"    : "desc"
                     }
@@ -195,7 +195,7 @@ class ModelControllerIntegrationTest {
         void getById() throws Exception {
 
             Model model = modelRepository.save(Model.builder()
-                    .age_group(ageGroupDictionary.getId())
+                    .ageGroup(ageGroupDictionary.getId())
                     .sport(sportDictionary.getId())
                     .description("desc")
                     .build());
@@ -210,7 +210,7 @@ class ModelControllerIntegrationTest {
             String expectedResponse = """
                 {
                     "id"             : %d,
-                    "age_group"      : "%s",
+                    "ageGroup"       : "%s",
                     "sport"          : "%s",
                     "description"    : "desc"
                 }
@@ -255,14 +255,14 @@ class ModelControllerIntegrationTest {
         @DisplayName("PUT /models -> updates and returns the Model")
         void update() throws Exception {
             Model original = modelRepository.save(Model.builder()
-                    .age_group(ageGroupDictionary.getId())
+                    .ageGroup(ageGroupDictionary.getId())
                     .sport(sportDictionary.getId())
                     .build());
 
             String updateRequest = """
                 {
                     "id"             : %d,
-                    "age_group"      : "%s",
+                    "ageGroup"       : "%s",
                     "sport"          : "%s",
                     "description"    : "desc"
                 }
@@ -282,7 +282,7 @@ class ModelControllerIntegrationTest {
             String expectedResponse = """
                 {
                     "id"             : %d,
-                    "age_group"      : "%s",
+                    "ageGroup"       : "%s",
                     "sport"          : "%s",
                     "description"    : "desc"
                 }
@@ -303,7 +303,7 @@ class ModelControllerIntegrationTest {
             String updateRequest = """
                 {
                     "id"             : 999999,
-                    "age_group"      : "%s",
+                    "ageGroup"       : "%s",
                     "sport"          : "%s",
                     "description"    : "desc"
                 }
@@ -344,7 +344,7 @@ class ModelControllerIntegrationTest {
         @DisplayName("DELETE /models/{id} -> deletes the Model")
         void delete() throws Exception {
             Model model = modelRepository.save(Model.builder()
-                    .age_group(ageGroupDictionary.getId())
+                    .ageGroup(ageGroupDictionary.getId())
                     .sport(sportDictionary.getId())
                     .description("desc")
                     .build());

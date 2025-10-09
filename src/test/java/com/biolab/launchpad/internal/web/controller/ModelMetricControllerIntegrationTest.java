@@ -29,7 +29,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @DisplayName("ModelMetric Integration Tests")
 class ModelMetricControllerIntegrationTest {
 
-    private static final String API = "/api/v1/model_metrics";
+    private static final String API = "/api/v1/modelMetrics";
 
     @Autowired
     private MockMvc mvc;
@@ -67,8 +67,8 @@ class ModelMetricControllerIntegrationTest {
             String request =
                             """ 
                                 {
-                                    "model_id"    : %d,
-                                    "metric_id"   : %d,
+                                    "modelId"     : %d,
+                                    "metricId"    : %d,
                                     "value"       : 1
                                 }
                             """.formatted(model.getId(), metric.getId());
@@ -93,8 +93,8 @@ class ModelMetricControllerIntegrationTest {
                     """ 
                             {
                                         "id"          : %d,
-                                        "model_id"    : %d,
-                                        "metric_id"   : %d,
+                                        "modelId"     : %d,
+                                        "metricId"    : %d,
                                         "value"       : 1
                                     }
                             """.formatted(modelMetricId, model.getId(), metric.getId());
@@ -130,7 +130,7 @@ class ModelMetricControllerIntegrationTest {
                     """
                             {
                                 "status"       : 422,
-                                "message"      : "Validation failed: metric_id: Model_metric metric_id cannot be null, and model_id: Model_metric model_id cannot be null"
+                                "message"      : "Validation failed: metricId: ModelMetric metricId cannot be null, and modelId: ModelMetric modelId cannot be null"
                             }
                             """;
 
@@ -149,14 +149,14 @@ class ModelMetricControllerIntegrationTest {
         void getAll() throws Exception {
 
             ModelMetric modelMetric1 = modelMetricRepository.save(ModelMetric.builder()
-                    .model_id(model.getId())
-                    .metric_id(metric.getId())
+                    .modelId(model.getId())
+                    .metricId(metric.getId())
                     .value(1)
                     .build());
 
             ModelMetric modelMetric2 = modelMetricRepository.save(ModelMetric.builder()
-                    .model_id(model.getId())
-                    .metric_id(metric.getId())
+                    .modelId(model.getId())
+                    .metricId(metric.getId())
                     .value(1)
                     .build());
 
@@ -171,14 +171,14 @@ class ModelMetricControllerIntegrationTest {
                 [
                     {
                         "id"            : %d,
-                        "model_id"      : %d,
-                        "metric_id"     : %d,
+                        "modelId"       : %d,
+                        "metricId"      : %d,
                         "value"         : 1
                     },
                     {
                         "id"             : %d,
-                        "model_id"       : %d,
-                        "metric_id"      : %d,
+                        "modelId"        : %d,
+                        "metricId"       : %d,
                         "value"          : 1
                     }
                 ]
@@ -195,8 +195,8 @@ class ModelMetricControllerIntegrationTest {
         void getById() throws Exception {
 
             ModelMetric modelMetric = modelMetricRepository.save(ModelMetric.builder()
-                    .model_id(model.getId())
-                    .metric_id(metric.getId())
+                    .modelId(model.getId())
+                    .metricId(metric.getId())
                     .value(1)
                     .build());
 
@@ -210,8 +210,8 @@ class ModelMetricControllerIntegrationTest {
             String expectedResponse = """
                 {
                     "id"            : %d,
-                    "model_id"      : %d,
-                    "metric_id"     : %d,
+                    "modelId"       : %d,
+                    "metricId"      : %d,
                     "value"         : 1
                 }
                 """.formatted(modelMetric.getId(), model.getId() ,metric.getId());
@@ -235,7 +235,7 @@ class ModelMetricControllerIntegrationTest {
             String expectedResponse = """
                 {
                     "status" : 404,
-                    "message": "Model_metric not found by id: 999999"
+                    "message": "ModelMetric not found by id: 999999"
                 }
                 """;
 
@@ -255,15 +255,15 @@ class ModelMetricControllerIntegrationTest {
         @DisplayName("PUT /modelMetrics -> updates and returns the ModelMetric")
         void update() throws Exception {
             ModelMetric original = modelMetricRepository.save(ModelMetric.builder()
-                    .model_id(model.getId())
-                    .metric_id(metric.getId())
+                    .modelId(model.getId())
+                    .metricId(metric.getId())
                     .build());
 
             String updateRequest = """
                 {
                     "id"          : %d,
-                    "model_id"    : %d,
-                    "metric_id"   : %d,
+                    "modelId"     : %d,
+                    "metricId"    : %d,
                     "value"       : 1
                 }
                 """.formatted(original.getId(), model.getId(), metric.getId());
@@ -282,8 +282,8 @@ class ModelMetricControllerIntegrationTest {
             String expectedResponse = """
                 {
                     "id"           : %d,
-                    "model_id"     : %d,
-                    "metric_id"    : %d,
+                    "modelId"      : %d,
+                    "metricId"     : %d,
                     "value"        : 1
                 }
                 """.formatted(original.getId(), model.getId(), metric.getId());
@@ -303,8 +303,8 @@ class ModelMetricControllerIntegrationTest {
             String updateRequest = """
                 {
                     "id"            : 999999,
-                    "model_id"      : %d,
-                    "metric_id"     : %d,
+                    "modelId"       : %d,
+                    "metricId"      : %d,
                     "value"         : 1
                 }
                 """.formatted(model.getId(), metric.getId());
@@ -344,8 +344,8 @@ class ModelMetricControllerIntegrationTest {
         @DisplayName("DELETE /modelMetrics/{id} -> deletes the ModelMetric")
         void delete() throws Exception {
             ModelMetric modelMetric = modelMetricRepository.save(ModelMetric.builder()
-                    .model_id(model.getId())
-                    .metric_id(metric.getId())
+                    .modelId(model.getId())
+                    .metricId(metric.getId())
                     .value(1)
                     .build());
 

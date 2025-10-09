@@ -27,7 +27,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @DisplayName("RepMetricSource Integration Tests")
 class RepMetricSourceControllerIntegrationTest {
 
-    private static final String API = "/api/v1/rep_metric_sources";
+    private static final String API = "/api/v1/repMetricSources";
 
     @Autowired
     private MockMvc mvc;
@@ -65,8 +65,8 @@ class RepMetricSourceControllerIntegrationTest {
             String request =
                             """
                                 {
-                                    "rep_metric_id"  : %d,
-                                    "data_source_id" : %d,
+                                    "repMetricId"    : %d,
+                                    "dataSourceId"   : %d,
                                     "description"    : "desc"
                                 }
                             """.formatted(repMetric.getId(), dataSource.getId());
@@ -91,8 +91,8 @@ class RepMetricSourceControllerIntegrationTest {
                     """
                             {
                                         "id"             : %d,
-                                        "rep_metric_id"  : %d,
-                                        "data_source_id" : %d,
+                                        "repMetricId"    : %d,
+                                        "dataSourceId"   : %d,
                                         "description"    : "desc"
                                     }
                             """.formatted(repMetricSourceId, repMetric.getId(), dataSource.getId());
@@ -128,7 +128,7 @@ class RepMetricSourceControllerIntegrationTest {
                     """
                             {
                                 "status"       : 422,
-                                "message"      : "Validation failed: data_source_id: Rep_metric_source data_source_id cannot be null, and rep_metric_id: Rep_metric_source rep_metric_id cannot be null"
+                                "message"      : "Validation failed: dataSourceId: RepMetricSource dataSourceId cannot be null, and repMetricId: RepMetricSource repMetricId cannot be null"
                             }
                             """;
 
@@ -147,14 +147,14 @@ class RepMetricSourceControllerIntegrationTest {
         void getAll() throws Exception {
 
             RepMetricSource repMetricSource1 = repMetricSourceRepository.save(RepMetricSource.builder()
-                    .rep_metric_id(repMetric.getId())
-                    .data_source_id(dataSource.getId())
+                    .repMetricId(repMetric.getId())
+                    .dataSourceId(dataSource.getId())
                     .description("desc")
                     .build());
 
             RepMetricSource repMetricSource2 = repMetricSourceRepository.save(RepMetricSource.builder()
-                    .rep_metric_id(repMetric.getId())
-                    .data_source_id(dataSource.getId())
+                    .repMetricId(repMetric.getId())
+                    .dataSourceId(dataSource.getId())
                     .description("desc")
                     .build());
 
@@ -169,14 +169,14 @@ class RepMetricSourceControllerIntegrationTest {
                 [
                     {
                         "id"             : %d,
-                        "rep_metric_id"  : %d,
-                        "data_source_id" : %d,
+                        "repMetricId"    : %d,
+                        "dataSourceId"   : %d,
                         "description"    : "desc"
                     },
                     {
                         "id"             : %d,
-                        "rep_metric_id"  : %d,
-                        "data_source_id" : %d,
+                        "repMetricId"    : %d,
+                        "dataSourceId"   : %d,
                         "description"    : "desc"
                     }
                 ]
@@ -193,8 +193,8 @@ class RepMetricSourceControllerIntegrationTest {
         void getById() throws Exception {
 
             RepMetricSource repMetricSource = repMetricSourceRepository.save(RepMetricSource.builder()
-                    .rep_metric_id(repMetric.getId())
-                    .data_source_id(dataSource.getId())
+                    .repMetricId(repMetric.getId())
+                    .dataSourceId(dataSource.getId())
                     .description("desc")
                     .build());
 
@@ -208,8 +208,8 @@ class RepMetricSourceControllerIntegrationTest {
             String expectedResponse = """
                 {
                     "id"             : %d,
-                    "rep_metric_id"  : %d,
-                    "data_source_id" : %d,
+                    "repMetricId"    : %d,
+                    "dataSourceId"   : %d,
                     "description"    : "desc"
                 }
                 """.formatted(repMetricSource.getId(), repMetric.getId() ,dataSource.getId());
@@ -233,7 +233,7 @@ class RepMetricSourceControllerIntegrationTest {
             String expectedResponse = """
                 {
                     "status" : 404,
-                    "message": "Rep_metric_source not found by id: 999999"
+                    "message": "RepMetricSource not found by id: 999999"
                 }
                 """;
 
@@ -252,16 +252,16 @@ class RepMetricSourceControllerIntegrationTest {
         @DisplayName("PUT /repMetricSources -> updates and returns the RepMetricSource")
         void update() throws Exception {
             RepMetricSource original = repMetricSourceRepository.save(RepMetricSource.builder()
-                    .rep_metric_id(repMetric.getId())
-                    .data_source_id(dataSource.getId())
+                    .repMetricId(repMetric.getId())
+                    .dataSourceId(dataSource.getId())
                     .description("desc")
                     .build());
 
             String updateRequest = """
                 {
                     "id"             : %d,
-                    "rep_metric_id"  : %d,
-                    "data_source_id" : %d,
+                    "repMetricId"    : %d,
+                    "dataSourceId"   : %d,
                     "description"    : "descUPD"
                 }
                 """.formatted(original.getId(), repMetric.getId(), dataSource.getId());
@@ -280,8 +280,8 @@ class RepMetricSourceControllerIntegrationTest {
             String expectedResponse = """
                 {
                     "id"             : %d,
-                    "rep_metric_id"  : %d,
-                    "data_source_id" : %d,
+                    "repMetricId"    : %d,
+                    "dataSourceId"   : %d,
                     "description"    : "descUPD"
                 }
                 """.formatted(original.getId(), repMetric.getId(), dataSource.getId());
@@ -301,8 +301,8 @@ class RepMetricSourceControllerIntegrationTest {
             String updateRequest = """
                 {
                     "id"             : 999999,
-                    "rep_metric_id"  : %d,
-                    "data_source_id" : %d,
+                    "repMetricId"    : %d,
+                    "dataSourceId"   : %d,
                     "description"    : "desc"
                 }
                 """.formatted(repMetric.getId(), dataSource.getId());
@@ -340,8 +340,8 @@ class RepMetricSourceControllerIntegrationTest {
         @DisplayName("DELETE /repMetricSources/{id} -> deletes the RepMetricSource")
         void delete() throws Exception {
             RepMetricSource repMetricSource = repMetricSourceRepository.save(RepMetricSource.builder()
-                    .rep_metric_id(repMetric.getId())
-                    .data_source_id(dataSource.getId())
+                    .repMetricId(repMetric.getId())
+                    .dataSourceId(dataSource.getId())
                     .description("desc")
                     .build());
 

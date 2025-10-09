@@ -6,7 +6,7 @@ import lombok.Builder;
 @Builder
 public record AssessmentResourceDto(
         Integer id,
-        @NotNull(message = "AssessmentResource assessment_id cannot be null")
+        @NotNull(message = "AssessmentResource assessmentId cannot be null")
         Integer assessmentId,
         @NotNull(message = "AssessmentResource type cannot be null")
         String type,

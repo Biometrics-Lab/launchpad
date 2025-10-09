@@ -18,7 +18,7 @@ import static com.biolab.launchpad.internal.web.mapper.RepMetricSourceMapper.rep
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/rep_metric_sources")
+@RequestMapping("/api/v1/repMetricSources")
 @Log4j2
 public class RepMetricSourceController {
 
@@ -41,8 +41,8 @@ public class RepMetricSourceController {
         if (rep_metric_sourceOptional.isPresent()) {
             return rep_metric_sourceOptional.get();
         } else {
-            log.warn("Could not find rep_metric_source with id {}", id);
-            throw new NotFoundByException("Rep_metric_source not found by id: %d", id);
+            log.warn("Could not find repMetricSource with id {}", id);
+            throw new NotFoundByException("RepMetricSource not found by id: %d", id);
         }
     }
 

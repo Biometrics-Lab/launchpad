@@ -28,7 +28,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @DisplayName("DataSource Integration Tests")
 class DataSourceControllerIntegrationTest {
 
-    private static final String API = "/api/v1/data_sources";
+    private static final String API = "/api/v1/dataSources";
 
     @Autowired
     private MockMvc mvc;
@@ -58,7 +58,7 @@ class DataSourceControllerIntegrationTest {
     @DisplayName("Create")
     class CreateTests {
         @Test
-        @DisplayName("POST /data_sources -> creates and returns the new DataSource")
+        @DisplayName("POST /dataSources -> creates and returns the new DataSource")
         void create() throws Exception {
 
             String request =
@@ -102,7 +102,7 @@ class DataSourceControllerIntegrationTest {
         }
 
         @Test
-        @DisplayName("POST /data_sources with validation message -> returns 422")
+        @DisplayName("POST /dataSources with validation message -> returns 422")
         void createValidationError() throws Exception {
             String request =
                             """
@@ -127,7 +127,7 @@ class DataSourceControllerIntegrationTest {
                     """
                             {
                                 "status"       : 422,
-                                "message"      : "Validation failed: name: Name cannot be blank, and type: Data_source type cannot be null"
+                                "message"      : "Validation failed: name: Name cannot be blank, and type: DataSource type cannot be null"
                             }
                             """;
 
@@ -142,7 +142,7 @@ class DataSourceControllerIntegrationTest {
     class ReadTests {
 
         @Test
-        @DisplayName("GET /data_sources -> returns all dataSources")
+        @DisplayName("GET /dataSources -> returns all dataSources")
         void getAll() throws Exception {
 
             DataSource dataSource1 = dataSourceRepository.save(DataSource.builder()
@@ -189,7 +189,7 @@ class DataSourceControllerIntegrationTest {
         }
 
         @Test
-        @DisplayName("GET /data_sources/{id} -> returns dataSource by ID")
+        @DisplayName("GET /dataSources/{id} -> returns dataSource by ID")
         void getById() throws Exception {
 
             DataSource dataSource = dataSourceRepository.save(DataSource.builder()
@@ -221,7 +221,7 @@ class DataSourceControllerIntegrationTest {
         }
 
         @Test
-        @DisplayName("GET /data_sources/{id} with unknown ID -> returns 404")
+        @DisplayName("GET /dataSources/{id} with unknown ID -> returns 404")
         void getByIdValidationError() throws Exception {
             String jsonResponse = mvc.perform(
                             get(API + "/999999")
@@ -233,7 +233,7 @@ class DataSourceControllerIntegrationTest {
             String expectedResponse = """
                 {
                     "status" : 404,
-                    "message": "Data_source not found by id: 999999"
+                    "message": "DataSource not found by id: 999999"
                 }
                 """;
 
@@ -250,7 +250,7 @@ class DataSourceControllerIntegrationTest {
     class UpdateTests {
 
         @Test
-        @DisplayName("PUT /data_sources -> updates and returns the DataSource")
+        @DisplayName("PUT /dataSources -> updates and returns the DataSource")
         void update() throws Exception {
             DataSource original = dataSourceRepository.save(DataSource.builder()
                     .name("avg_exit_velocity")
@@ -296,7 +296,7 @@ class DataSourceControllerIntegrationTest {
         }
 
         @Test
-        @DisplayName("PUT /data_sources with invalid id -> returns 404")
+        @DisplayName("PUT /dataSources with invalid id -> returns 404")
         void updateValidationError() throws Exception {
 
             String updateRequest = """
@@ -340,7 +340,7 @@ class DataSourceControllerIntegrationTest {
 
 
         @Test
-        @DisplayName("DELETE /data_sources/{id} -> deletes the DataSource")
+        @DisplayName("DELETE /dataSources/{id} -> deletes the DataSource")
         void delete() throws Exception {
             DataSource dataSource = dataSourceRepository.save(DataSource.builder()
                     .name("avg_exit_velocity")
@@ -371,7 +371,7 @@ class DataSourceControllerIntegrationTest {
         }
 
         @Test
-        @DisplayName("DELETE /data_sources/{id} with unknown ID -> returns 404")
+        @DisplayName("DELETE /dataSources/{id} with unknown ID -> returns 404")
         void deleteValidationError() throws Exception {
             String jsonResponse = mvc.perform(
                             MockMvcRequestBuilders.delete(API + "/999999")

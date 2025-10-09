@@ -14,10 +14,10 @@ import java.sql.Timestamp;
 @NoArgsConstructor
 @Table("session1")
 public class Session1 extends ID {
-    @NotNull(message = "Session assessment_id cannot be null")
+    @NotNull(message = "Session assessmentId cannot be null")
     @Column("assessment_id")
     private Integer assessmentId;
-    @NotNull(message = "Session start_time cannot be null")
+    @NotNull(message = "Session startTime cannot be null")
     @Column("start_time")
     private Timestamp startTime;
 }

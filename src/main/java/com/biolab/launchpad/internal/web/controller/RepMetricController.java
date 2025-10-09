@@ -18,7 +18,7 @@ import static com.biolab.launchpad.internal.web.mapper.RepMetricMapper.repMetric
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/rep_metrics")
+@RequestMapping("/api/v1/repMetrics")
 @Log4j2
 public class RepMetricController {
 
@@ -41,8 +41,8 @@ public class RepMetricController {
         if (rep_metricOptional.isPresent()) {
             return rep_metricOptional.get();
         } else {
-            log.warn("Could not find rep_metric with id {}", id);
-            throw new NotFoundByException("Rep_metric not found by id: %d", id);
+            log.warn("Could not find repMetric with id {}", id);
+            throw new NotFoundByException("RepMetric not found by id: %d", id);
         }
     }
 

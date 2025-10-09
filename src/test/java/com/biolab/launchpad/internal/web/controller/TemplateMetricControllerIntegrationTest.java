@@ -27,7 +27,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @DisplayName("TemplateMetric Integration Tests")
 class TemplateMetricControllerIntegrationTest {
 
-    private static final String API = "/api/v1/template_metrics";
+    private static final String API = "/api/v1/templateMetrics";
 
     @Autowired
     private MockMvc mvc;
@@ -67,9 +67,9 @@ class TemplateMetricControllerIntegrationTest {
             String request =
                             """ 
                                 {
-                                    "template_id": %d,
-                                    "metric_id"  : %d,
-                                    "source_id"  : %d
+                                    "templateId" : %d,
+                                    "metricId"   : %d,
+                                    "sourceId"   : %d
                                 }
                             """.formatted(template.getId(), metric.getId(), source.getId());
 
@@ -93,9 +93,9 @@ class TemplateMetricControllerIntegrationTest {
                                     """
                                       {
                                         "id"         : %d,
-                                        "template_id": %d,
-                                        "metric_id"  : %d,
-                                        "source_id"  : %d
+                                        "templateId" : %d,
+                                        "metricId"   : %d,
+                                        "sourceId"   : %d
                                       }
                                     """.formatted(templateMetricId, template.getId(), metric.getId(), source.getId());
 
@@ -130,7 +130,7 @@ class TemplateMetricControllerIntegrationTest {
                     """
                             {
                                 "status"       : 422,
-                                "message"      : "Validation failed: metric_id: Template_metric metric_id cannot be null, and source_id: Template_metric source_id cannot be null, and template_id: Template_metric template_id cannot be null"
+                                "message"      : "Validation failed: metricId: TemplateMetric metricId cannot be null, and sourceId: TemplateMetric sourceId cannot be null, and templateId: TemplateMetric templateId cannot be null"
                             }
                             """;
 
@@ -149,15 +149,15 @@ class TemplateMetricControllerIntegrationTest {
         void getAll() throws Exception {
 
             TemplateMetric templateMetric1 = templateMetricRepository.save(TemplateMetric.builder()
-                    .template_id(template.getId())
-                    .metric_id(metric.getId())
-                    .source_id(source.getId())
+                    .templateId(template.getId())
+                    .metricId(metric.getId())
+                    .sourceId(source.getId())
                     .build());
 
             TemplateMetric templateMetric2 = templateMetricRepository.save(TemplateMetric.builder()
-                    .template_id(template.getId())
-                    .metric_id(metric.getId())
-                    .source_id(source.getId())
+                    .templateId(template.getId())
+                    .metricId(metric.getId())
+                    .sourceId(source.getId())
                     .build());
 
             String jsonResponse = mvc.perform(
@@ -171,15 +171,15 @@ class TemplateMetricControllerIntegrationTest {
                 [
                     {
                         "id"         : %d,
-                        "template_id": %d,
-                        "metric_id"  : %d,
-                        "source_id"  : %d
+                        "templateId" : %d,
+                        "metricId"   : %d,
+                        "sourceId"   : %d
                     },
                     {
                         "id"         : %d,
-                        "template_id": %d,
-                        "metric_id"  : %d,
-                        "source_id"  : %d
+                        "templateId" : %d,
+                        "metricId"   : %d,
+                        "sourceId"   : %d
                     }
                 ]
                 """.formatted(templateMetric1.getId(), template.getId(), metric.getId(), source.getId(), templateMetric2.getId(),template.getId(), metric.getId(), source.getId());
@@ -195,9 +195,9 @@ class TemplateMetricControllerIntegrationTest {
         void getById() throws Exception {
 
             TemplateMetric templateMetric = templateMetricRepository.save(TemplateMetric.builder()
-                    .template_id(template.getId())
-                    .metric_id(metric.getId())
-                    .source_id(source.getId())
+                    .templateId(template.getId())
+                    .metricId(metric.getId())
+                    .sourceId(source.getId())
                     .build());
 
             String jsonResponse = mvc.perform(
@@ -210,9 +210,9 @@ class TemplateMetricControllerIntegrationTest {
             String expectedResponse = """
                                      {
                                         "id"          : %d,
-                                         "template_id": %d,
-                                         "metric_id"  : %d,
-                                         "source_id"  : %d
+                                         "templateId" : %d,
+                                         "metricId"   : %d,
+                                         "sourceId"   : %d
                                      }
                                     """.formatted(templateMetric.getId(), template.getId(), metric.getId(), source.getId());
 
@@ -235,7 +235,7 @@ class TemplateMetricControllerIntegrationTest {
             String expectedResponse = """
                 {
                     "status" : 404,
-                    "message": "Template_metric not found by id: 999999"
+                    "message": "TemplateMetric not found by id: 999999"
                 }
                 """;
 
@@ -255,18 +255,18 @@ class TemplateMetricControllerIntegrationTest {
         @DisplayName("PUT /templateMetrics -> updates and returns the TemplateMetric")
         void update() throws Exception {
             TemplateMetric original = templateMetricRepository.save(TemplateMetric.builder()
-                    .template_id(template.getId())
-                    .metric_id(metric.getId())
-                    .source_id(source.getId())
+                    .templateId(template.getId())
+                    .metricId(metric.getId())
+                    .sourceId(source.getId())
                     .build());
 
             metric = factory.createMetric("updated");
             String updateRequest = """
                                 {
                                     "id"          : %d,
-                                    "template_id" : %d,
-                                    "metric_id"   : %d,
-                                    "source_id"   : %d
+                                    "templateId"  : %d,
+                                    "metricId"    : %d,
+                                    "sourceId"    : %d
                                  }
                                 """.formatted(original.getId(), template.getId(), metric.getId(), source.getId());
 
@@ -284,9 +284,9 @@ class TemplateMetricControllerIntegrationTest {
             String expectedResponse = """
                                 {
                                     "id"          : %d,
-                                    "template_id" : %d,
-                                    "metric_id"   : %d,
-                                    "source_id"   : %d
+                                    "templateId"  : %d,
+                                    "metricId"    : %d,
+                                    "sourceId"    : %d
                                  }
                                 """.formatted(original.getId(), template.getId(), metric.getId(), source.getId());
 
@@ -295,7 +295,7 @@ class TemplateMetricControllerIntegrationTest {
             assertEquals(expectedNode, responseNode);
 
             TemplateMetric updated = templateMetricRepository.findById(original.getId()).orElseThrow();
-            assertEquals(updated.getMetric_id(), metric.getId());
+            assertEquals(updated.getMetricId(), metric.getId());
 
         }
 
@@ -306,9 +306,9 @@ class TemplateMetricControllerIntegrationTest {
             String updateRequest = """
                                  {
                                      "id"             : 999999,
-                                     "template_id" : %d,
-                                     "metric_id"   : %d,
-                                     "source_id"   : %d
+                                     "templateId"  : %d,
+                                     "metricId"    : %d,
+                                     "sourceId"    : %d
                                  }
                                  """.formatted(template.getId(), metric.getId(), source.getId());
 
@@ -347,9 +347,9 @@ class TemplateMetricControllerIntegrationTest {
         @DisplayName("DELETE /templateMetrics/{id} -> deletes the TemplateMetric")
         void delete() throws Exception {
             TemplateMetric templateMetric = templateMetricRepository.save(TemplateMetric.builder()
-                    .template_id(template.getId())
-                    .metric_id(metric.getId())
-                    .source_id(source.getId())
+                    .templateId(template.getId())
+                    .metricId(metric.getId())
+                    .sourceId(source.getId())
                     .build());
 
             String jsonResponse = mvc.perform(

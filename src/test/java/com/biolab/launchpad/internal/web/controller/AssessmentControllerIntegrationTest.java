@@ -48,13 +48,14 @@ class AssessmentControllerIntegrationTest {
     @BeforeEach
     void setUp() {
         template = factory.createAssessmentTemplate("height");
-        sport   = factory.createSportDictionary("basketball");
+        sport    = factory.createSportDictionary("basketball");
         player   = factory.createPlayer("pl2");
     }
 
     @AfterEach
     void tearDown() {
         assessmentRepository.deleteAll();
+        factory.cleanup();
     }
 
     @Nested

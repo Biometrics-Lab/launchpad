@@ -1,10 +1,13 @@
 package com.biolab.launchpad.internal.web.controller;
 
-import com.biolab.launchpad.internal.repository.MeasurementRepository;
-import com.biolab.launchpad.internal.repository.model.Measurement;
+import com.biolab.launchpad.internal.repository.model.SportDictionary;
+import com.biolab.launchpad.internal.repository.SportDictionaryRepository;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -14,21 +17,20 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
+import static graphql.Assert.assertFalse;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
 @AutoConfigureMockMvc
-@DisplayName("MeasurementController Integration Tests")
-class MeasurementControllerIntegrationTest {
+@DisplayName("SportDictionaryController Integration Tests")
+class SportDictionaryControllerIntegrationTest_ {
 
-    private static final String API = "/api/v1/measurements";
+    private static final String API = "/api/v1/sportDictionarys";
 
     @Autowired
     private MockMvc mvc;
@@ -37,26 +39,27 @@ class MeasurementControllerIntegrationTest {
     ObjectMapper objectMapper;
 
     @Autowired
-    MeasurementRepository measurementRepository;
+    SportDictionaryRepository sportDictionaryRepository;
 
     @AfterEach
     void tearDown() {
-        measurementRepository.deleteAll();
+        sportDictionaryRepository.deleteAll();
     }
 
     @Nested
     @DisplayName("Create")
     class CreateTests {
         @Test
-        @DisplayName("POST /measurements -> creates and returns the new Measurement")
+        @DisplayName("POST /ageGroupDictionarys -> creates and returns the new SportDictionary")
         void create() throws Exception {
 
             String request =
                     """
-                                {
-                                    "name" : "launch_angle"
-                                }
-                            """;
+                        {
+                            "name"        : "AgeGroup",
+                            "description" : "other description"
+                        }
+                    """;
 
             String jsonResponse = mvc.perform(
                             post(API)
@@ -69,17 +72,16 @@ class MeasurementControllerIntegrationTest {
 
             JsonNode responseNode = objectMapper.readTree(jsonResponse);
 
-            int measurementId = responseNode.get("id").asInt();
-            assertThat(measurementId).isPositive();
-
+            String sportDictionaryId = responseNode.get("name").asText();
+            assertThat(sportDictionaryId).isNotBlank();
 
             String expectedResponse =
                     """
-                            {
-                                        "id"     : %d,
-                                        "name"   : "launch_angle"
-                                    }
-                            """.formatted(measurementId);
+                       {
+                            "name"        : "AgeGroup",
+                            "description" : "other description"
+                        }
+                    """.formatted(sportDictionaryId);
 
             JsonNode expectedResponseNode = objectMapper.readTree(expectedResponse);
 
@@ -87,11 +89,11 @@ class MeasurementControllerIntegrationTest {
         }
 
         @Test
-        @DisplayName("POST /measurements with validation message -> returns 422")
+        @DisplayName("POST /ageGroupDictionarys with validation message -> returns 422")
         void createValidationError() throws Exception {
 
             String request =
-                    """ 
+                    """
                          {
                                "name" : ""
                          }
@@ -110,7 +112,7 @@ class MeasurementControllerIntegrationTest {
             JsonNode responseNode = objectMapper.readTree(jsonResponse);
 
             String expectedResponse =
-                    """ 
+                    """
                             {
                                 "status"  : 422,
                                 "message" : "Validation failed: name: Name cannot be blank"
@@ -128,16 +130,23 @@ class MeasurementControllerIntegrationTest {
     class ReadTests {
 
         @Test
-        @DisplayName("GET /measurements -> returns all measurements")
+        @DisplayName("GET /ageGroupDictionarys -> returns all sportDictionarys")
         void getAll() throws Exception {
 
-            Measurement measurement1 = measurementRepository.save(Measurement.builder()
+            SportDictionary sportDictionary1 = SportDictionary.builder()
                     .name("avg_launch_angle")
-                    .build());
-
-            Measurement measurement2 = measurementRepository.save(Measurement.builder()
+                    .description("other description")
+                    .build();
+            SportDictionary sportDictionary2 = SportDictionary.builder()
                     .name("max_launch_angle")
-                    .build());
+                    .description("other description")
+                    .build();
+
+            sportDictionary1.markAsNew(true);
+            sportDictionary2.markAsNew(true);
+
+            sportDictionaryRepository.save(sportDictionary1);
+            sportDictionaryRepository.save(sportDictionary2);
 
             String jsonResponse = mvc.perform(
                             get(API)
@@ -150,15 +159,15 @@ class MeasurementControllerIntegrationTest {
             String expectedResponse = """
                 [
                     {
-                        "id"     : %d,
-                        "name"   : "avg_launch_angle"
+                        "name"           : "%s",
+                        "description" : "other description"
                     },
                     {
-                        "id"     : %d,
-                        "name"   : "max_launch_angle"
+                        "name"           : "%s",
+                        "description" : "other description"
                     }
                 ]
-                """.formatted(measurement1.getId(), measurement2.getId());
+                """.formatted(sportDictionary1.getName(), sportDictionary2.getName());
 
             JsonNode expectedNode = objectMapper.readTree(expectedResponse);
             JsonNode actualNode   = objectMapper.readTree(jsonResponse);
@@ -167,26 +176,30 @@ class MeasurementControllerIntegrationTest {
         }
 
         @Test
-        @DisplayName("GET /measurements/{id} -> returns measurement by ID")
+        @DisplayName("GET /ageGroupDictionarys/{id} -> returns sportDictionary by ID")
         void getById() throws Exception {
 
-            Measurement measurement = measurementRepository.save(Measurement.builder()
-                    .name("launch_angle")
-                    .build());
+            SportDictionary sportDictionary = SportDictionary.builder()
+                    .name("ageGroup")
+                    .description("other description")
+                    .build();
+            sportDictionary.markAsNew(true);
+
+            sportDictionaryRepository.save(sportDictionary);
 
             String jsonResponse = mvc.perform(
-                            get(API + "/" + measurement.getId())
+                            get(API + "/" + sportDictionary.getId())
                                     .with(httpBasic("biolab", "biolab"))
                     )
                     .andExpect(status().isOk())
                     .andReturn().getResponse().getContentAsString();
 
             String expectedResponse = """
-                {
-                    "id"     : %d,
-                    "name"   : "launch_angle"
-                }
-                """.formatted(measurement.getId());
+                                        {
+                                             "name" : "%s",
+                                             "description" : "other description"
+                                         }
+                                        """.formatted(sportDictionary.getName());
 
             JsonNode expectedNode = objectMapper.readTree(expectedResponse);
             JsonNode actualNode   = objectMapper.readTree(jsonResponse);
@@ -195,7 +208,7 @@ class MeasurementControllerIntegrationTest {
         }
 
         @Test
-        @DisplayName("GET /measurements/{id} with unknown ID -> returns 404")
+        @DisplayName("GET /ageGroupDictionarys/{id} with unknown ID -> returns 404")
         void getByIdValidationError() throws Exception {
             String jsonResponse = mvc.perform(
                             get(API + "/999999")
@@ -207,7 +220,7 @@ class MeasurementControllerIntegrationTest {
             String expectedResponse = """
                 {
                     "status" : 404,
-                    "message": "Measurement not found by id: 999999"
+                    "message": "Sport_dictionary not found by id: 999999"
                 }
                 """;
 
@@ -224,18 +237,23 @@ class MeasurementControllerIntegrationTest {
     class UpdateTests {
 
         @Test
-        @DisplayName("PUT /measurements -> updates and returns the Measurement")
+        @DisplayName("PUT /ageGroupDictionarys -> updates and returns the SportDictionary")
         void update() throws Exception {
-            Measurement original = measurementRepository.save(Measurement.builder()
-                    .name("launch_angle")
-                    .build());
+
+            SportDictionary sportDictionary = SportDictionary.builder()
+                    .name("ageGroup")
+                    .description("other description")
+                    .build();
+            sportDictionary.markAsNew(true);
+
+            SportDictionary original = sportDictionaryRepository.save(sportDictionary);
 
             String updateRequest = """
-                {
-                    "id"      : %d,
-                    "name"    : "updated_launch_angle"
-                }
-                """.formatted(original.getId());
+                                    {
+                                             "name" : "%s",
+                                             "description" : "updated other description"
+                                    }
+                                    """.formatted(original.getId());
 
             String jsonResponse = mvc.perform(
                             put(API)
@@ -249,31 +267,31 @@ class MeasurementControllerIntegrationTest {
             JsonNode responseNode = objectMapper.readTree(jsonResponse);
 
             String expectedResponse = """
-                {
-                    "id"     : %d,
-                    "name"   : "updated_launch_angle"
-                }
-                """.formatted(original.getId());
+                                       {
+                                             "name" : "%s",
+                                             "description" : "updated other description"
+                                        }
+                                       """.formatted(original.getId());
 
             JsonNode expectedNode = objectMapper.readTree(expectedResponse);
 
             assertEquals(expectedNode, responseNode);
 
-            Measurement updated = measurementRepository.findById(original.getId()).orElseThrow();
-            assertEquals("updated_launch_angle", updated.getName());
+            SportDictionary updated = sportDictionaryRepository.findById(original.getId()).orElseThrow();
+            assertEquals("updated other description", updated.getDescription());
 
         }
 
         @Test
-        @DisplayName("PUT /measurements with invalid id -> returns 404")
+        @DisplayName("PUT /ageGroupDictionarys with invalid id -> returns 404")
         void updateValidationError() throws Exception {
 
             String updateRequest = """
-                {
-                    "id"      : 999999,
-                    "name"    : "updated_launch_angle"
-                }
-                """;
+                                    {
+                                          "name" : "999999",
+                                          "description" : "updated other description"
+                                    }
+                                    """;
 
             String jsonResponse = mvc.perform(
                             put(API)
@@ -288,7 +306,7 @@ class MeasurementControllerIntegrationTest {
             String expectedResponse = """
                 {
                     "status" : 404,
-                    "message": "MeasurementService. Could not update Measurement by id: 999999"
+                    "message": "SportDictionaryService. Could not update SportDictionary by id: 999999"
                 }
                 """;
 
@@ -306,14 +324,19 @@ class MeasurementControllerIntegrationTest {
     class DeleteTests {
 
         @Test
-        @DisplayName("DELETE /measurements/{id} -> deletes the Measurement")
+        @DisplayName("DELETE /ageGroupDictionarys/{id} -> deletes the SportDictionary")
         void delete() throws Exception {
-            Measurement measurement = measurementRepository.save(Measurement.builder()
-                    .name("launch_angle")
-                    .build());
+
+            SportDictionary sportDictionary = SportDictionary.builder()
+                    .name("ageGroup")
+                    .description("other description")
+                    .build();
+            sportDictionary.markAsNew(true);
+
+            SportDictionary original = sportDictionaryRepository.save(sportDictionary);
 
             String jsonResponse = mvc.perform(
-                            MockMvcRequestBuilders.delete(API + "/" + measurement.getId())
+                            MockMvcRequestBuilders.delete(API + "/" + sportDictionary.getId())
                                     .with(httpBasic("biolab", "biolab"))
                     )
                     .andExpect(status().isOk())
@@ -331,11 +354,11 @@ class MeasurementControllerIntegrationTest {
 
             assertEquals(expectedNode, actualNode);
 
-            assertFalse(measurementRepository.existsById(measurement.getId()));
+            assertFalse(sportDictionaryRepository.existsById(sportDictionary.getId()));
         }
 
         @Test
-        @DisplayName("DELETE /measurements/{id} with unknown ID -> returns 404")
+        @DisplayName("DELETE /ageGroupDictionarys/{id} with unknown ID -> returns 404")
         void deleteValidationError() throws Exception {
             String jsonResponse = mvc.perform(
                             MockMvcRequestBuilders.delete(API + "/999999")
@@ -347,7 +370,7 @@ class MeasurementControllerIntegrationTest {
             String expectedResponse = """
                 {
                     "status" : 404,
-                    "message": "MeasurementService. Could not delete id: 999999"
+                    "message": "SportDictionaryService. Could not delete id: 999999"
                 }
                 """;
 
@@ -357,4 +380,5 @@ class MeasurementControllerIntegrationTest {
             assertEquals(expectedNode, actualNode);
         }
     }
+
 }

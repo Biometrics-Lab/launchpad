@@ -18,7 +18,7 @@ import static com.biolab.launchpad.internal.web.mapper.DataSourceMapper.dataSour
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/data_sources")
+@RequestMapping("/api/v1/dataSources")
 @Log4j2
 public class DataSourceController {
 
@@ -41,8 +41,8 @@ public class DataSourceController {
         if (data_sourceOptional.isPresent()) {
             return data_sourceOptional.get();
         } else {
-            log.warn("Could not find data_source with id {}", id);
-            throw new NotFoundByException("Data_source not found by id: %d", id);
+            log.warn("Could not find dataSource with id {}", id);
+            throw new NotFoundByException("DataSource not found by id: %d", id);
         }
     }
 

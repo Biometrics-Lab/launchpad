@@ -1,12 +1,13 @@
 package com.biolab.launchpad.internal.web.controller;
 
-import com.biolab.launchpad.internal.repository.PlayerRepository;
-import com.biolab.launchpad.internal.repository.model.Measurement;
-import com.biolab.launchpad.internal.repository.model.Player;
-import com.biolab.launchpad.internal.repository.model.Team;
+import com.biolab.launchpad.internal.repository.model.UserRoleDictionary;
+import com.biolab.launchpad.internal.repository.UserRoleDictionaryRepository;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -16,11 +17,9 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
-import java.time.LocalDate;
-
+import static graphql.Assert.assertFalse;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -28,10 +27,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
 @AutoConfigureMockMvc
-@DisplayName("PlayerController Integration Tests")
-class PlayerControllerIntegrationTest {
+@DisplayName("UserRoleDictionaryController Integration Tests")
+class UserRoleDictionaryControllerIntegrationTest_ {
 
-    private static final String API = "/api/v1/players";
+    private static final String API = "/api/v1/userRoleDictionarys";
 
     @Autowired
     private MockMvc mvc;
@@ -40,39 +39,27 @@ class PlayerControllerIntegrationTest {
     ObjectMapper objectMapper;
 
     @Autowired
-    PlayerRepository playerRepository;
-
-    @Autowired
-    EntityFactory factory;
-
-    Team team;
-
-    @BeforeEach
-    void setUp() {
-        team = factory.createTeam("team_main");
-    }
+    UserRoleDictionaryRepository userRoleDictionaryRepository;
 
     @AfterEach
     void tearDown() {
-        playerRepository.deleteAll();
+        userRoleDictionaryRepository.deleteAll();
     }
 
     @Nested
     @DisplayName("Create")
     class CreateTests {
         @Test
-        @DisplayName("POST /players -> creates and returns the new Player")
+        @DisplayName("POST /userRoleDictionarys -> creates and returns the new UserRoleDictionary")
         void create() throws Exception {
 
             String request =
-                    """ 
-                                {
-                                    "name"           : "avg_exit_team",
-                                    "team_id"        : %d,
-                                    "graduation_year": 2020,
-                                    "dob"            : "1990-05-15"
-                                }
-                            """.formatted(team.getId());
+                    """
+                        {
+                            "name"        : "AgeGroup",
+                            "description" : "other description"
+                        }
+                    """;
 
             String jsonResponse = mvc.perform(
                             post(API)
@@ -83,23 +70,18 @@ class PlayerControllerIntegrationTest {
                     .andExpect(status().isOk())
                     .andReturn().getResponse().getContentAsString();
 
-
             JsonNode responseNode = objectMapper.readTree(jsonResponse);
 
-            int playerId = responseNode.get("id").asInt();
-            assertThat(playerId).isPositive();
-
+            String userRoleDictionaryId = responseNode.get("name").asText();
+            assertThat(userRoleDictionaryId).isNotBlank();
 
             String expectedResponse =
-                    """ 
-                            {
-                                        "id"             : %d,
-                                        "name"           : "avg_exit_team",
-                                        "team_id"        : %d,
-                                        "graduation_year": 2020,
-                                        "dob"            : "1990-05-15"
-                                    }
-                            """.formatted(playerId, team.getId());
+                    """
+                       {
+                            "name"        : "AgeGroup",
+                            "description" : "other description"
+                        }
+   """.formatted(userRoleDictionaryId);
 
             JsonNode expectedResponseNode = objectMapper.readTree(expectedResponse);
 
@@ -107,15 +89,15 @@ class PlayerControllerIntegrationTest {
         }
 
         @Test
-        @DisplayName("POST /players with validation message -> returns 422")
+        @DisplayName("POST /userRoleDictionarys with validation message -> returns 422")
         void createValidationError() throws Exception {
 
             String request =
                     """
-                                {
-                                    "graduation_year" : 2020
-                                }
-                            """;
+                         {
+                               "name" : ""
+                         }
+                    """;
 
             String jsonResponse = mvc.perform(
                             post(API)
@@ -132,8 +114,8 @@ class PlayerControllerIntegrationTest {
             String expectedResponse =
                     """
                             {
-                                "status"       : 422,
-                                "message"        : "Validation failed: name: Name cannot be blank, and team_id: Player team_id cannot be null"
+                                "status"  : 422,
+                                "message" : "Validation failed: name: Name cannot be blank"
                             }
                             """;
 
@@ -148,25 +130,27 @@ class PlayerControllerIntegrationTest {
     class ReadTests {
 
         @Test
-        @DisplayName("GET /players -> returns all players")
+        @DisplayName("GET /userRoleDictionarys -> returns all userRoleDictionarys")
         void getAll() throws Exception {
 
-            Player player1 = playerRepository.save(Player.builder()
-                    .name("avg_exit_team")
-                    .team_id(team.getId())
-                    .graduation_year(2020)
-                    .dob(LocalDate.of(1990, 5, 15))
-                    .build());
+            UserRoleDictionary userRoleDictionary1 = UserRoleDictionary.builder()
+                    .name("avg_launch_angle")
+                    .description("other description")
+                    .build();
+            UserRoleDictionary userRoleDictionary2 = UserRoleDictionary.builder()
+                    .name("max_launch_angle")
+                    .description("other description")
+                    .build();
 
-            Player player2 = playerRepository.save(Player.builder()
-                    .name("max_entry_velocity")
-                    .team_id(team.getId())
-                    .graduation_year(2020)
-                    .dob(LocalDate.of(1990, 5, 15))
-                    .build());
+            userRoleDictionary1.markAsNew(true);
+            userRoleDictionary2.markAsNew(true);
+
+            userRoleDictionaryRepository.save(userRoleDictionary1);
+            userRoleDictionaryRepository.save(userRoleDictionary2);
 
             String jsonResponse = mvc.perform(
                             get(API)
+                                    .contentType(MediaType.APPLICATION_JSON)
                                     .with(httpBasic("biolab", "biolab"))
                     )
                     .andExpect(status().isOk())
@@ -175,21 +159,15 @@ class PlayerControllerIntegrationTest {
             String expectedResponse = """
                 [
                     {
-                        "id"             : %d,
-                        "name"           : "avg_exit_team",
-                        "team_id"        : %d,
-                        "graduation_year": 2020,
-                        "dob"            : "1990-05-15"
+                        "name"           : "%s",
+                        "description" : "other description"
                     },
                     {
-                        "id"             : %d,
-                        "name"           : "max_entry_velocity",
-                        "team_id"        : %d,
-                        "graduation_year": 2020,
-                        "dob"            : "1990-05-15"
+                        "name"           : "%s",
+                        "description" : "other description"
                     }
                 ]
-                """.formatted(player1.getId(), team.getId(), player2.getId(), team.getId());
+                """.formatted(userRoleDictionary1.getName(), userRoleDictionary2.getName());
 
             JsonNode expectedNode = objectMapper.readTree(expectedResponse);
             JsonNode actualNode   = objectMapper.readTree(jsonResponse);
@@ -198,32 +176,30 @@ class PlayerControllerIntegrationTest {
         }
 
         @Test
-        @DisplayName("GET /players/{id} -> returns player by ID")
+        @DisplayName("GET /userRoleDictionarys/{id} -> returns userRoleDictionary by ID")
         void getById() throws Exception {
 
-            Player player = playerRepository.save(Player.builder()
-                    .name("avg_exit_team")
-                    .team_id(team.getId())
-                    .graduation_year(2020)
-                    .dob(LocalDate.of(1990, 5, 15))
-                    .build());
+            UserRoleDictionary userRoleDictionary = UserRoleDictionary.builder()
+                    .name("ageGroup")
+                    .description("other description")
+                    .build();
+            userRoleDictionary.markAsNew(true);
+
+            userRoleDictionaryRepository.save(userRoleDictionary);
 
             String jsonResponse = mvc.perform(
-                            get(API + "/" + player.getId())
+                            get(API + "/" + userRoleDictionary.getId())
                                     .with(httpBasic("biolab", "biolab"))
                     )
                     .andExpect(status().isOk())
                     .andReturn().getResponse().getContentAsString();
 
             String expectedResponse = """
-                {
-                    "id"             : %d,
-                    "name"           : "avg_exit_team",
-                    "team_id"        : %d,
-                    "graduation_year": 2020,
-                    "dob"            : "1990-05-15"
-                }
-                """.formatted(player.getId(), team.getId());
+                                        {
+                                             "name"        : "%s",
+                                             "description" : "other description"
+                                         }
+                                        """.formatted(userRoleDictionary.getName());
 
             JsonNode expectedNode = objectMapper.readTree(expectedResponse);
             JsonNode actualNode   = objectMapper.readTree(jsonResponse);
@@ -232,7 +208,7 @@ class PlayerControllerIntegrationTest {
         }
 
         @Test
-        @DisplayName("GET /players/{id} with unknown ID -> returns 404")
+        @DisplayName("GET /userRoleDictionarys/{id} with unknown ID -> returns 404")
         void getByIdValidationError() throws Exception {
             String jsonResponse = mvc.perform(
                             get(API + "/999999")
@@ -244,7 +220,7 @@ class PlayerControllerIntegrationTest {
             String expectedResponse = """
                 {
                     "status" : 404,
-                    "message": "Player not found by id: 999999"
+                    "message": "User_role_dictionary not found by id: 999999"
                 }
                 """;
 
@@ -261,24 +237,23 @@ class PlayerControllerIntegrationTest {
     class UpdateTests {
 
         @Test
-        @DisplayName("PUT /players -> updates and returns the Player")
+        @DisplayName("PUT /userRoleDictionarys -> updates and returns the UserRoleDictionary")
         void update() throws Exception {
-            Player original = playerRepository.save(Player.builder()
-                    .name("avg_exit_team")
-                    .team_id(team.getId())
-                    .graduation_year(2020)
-                    .dob(LocalDate.of(1990, 5, 15))
-                    .build());
+
+            UserRoleDictionary userRoleDictionary = UserRoleDictionary.builder()
+                    .name("ageGroup")
+                    .description("other description")
+                    .build();
+            userRoleDictionary.markAsNew(true);
+
+            UserRoleDictionary original = userRoleDictionaryRepository.save(userRoleDictionary);
 
             String updateRequest = """
-                {
-                    "id"             : %d,
-                    "name"           : "upd",
-                    "team_id"        : %d,
-                    "graduation_year": 2021,
-                    "dob"            : "1990-05-16"
-                }
-                """.formatted(original.getId(), team.getId());
+                                    {
+                                             "name"        : "%s",
+                                             "description" : "updated other description"
+                                    }
+                                    """.formatted(original.getId());
 
             String jsonResponse = mvc.perform(
                             put(API)
@@ -292,37 +267,31 @@ class PlayerControllerIntegrationTest {
             JsonNode responseNode = objectMapper.readTree(jsonResponse);
 
             String expectedResponse = """
-                {
-                    "id"             : %d,
-                    "name"           : "upd",
-                    "team_id"        : %d,
-                    "graduation_year": 2021,
-                    "dob"            : "1990-05-16"
-                }
-                """.formatted(original.getId(), team.getId());
+                                       {
+                                             "name"        : "%s",
+                                             "description" : "updated other description"
+                                        }
+                                       """.formatted(original.getId());
 
             JsonNode expectedNode = objectMapper.readTree(expectedResponse);
 
             assertEquals(expectedNode, responseNode);
 
-            Player updated = playerRepository.findById(original.getId()).orElseThrow();
-            assertEquals("upd"        , updated.getName());
-            assertEquals(2021         , updated.getGraduation_year());
-            assertEquals("1990-05-16" , updated.getDob().toString());
+            UserRoleDictionary updated = userRoleDictionaryRepository.findById(original.getId()).orElseThrow();
+            assertEquals("updated other description", updated.getDescription());
 
         }
 
         @Test
-        @DisplayName("PUT /players with invalid id -> returns 404")
+        @DisplayName("PUT /userRoleDictionarys with invalid id -> returns 404")
         void updateValidationError() throws Exception {
 
             String updateRequest = """
-                {
-                    "id"            : 999999,
-                    "name"          : "upd",
-                    "team_id"       : %d
-                }
-                """.formatted(team.getId());
+                                    {
+                                          "name"        : "999999",
+                                          "description" : "updated other description"
+                                    }
+                                    """;
 
             String jsonResponse = mvc.perform(
                             put(API)
@@ -337,7 +306,7 @@ class PlayerControllerIntegrationTest {
             String expectedResponse = """
                 {
                     "status" : 404,
-                    "message": "PlayerService. Could not update Player by id: 999999"
+                    "message": "UserRoleDictionaryService. Could not update UserRoleDictionary by id: 999999"
                 }
                 """;
 
@@ -355,17 +324,19 @@ class PlayerControllerIntegrationTest {
     class DeleteTests {
 
         @Test
-        @DisplayName("DELETE /players/{id} -> deletes the Player")
+        @DisplayName("DELETE /userRoleDictionarys/{id} -> deletes the UserRoleDictionary")
         void delete() throws Exception {
-            Player player = playerRepository.save(Player.builder()
-                    .name("avg_exit_team")
-                    .team_id(team.getId())
-                    .graduation_year(2020)
-                    .dob(LocalDate.of(1990, 5, 15))
-                    .build());
+
+            UserRoleDictionary userRoleDictionary = UserRoleDictionary.builder()
+                    .name("ageGroup")
+                    .description("other description")
+                    .build();
+            userRoleDictionary.markAsNew(true);
+
+            UserRoleDictionary original = userRoleDictionaryRepository.save(userRoleDictionary);
 
             String jsonResponse = mvc.perform(
-                            MockMvcRequestBuilders.delete(API + "/" + player.getId())
+                            MockMvcRequestBuilders.delete(API + "/" + userRoleDictionary.getId())
                                     .with(httpBasic("biolab", "biolab"))
                     )
                     .andExpect(status().isOk())
@@ -383,11 +354,11 @@ class PlayerControllerIntegrationTest {
 
             assertEquals(expectedNode, actualNode);
 
-            assertFalse(playerRepository.existsById(player.getId()));
+            assertFalse(userRoleDictionaryRepository.existsById(userRoleDictionary.getId()));
         }
 
         @Test
-        @DisplayName("DELETE /players/{id} with unknown ID -> returns 404")
+        @DisplayName("DELETE /userRoleDictionarys/{id} with unknown ID -> returns 404")
         void deleteValidationError() throws Exception {
             String jsonResponse = mvc.perform(
                             MockMvcRequestBuilders.delete(API + "/999999")
@@ -399,7 +370,7 @@ class PlayerControllerIntegrationTest {
             String expectedResponse = """
                 {
                     "status" : 404,
-                    "message": "PlayerService. Could not delete id: 999999"
+                    "message": "UserRoleDictionaryService. Could not delete id: 999999"
                 }
                 """;
 

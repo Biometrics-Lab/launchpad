@@ -18,7 +18,7 @@ import static com.biolab.launchpad.internal.web.mapper.ResourceTypeDictionaryMap
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/resource_type_dictionarys")
+@RequestMapping("/api/v1/resourceTypeDictionarys")
 @Log4j2
 public class ResourceTypeDictionaryController {
 
@@ -41,8 +41,8 @@ public class ResourceTypeDictionaryController {
         if (resourceTypeDictionaryOptional.isPresent()) {
             return resourceTypeDictionaryOptional.get();
         } else {
-            log.warn("Could not find resource_type_dictionary with id {}", id);
-            throw new NotFoundByException("Resource_type_dictionary not found by id: %s", id);
+            log.warn("Could not find resourceTypeDictionary with id {}", id);
+            throw new NotFoundByException("ResourceTypeDictionary not found by id: %s", id);
         }
     }
 

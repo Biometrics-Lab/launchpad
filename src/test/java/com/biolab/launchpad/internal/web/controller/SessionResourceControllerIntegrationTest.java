@@ -30,7 +30,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @DisplayName("SessionResource Integration Tests")
 class SessionResourceControllerIntegrationTest {
 
-    private static final String API = "/api/v1/session_resources";
+    private static final String API = "/api/v1/sessionResources";
 
     @Autowired
     private MockMvc mvc;
@@ -68,7 +68,7 @@ class SessionResourceControllerIntegrationTest {
             String request =
                             """
                                 {
-                                    "session1_id"    : %d,
+                                    "session1Id"     : %d,
                                     "type"           : "%s",
                                     "url"            : "desc"
                                 }
@@ -94,7 +94,7 @@ class SessionResourceControllerIntegrationTest {
                     """
                             {
                                         "id"             : %d,
-                                        "session1_id"    : %d,
+                                        "session1Id"     : %d,
                                         "type"           : "%s",
                                         "url"            :"desc"
                                     }
@@ -131,7 +131,7 @@ class SessionResourceControllerIntegrationTest {
                     """
                             {
                                 "status"       : 422,
-                                "message"      : "Validation failed: session1_id: Session_resource session_id cannot be null, and type: Session_resource type cannot be null"
+                                "message"      : "Validation failed: session1Id: SessionResource sessionId cannot be null, and type: SessionResource type cannot be null"
                             }
                             """;
 
@@ -150,13 +150,13 @@ class SessionResourceControllerIntegrationTest {
         void getAll() throws Exception {
 
             SessionResource sessionResource1 = sessionResourceRepository.save(SessionResource.builder()
-                    .session1_id(session1.getId())
+                    .session1Id(session1.getId())
                     .type(resourceTypeDictionary.getId())
                     .url("desc")
                     .build());
 
             SessionResource sessionResource2 = sessionResourceRepository.save(SessionResource.builder()
-                    .session1_id(session1.getId())
+                    .session1Id(session1.getId())
                     .type(resourceTypeDictionary.getId())
                     .url("desc")
                     .build());
@@ -172,13 +172,13 @@ class SessionResourceControllerIntegrationTest {
                 [
                     {
                         "id"             : %d,
-                        "session1_id"    : %d,
+                        "session1Id"     : %d,
                         "type"           : "%s",
                         "url"            :"desc"
                     },
                     {
                         "id"             : %d,
-                        "session1_id"    : %d,
+                        "session1Id"     : %d,
                         "type"           : "%s",
                         "url"            :"desc"
                     }
@@ -196,7 +196,7 @@ class SessionResourceControllerIntegrationTest {
         void getById() throws Exception {
 
             SessionResource sessionResource = sessionResourceRepository.save(SessionResource.builder()
-                    .session1_id(session1.getId())
+                    .session1Id(session1.getId())
                     .type(resourceTypeDictionary.getId())
                     .url("desc")
                     .build());
@@ -211,7 +211,7 @@ class SessionResourceControllerIntegrationTest {
             String expectedResponse = """
                 {
                     "id"             : %d,
-                    "session1_id"    : %d,
+                    "session1Id"     : %d,
                     "type"           : "%s",
                     "url"            :"desc"
                 }
@@ -236,7 +236,7 @@ class SessionResourceControllerIntegrationTest {
             String expectedResponse = """
                 {
                     "status" : 404,
-                    "message": "Session_resource not found by id: 999999"
+                    "message": "SessionResource not found by id: 999999"
                 }
                 """;
 
@@ -255,7 +255,7 @@ class SessionResourceControllerIntegrationTest {
         @DisplayName("PUT /sessionResources -> updates and returns the SessionResource")
         void update() throws Exception {
             SessionResource original = sessionResourceRepository.save(SessionResource.builder()
-                    .session1_id(session1.getId())
+                    .session1Id(session1.getId())
                     .type(resourceTypeDictionary.getId())
                     .url("desc")
                     .build());
@@ -263,7 +263,7 @@ class SessionResourceControllerIntegrationTest {
             String updateRequest = """
                 {
                     "id"             : %d,
-                    "session1_id"    : %d,
+                    "session1Id"     : %d,
                     "type"           : "%s",
                     "url"            : "descUPD"
                 }
@@ -283,7 +283,7 @@ class SessionResourceControllerIntegrationTest {
             String expectedResponse = """
                 {
                     "id"             : %d,
-                    "session1_id"    : %d,
+                    "session1Id"     : %d,
                     "type"           : "%s",
                     "url"            :"descUPD"
                 }
@@ -304,7 +304,7 @@ class SessionResourceControllerIntegrationTest {
             String updateRequest = """
                 {
                     "id"             : 999999,
-                    "session1_id"    : %d,
+                    "session1Id"     : %d,
                     "type"           : "%s",
                     "url"            :"desc"
                 }
@@ -343,7 +343,7 @@ class SessionResourceControllerIntegrationTest {
         @DisplayName("DELETE /sessionResources/{id} -> deletes the SessionResource")
         void delete() throws Exception {
             SessionResource sessionResource = sessionResourceRepository.save(SessionResource.builder()
-                    .session1_id(session1.getId())
+                    .session1Id(session1.getId())
                     .type(resourceTypeDictionary.getId())
                     .url("desc")
                     .build());

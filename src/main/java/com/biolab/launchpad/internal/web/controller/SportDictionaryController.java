@@ -18,7 +18,7 @@ import static com.biolab.launchpad.internal.web.mapper.SportDictionaryMapper.spo
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/sport_dictionarys")
+@RequestMapping("/api/v1/sportDictionarys")
 @Log4j2
 public class SportDictionaryController {
 
@@ -41,8 +41,8 @@ public class SportDictionaryController {
         if (sportDictionaryOptional.isPresent()) {
             return sportDictionaryOptional.get();
         } else {
-            log.warn("Could not find sport_dictionary with id {}", id);
-            throw new NotFoundByException("Sport_dictionary not found by id: %s", id);
+            log.warn("Could not find sportDictionary with id {}", id);
+            throw new NotFoundByException("SportDictionary not found by id: %s", id);
         }
     }
 

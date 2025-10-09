@@ -1,9 +1,7 @@
 package com.biolab.launchpad.internal.web.controller;
 
-import com.biolab.launchpad.internal.repository.UserPlayerRepository;
-import com.biolab.launchpad.internal.repository.model.Player;
-import com.biolab.launchpad.internal.repository.model.User;
-import com.biolab.launchpad.internal.repository.model.UserPlayer;
+import com.biolab.launchpad.internal.repository.MeasurementRepository;
+import com.biolab.launchpad.internal.repository.model.Measurement;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.*;
@@ -17,19 +15,20 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
 @AutoConfigureMockMvc
-@DisplayName("UserPlayerController Integration Tests")
-class UserPlayerControllerIntegrationTest {
+@DisplayName("MeasurementController Integration Tests")
+class MeasurementControllerIntegrationTest_ {
 
-    private static final String API = "/api/v1/user_players";
+    private static final String API = "/api/v1/measurements";
 
     @Autowired
     private MockMvc mvc;
@@ -38,39 +37,26 @@ class UserPlayerControllerIntegrationTest {
     ObjectMapper objectMapper;
 
     @Autowired
-    UserPlayerRepository userPlayerRepository;
-
-    @Autowired
-    EntityFactory factory;
-
-    User   user;
-    Player player;
-
-    @BeforeEach
-    void setUp() {
-        user   = factory.createUser("Us");
-        player = factory.createPlayer("Pl1");
-    }
+    MeasurementRepository measurementRepository;
 
     @AfterEach
     void tearDown() {
-        userPlayerRepository.deleteAll();
+        measurementRepository.deleteAll();
     }
 
     @Nested
     @DisplayName("Create")
     class CreateTests {
         @Test
-        @DisplayName("POST /userPlayers -> creates and returns the new UserPlayer")
+        @DisplayName("POST /measurements -> creates and returns the new Measurement")
         void create() throws Exception {
 
             String request =
-                    """ 
+                    """
                                 {
-                                    "user_id"         : %d,
-                                    "player_id"       : %d
+                                    "name" : "launch_angle"
                                 }
-                            """.formatted(user.getId(), player.getId());
+                            """;
 
             String jsonResponse = mvc.perform(
                             post(API)
@@ -81,21 +67,19 @@ class UserPlayerControllerIntegrationTest {
                     .andExpect(status().isOk())
                     .andReturn().getResponse().getContentAsString();
 
-
             JsonNode responseNode = objectMapper.readTree(jsonResponse);
 
-            int userPlayerId = responseNode.get("id").asInt();
-            assertThat(userPlayerId).isPositive();
+            int measurementId = responseNode.get("id").asInt();
+            assertThat(measurementId).isPositive();
 
 
             String expectedResponse =
-                                    """ 
-                                    {
-                                        "id"           : %d,
-                                        "user_id"      : %d,
-                                        "player_id"    : %d
+                    """
+                            {
+                                        "id"     : %d,
+                                        "name"   : "launch_angle"
                                     }
-                                    """.formatted(userPlayerId, user.getId(), player.getId());
+                            """.formatted(measurementId);
 
             JsonNode expectedResponseNode = objectMapper.readTree(expectedResponse);
 
@@ -103,15 +87,15 @@ class UserPlayerControllerIntegrationTest {
         }
 
         @Test
-        @DisplayName("POST /userPlayers with validation message -> returns 422")
+        @DisplayName("POST /measurements with validation message -> returns 422")
         void createValidationError() throws Exception {
 
             String request =
-                            """
-                                {
-                                    "role" : null
-                                }
-                            """;
+                    """ 
+                         {
+                               "name" : ""
+                         }
+                    """;
 
             String jsonResponse = mvc.perform(
                             post(API)
@@ -126,10 +110,10 @@ class UserPlayerControllerIntegrationTest {
             JsonNode responseNode = objectMapper.readTree(jsonResponse);
 
             String expectedResponse =
-                    """
+                    """ 
                             {
-                                "status"       : 422,
-                                "message"      : "Validation failed: player_id: User_player player_id cannot be null, and user_id: User_player user_id cannot be null"
+                                "status"  : 422,
+                                "message" : "Validation failed: name: Name cannot be blank"
                             }
                             """;
 
@@ -144,21 +128,20 @@ class UserPlayerControllerIntegrationTest {
     class ReadTests {
 
         @Test
-        @DisplayName("GET /userPlayers -> returns all userPlayers")
+        @DisplayName("GET /measurements -> returns all measurements")
         void getAll() throws Exception {
 
-            UserPlayer userPlayer1 = userPlayerRepository.save(UserPlayer.builder()
-                    .user_id(user.getId())
-                    .player_id(player.getId())
+            Measurement measurement1 = measurementRepository.save(Measurement.builder()
+                    .name("avg_launch_angle")
                     .build());
 
-            UserPlayer userPlayer2 = userPlayerRepository.save(UserPlayer.builder()
-                    .user_id(user.getId())
-                    .player_id(player.getId())
+            Measurement measurement2 = measurementRepository.save(Measurement.builder()
+                    .name("max_launch_angle")
                     .build());
 
             String jsonResponse = mvc.perform(
                             get(API)
+                                    .contentType(MediaType.APPLICATION_JSON)
                                     .with(httpBasic("biolab", "biolab"))
                     )
                     .andExpect(status().isOk())
@@ -167,17 +150,15 @@ class UserPlayerControllerIntegrationTest {
             String expectedResponse = """
                 [
                     {
-                        "id"           : %d,
-                        "user_id"      : %d,
-                        "player_id"    : %d
+                        "id"     : %d,
+                        "name"   : "avg_launch_angle"
                     },
                     {
-                        "id"           : %d,
-                        "user_id"      : %d,
-                        "player_id"    : %d
+                        "id"     : %d,
+                        "name"   : "max_launch_angle"
                     }
                 ]
-                """.formatted(userPlayer1.getId(), user.getId(), player.getId(), userPlayer2.getId(), user.getId(), player.getId());
+                """.formatted(measurement1.getId(), measurement2.getId());
 
             JsonNode expectedNode = objectMapper.readTree(expectedResponse);
             JsonNode actualNode   = objectMapper.readTree(jsonResponse);
@@ -186,29 +167,26 @@ class UserPlayerControllerIntegrationTest {
         }
 
         @Test
-        @DisplayName("GET /userPlayers/{id} -> returns userPlayer by ID")
+        @DisplayName("GET /measurements/{id} -> returns measurement by ID")
         void getById() throws Exception {
 
-            UserPlayer userPlayer = userPlayerRepository.save(UserPlayer.builder()
-                    .user_id(user.getId())
-                    .player_id(player.getId())
+            Measurement measurement = measurementRepository.save(Measurement.builder()
+                    .name("launch_angle")
                     .build());
 
             String jsonResponse = mvc.perform(
-                            get(API + "/" + userPlayer.getId())
+                            get(API + "/" + measurement.getId())
                                     .with(httpBasic("biolab", "biolab"))
                     )
                     .andExpect(status().isOk())
                     .andReturn().getResponse().getContentAsString();
 
-            String expectedResponse =
-                    """ 
-                    {
-                        "id"           : %d,
-                        "user_id"      : %d,
-                        "player_id"    : %d
-                    }
-                    """.formatted(userPlayer.getId(), user.getId(), player.getId());
+            String expectedResponse = """
+                {
+                    "id"     : %d,
+                    "name"   : "launch_angle"
+                }
+                """.formatted(measurement.getId());
 
             JsonNode expectedNode = objectMapper.readTree(expectedResponse);
             JsonNode actualNode   = objectMapper.readTree(jsonResponse);
@@ -217,7 +195,7 @@ class UserPlayerControllerIntegrationTest {
         }
 
         @Test
-        @DisplayName("GET /userPlayers/{id} with unknown ID -> returns 404")
+        @DisplayName("GET /measurements/{id} with unknown ID -> returns 404")
         void getByIdValidationError() throws Exception {
             String jsonResponse = mvc.perform(
                             get(API + "/999999")
@@ -229,7 +207,7 @@ class UserPlayerControllerIntegrationTest {
             String expectedResponse = """
                 {
                     "status" : 404,
-                    "message": "User_player not found by id: 999999"
+                    "message": "Measurement not found by id: 999999"
                 }
                 """;
 
@@ -246,22 +224,18 @@ class UserPlayerControllerIntegrationTest {
     class UpdateTests {
 
         @Test
-        @DisplayName("PUT /userPlayers -> updates and returns the UserPlayer")
+        @DisplayName("PUT /measurements -> updates and returns the Measurement")
         void update() throws Exception {
-            UserPlayer original = userPlayerRepository.save(UserPlayer.builder()
-                    .user_id(user.getId())
-                    .player_id(player.getId())
+            Measurement original = measurementRepository.save(Measurement.builder()
+                    .name("launch_angle")
                     .build());
 
-            user.setName("UsUp");
-            String updateRequest =
-                    """ 
-                    {
-                        "id"           : %d,
-                        "user_id"      : %d,
-                        "player_id"    : %d
-                    }
-                    """.formatted(original.getId(), user.getId(), player.getId());
+            String updateRequest = """
+                {
+                    "id"      : %d,
+                    "name"    : "updated_launch_angle"
+                }
+                """.formatted(original.getId());
 
             String jsonResponse = mvc.perform(
                             put(API)
@@ -274,36 +248,32 @@ class UserPlayerControllerIntegrationTest {
 
             JsonNode responseNode = objectMapper.readTree(jsonResponse);
 
-            String expectedResponse =
-                    """ 
-                    {
-                        "id"           : %d,
-                        "user_id"      : %d,
-                        "player_id"    : %d
-                    }
-                    """.formatted(original.getId(), user.getId(), player.getId());
+            String expectedResponse = """
+                {
+                    "id"     : %d,
+                    "name"   : "updated_launch_angle"
+                }
+                """.formatted(original.getId());
 
             JsonNode expectedNode = objectMapper.readTree(expectedResponse);
 
             assertEquals(expectedNode, responseNode);
 
-            UserPlayer updated = userPlayerRepository.findById(original.getId()).orElseThrow();
-
-            user.setName("Us");
+            Measurement updated = measurementRepository.findById(original.getId()).orElseThrow();
+            assertEquals("updated_launch_angle", updated.getName());
 
         }
 
         @Test
-        @DisplayName("PUT /userPlayers with invalid id -> returns 404")
+        @DisplayName("PUT /measurements with invalid id -> returns 404")
         void updateValidationError() throws Exception {
 
-            String updateRequest =  """ 
-                    {
-                        "id"           : 999999,
-                        "user_id"      : %d,
-                        "player_id"    : %d
-                    }
-                    """.formatted(user.getId(), player.getId());
+            String updateRequest = """
+                {
+                    "id"      : 999999,
+                    "name"    : "updated_launch_angle"
+                }
+                """;
 
             String jsonResponse = mvc.perform(
                             put(API)
@@ -318,7 +288,7 @@ class UserPlayerControllerIntegrationTest {
             String expectedResponse = """
                 {
                     "status" : 404,
-                    "message": "UserPlayerService. Could not update UserPlayer by id: 999999"
+                    "message": "MeasurementService. Could not update Measurement by id: 999999"
                 }
                 """;
 
@@ -336,15 +306,14 @@ class UserPlayerControllerIntegrationTest {
     class DeleteTests {
 
         @Test
-        @DisplayName("DELETE /userPlayers/{id} -> deletes the UserPlayer")
+        @DisplayName("DELETE /measurements/{id} -> deletes the Measurement")
         void delete() throws Exception {
-            UserPlayer userPlayer = userPlayerRepository.save(UserPlayer.builder()
-                    .user_id(user.getId())
-                    .player_id(player.getId())
+            Measurement measurement = measurementRepository.save(Measurement.builder()
+                    .name("launch_angle")
                     .build());
 
             String jsonResponse = mvc.perform(
-                            MockMvcRequestBuilders.delete(API + "/" + userPlayer.getId())
+                            MockMvcRequestBuilders.delete(API + "/" + measurement.getId())
                                     .with(httpBasic("biolab", "biolab"))
                     )
                     .andExpect(status().isOk())
@@ -362,11 +331,11 @@ class UserPlayerControllerIntegrationTest {
 
             assertEquals(expectedNode, actualNode);
 
-            assertFalse(userPlayerRepository.existsById(userPlayer.getId()));
+            assertFalse(measurementRepository.existsById(measurement.getId()));
         }
 
         @Test
-        @DisplayName("DELETE /userPlayers/{id} with unknown ID -> returns 404")
+        @DisplayName("DELETE /measurements/{id} with unknown ID -> returns 404")
         void deleteValidationError() throws Exception {
             String jsonResponse = mvc.perform(
                             MockMvcRequestBuilders.delete(API + "/999999")
@@ -378,7 +347,7 @@ class UserPlayerControllerIntegrationTest {
             String expectedResponse = """
                 {
                     "status" : 404,
-                    "message": "UserPlayerService. Could not delete id: 999999"
+                    "message": "MeasurementService. Could not delete id: 999999"
                 }
                 """;
 

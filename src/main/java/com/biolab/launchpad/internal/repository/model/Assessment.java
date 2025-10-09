@@ -15,12 +15,12 @@ import org.springframework.data.relational.core.mapping.Table;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Table("assessment")
 public class Assessment  extends ID {
-    @NotNull(message = "Assessment player_id cannot be null")
+    @NotNull(message = "Assessment playerId cannot be null")
     @Column("player_id")
     private Integer playerId;
     @NotNull(message = "Assessment sport cannot be null")
     private String sport;
-    @NotNull(message = "Assessment template_id cannot be null")
+    @NotNull(message = "Assessment templateId cannot be null")
     @Column("template_id")
     private Integer templateId;
 }

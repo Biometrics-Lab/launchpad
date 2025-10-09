@@ -129,7 +129,7 @@ class MetricControllerIntegrationTest{
                             """
                             {
                                 "status"  : 422,
-                                "message" : "Validation failed: measurementId: Measurement ID cannot be null, and name: Name cannot be blank"
+                                "message" : "Validation failed: measurementId: MeasurementId cannot be null, and name: Name cannot be blank"
                             }
                             """;
 

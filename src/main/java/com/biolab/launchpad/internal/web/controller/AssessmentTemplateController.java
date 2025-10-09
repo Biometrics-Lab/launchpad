@@ -18,7 +18,7 @@ import static com.biolab.launchpad.internal.web.mapper.AssessmentTemplateMapper.
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/assessment_templates")
+@RequestMapping("/api/v1/assessmentTemplates")
 @Log4j2
 public class AssessmentTemplateController {
 
@@ -42,7 +42,7 @@ public class AssessmentTemplateController {
             return assessment_templateOptional.get();
         } else {
             log.warn("Could not find assessment_template with id {}", id);
-            throw new NotFoundByException("Assessment_template not found by id: %d", id);
+            throw new NotFoundByException("AssessmentTemplate not found by id: %d", id);
         }
     }
 

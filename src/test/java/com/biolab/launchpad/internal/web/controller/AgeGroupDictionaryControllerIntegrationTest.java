@@ -30,7 +30,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @DisplayName("AgeGroupDictionaryController Integration Tests")
 class AgeGroupDictionaryControllerIntegrationTest {
 
-    private static final String API = "/api/v1/age_group_dictionarys";
+    private static final String API = "/api/v1/ageGroupDictionarys";
 
     @Autowired
     private MockMvc mvc;
@@ -50,7 +50,7 @@ class AgeGroupDictionaryControllerIntegrationTest {
     @DisplayName("Create")
     class CreateTests {
         @Test
-        @DisplayName("POST /age_group_dictionarys -> creates and returns the new AgeGroupDictionary")
+        @DisplayName("POST /ageGroupDictionarys -> creates and returns the new AgeGroupDictionary")
         void create() throws Exception {
 
             String request =
@@ -89,7 +89,7 @@ class AgeGroupDictionaryControllerIntegrationTest {
         }
 
         @Test
-        @DisplayName("POST /age_group_dictionarys with validation message -> returns 422")
+        @DisplayName("POST /ageGroupDictionarys with validation message -> returns 422")
         void createValidationError() throws Exception {
 
             String request =
@@ -130,7 +130,7 @@ class AgeGroupDictionaryControllerIntegrationTest {
     class ReadTests {
 
         @Test
-        @DisplayName("GET /age_group_dictionarys -> returns all ageGroupDictionarys")
+        @DisplayName("GET /ageGroupDictionarys -> returns all ageGroupDictionarys")
         void getAll() throws Exception {
 
             AgeGroupDictionary ageGroupDictionary1 = AgeGroupDictionary.builder()
@@ -176,7 +176,7 @@ class AgeGroupDictionaryControllerIntegrationTest {
         }
 
         @Test
-        @DisplayName("GET /age_group_dictionarys/{id} -> returns ageGroupDictionary by ID")
+        @DisplayName("GET /ageGroupDictionarys/{id} -> returns ageGroupDictionary by ID")
         void getById() throws Exception {
 
             AgeGroupDictionary ageGroupDictionary = AgeGroupDictionary.builder()
@@ -208,7 +208,7 @@ class AgeGroupDictionaryControllerIntegrationTest {
         }
 
         @Test
-        @DisplayName("GET /age_group_dictionarys/{id} with unknown ID -> returns 404")
+        @DisplayName("GET /ageGroupDictionarys/{id} with unknown ID -> returns 404")
         void getByIdValidationError() throws Exception {
             String jsonResponse = mvc.perform(
                             get(API + "/999999")
@@ -237,7 +237,7 @@ class AgeGroupDictionaryControllerIntegrationTest {
     class UpdateTests {
 
         @Test
-        @DisplayName("PUT /age_group_dictionarys -> updates and returns the AgeGroupDictionary")
+        @DisplayName("PUT /ageGroupDictionarys -> updates and returns the AgeGroupDictionary")
         void update() throws Exception {
 
             AgeGroupDictionary ageGroupDictionary = AgeGroupDictionary.builder()
@@ -283,7 +283,7 @@ class AgeGroupDictionaryControllerIntegrationTest {
         }
 
         @Test
-        @DisplayName("PUT /age_group_dictionarys with invalid id -> returns 404")
+        @DisplayName("PUT /ageGroupDictionarys with invalid id -> returns 404")
         void updateValidationError() throws Exception {
 
             String updateRequest = """
@@ -324,7 +324,7 @@ class AgeGroupDictionaryControllerIntegrationTest {
     class DeleteTests {
 
         @Test
-        @DisplayName("DELETE /age_group_dictionarys/{id} -> deletes the AgeGroupDictionary")
+        @DisplayName("DELETE /ageGroupDictionarys/{id} -> deletes the AgeGroupDictionary")
         void delete() throws Exception {
 
             AgeGroupDictionary ageGroupDictionary = AgeGroupDictionary.builder()
@@ -358,7 +358,7 @@ class AgeGroupDictionaryControllerIntegrationTest {
         }
 
         @Test
-        @DisplayName("DELETE /age_group_dictionarys/{id} with unknown ID -> returns 404")
+        @DisplayName("DELETE /ageGroupDictionarys/{id} with unknown ID -> returns 404")
         void deleteValidationError() throws Exception {
             String jsonResponse = mvc.perform(
                             MockMvcRequestBuilders.delete(API + "/999999")

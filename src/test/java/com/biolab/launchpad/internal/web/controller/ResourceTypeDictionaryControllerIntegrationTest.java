@@ -30,7 +30,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @DisplayName("ResourceTypeDictionaryController Integration Tests")
 class ResourceTypeDictionaryControllerIntegrationTest {
 
-    private static final String API = "/api/v1/resource_type_dictionarys";
+    private static final String API = "/api/v1/resourceTypeDictionarys";
 
     @Autowired
     private MockMvc mvc;
@@ -220,7 +220,7 @@ class ResourceTypeDictionaryControllerIntegrationTest {
             String expectedResponse = """
                 {
                     "status" : 404,
-                    "message": "Resource_type_dictionary not found by id: 999999"
+                    "message": "ResourceTypeDictionary not found by id: 999999"
                 }
                 """;
 
