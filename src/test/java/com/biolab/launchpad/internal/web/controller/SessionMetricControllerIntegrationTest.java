@@ -46,7 +46,7 @@ class SessionMetricControllerIntegrationTest {
 
     @BeforeEach
     void setUp() {
-        session1 = factory.createSession1("conec");
+        session1 = factory.createSession1();
         metric   = factory.createMetric("weight");
     }
 

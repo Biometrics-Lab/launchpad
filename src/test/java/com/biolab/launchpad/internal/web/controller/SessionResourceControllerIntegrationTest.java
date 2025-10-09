@@ -48,7 +48,7 @@ class SessionResourceControllerIntegrationTest {
 
     @BeforeEach
     void setUp() {
-        session1                = factory.createSession1("session");
+        session1                = factory.createSession1();
         resourceTypeDictionary  = factory.createResourceTypeDictionary("rTypeDictionary");
     }
 

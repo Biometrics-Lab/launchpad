@@ -51,7 +51,7 @@ class RepControllerIntegrationTest {
 
     @BeforeEach
     void setUp() {
-        session1 = factory.createSession1("Ses1");
+        session1 = factory.createSession1();
     }
 
     @AfterEach
