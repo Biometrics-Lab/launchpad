@@ -255,8 +255,8 @@ public class EntityFactory {
         return assessmentRepository.save(
                 Assessment.builder()
                         .sport(sportDictionary.getId())
-                        .player_id (player.getId())
-                        .template_id(assessmentTemplate.getId())
+                        .playerId (player.getId())
+                        .templateId(assessmentTemplate.getId())
                         .build()
         );
     }
@@ -265,8 +265,8 @@ public class EntityFactory {
         Assessment assessment = createAssessment("AutoAss");
         return session1Repository.save(
                 Session1.builder()
-                        .assessment_id(assessment.getId())
-                        .start_time(Timestamp.valueOf(LocalDateTime.of(2025, 10, 2, 14, 45, 1)))
+                        .assessmentId(assessment.getId())
+                        .startTime(Timestamp.valueOf(LocalDateTime.of(2025, 10, 2, 14, 45, 1)))
                         .build()
         );
     }

@@ -4,6 +4,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
+import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
 @Data
@@ -11,11 +12,16 @@ import org.springframework.data.relational.core.mapping.Table;
 @NoArgsConstructor
 @Table("session_metric")
 public class SessionMetric extends ID {
-    @NotNull(message = "session_metric session_id cannot be null")
-    private Integer session1_id;
-    @NotNull(message = "session_metric metric_id cannot be null")
-    private Integer metric_id;
-    private Number min_value;
-    private Number max_value;
-    private Number avg_value;
+    @NotNull(message = "SessionMetric sessionId cannot be null")
+    @Column("session1_id")
+    private Integer session1Id;
+    @NotNull(message = "SessionMetric metricId cannot be null")
+    @Column("metric_id")
+    private Integer metricId;
+    @Column("min_value")
+    private Number minValue;
+    @Column("max_value")
+    private Number maxValue;
+    @Column("avg_value")
+    private Number avgValue;
 }

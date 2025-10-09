@@ -6,9 +6,9 @@ import lombok.Builder;
 @Builder
 public record ModelMetricDto(
         Integer id,
-        @NotNull(message = "Model_metric model_id cannot be null")
-        Integer model_id,
-        @NotNull(message = "Model_metric metric_id cannot be null")
-        Integer metric_id,
+        @NotNull(message = "ModelMetric modelId cannot be null")
+        Integer modelId,
+        @NotNull(message = "ModelMetric metricId cannot be null")
+        Integer metricId,
         Number value
 ){}

@@ -8,9 +8,9 @@ import java.sql.Timestamp;
 @Builder
 public record RepDto(
         Integer id,
-        @NotNull(message = "Rep session1_id cannot be null")
-        Integer session1_id,
-        @NotNull(message = "Rep start_time cannot be null")
-        Timestamp start_time
+        @NotNull(message = "Rep session1Id cannot be null")
+        Integer session1Id,
+        @NotNull(message = "Rep startTime cannot be null")
+        Timestamp startTime
 ) { }
 

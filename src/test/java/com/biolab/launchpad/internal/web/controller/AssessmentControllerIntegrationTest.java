@@ -67,9 +67,9 @@ class AssessmentControllerIntegrationTest {
             String request =
                             """ 
                                 {
-                                    "template_id": %d,
+                                    "templateId" : %d,
                                     "sport"      : "%s",
-                                    "player_id"  : %d
+                                    "playerId"   : %d
                                 }
                             """.formatted(template.getId(), sport.getId(), player.getId());
 
@@ -93,9 +93,9 @@ class AssessmentControllerIntegrationTest {
                                     """
                                       {
                                         "id"         : %d,
-                                        "template_id": %d,
+                                        "templateId" : %d,
                                         "sport"      : "%s",
-                                        "player_id"  : %d
+                                        "playerId"   : %d
                                       }
                                     """.formatted(assessmentId, template.getId(), sport.getId(), player.getId());
 
@@ -130,7 +130,7 @@ class AssessmentControllerIntegrationTest {
                     """
                             {
                                 "status"       : 422,
-                                "message"      : "Validation failed: player_id: Assessment player_id cannot be null, and sport: Assessment sport cannot be null, and template_id: Assessment template_id cannot be null"
+                                "message"      : "Validation failed: playerId: Assessment playerId cannot be null, and sport: Assessment sport cannot be null, and templateId: Assessment templateId cannot be null"
                             }
                             """;
 
@@ -149,15 +149,15 @@ class AssessmentControllerIntegrationTest {
         void getAll() throws Exception {
 
             Assessment assessment1 = assessmentRepository.save(Assessment.builder()
-                    .template_id(template.getId())
+                    .templateId(template.getId())
                     .sport(sport.getId())
-                    .player_id(player.getId())
+                    .playerId(player.getId())
                     .build());
 
             Assessment assessment2 = assessmentRepository.save(Assessment.builder()
-                    .template_id(template.getId())
+                    .templateId(template.getId())
                     .sport(sport.getId())
-                    .player_id(player.getId())
+                    .playerId(player.getId())
                     .build());
 
             String jsonResponse = mvc.perform(
@@ -171,15 +171,15 @@ class AssessmentControllerIntegrationTest {
                 [
                     {
                         "id"         : %d,
-                        "template_id": %d,
+                        "templateId" : %d,
                         "sport"      : "%s",
-                        "player_id"  : %d
+                        "playerId"   : %d
                     },
                     {
                         "id"         : %d,
-                        "template_id": %d,
+                        "templateId" : %d,
                         "sport"      : "%s",
-                        "player_id"  : %d
+                        "playerId"   : %d
                     }
                 ]
                 """.formatted(assessment1.getId(), template.getId(), sport.getId(), player.getId(), assessment2.getId(),template.getId(), sport.getId(), player.getId());
@@ -195,9 +195,9 @@ class AssessmentControllerIntegrationTest {
         void getById() throws Exception {
 
             Assessment assessment = assessmentRepository.save(Assessment.builder()
-                    .template_id(template.getId())
+                    .templateId(template.getId())
                     .sport(sport.getId())
-                    .player_id(player.getId())
+                    .playerId(player.getId())
                     .build());
 
             String jsonResponse = mvc.perform(
@@ -210,9 +210,9 @@ class AssessmentControllerIntegrationTest {
             String expectedResponse = """
                                      {
                                         "id"          : %d,
-                                         "template_id": %d,
+                                         "templateId" : %d,
                                          "sport"      : "%s",
-                                         "player_id"  : %d
+                                         "playerId"   : %d
                                      }
                                     """.formatted(assessment.getId(), template.getId(), sport.getId(), player.getId());
 
@@ -255,18 +255,18 @@ class AssessmentControllerIntegrationTest {
         @DisplayName("PUT /assessments -> updates and returns the Assessment")
         void update() throws Exception {
             Assessment original = assessmentRepository.save(Assessment.builder()
-                    .template_id(template.getId())
+                    .templateId(template.getId())
                     .sport(sport.getId())
-                    .player_id(player.getId())
+                    .playerId(player.getId())
                     .build());
 
             sport = factory.createSportDictionary("updated");
             String updateRequest = """
                                 {
                                     "id"          : %d,
-                                    "template_id" : %d,
+                                    "templateId"  : %d,
                                     "sport"       : "%s",
-                                    "player_id"   : %d
+                                    "playerId"    : %d
                                  }
                                 """.formatted(original.getId(), template.getId(), sport.getId(), player.getId());
 
@@ -284,9 +284,9 @@ class AssessmentControllerIntegrationTest {
             String expectedResponse = """
                                 {
                                     "id"          : %d,
-                                    "template_id" : %d,
+                                    "templateId"  : %d,
                                     "sport"       : "%s",
-                                    "player_id"   : %d
+                                    "playerId"    : %d
                                  }
                                 """.formatted(original.getId(), template.getId(), sport.getId(), player.getId());
 
@@ -305,9 +305,9 @@ class AssessmentControllerIntegrationTest {
             String updateRequest = """
                                  {
                                      "id"          : 999999,
-                                     "template_id" : %d,
+                                     "templateId"  : %d,
                                      "sport"       : "%s",
-                                     "player_id"   : %d
+                                     "playerId"    : %d
                                  }
                                  """.formatted(template.getId(), sport.getId(), player.getId());
 
@@ -346,9 +346,9 @@ class AssessmentControllerIntegrationTest {
         @DisplayName("DELETE /assessments/{id} -> deletes the Assessment")
         void delete() throws Exception {
             Assessment assessment = assessmentRepository.save(Assessment.builder()
-                    .template_id(template.getId())
+                    .templateId(template.getId())
                     .sport(sport.getId())
-                    .player_id(player.getId())
+                    .playerId(player.getId())
                     .build());
 
             String jsonResponse = mvc.perform(

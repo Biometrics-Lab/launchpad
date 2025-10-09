@@ -67,8 +67,8 @@ class Session1ControllerIntegrationTest {
             String request =
                             """
                                 {
-                                    "assessment_id": %d,
-                                    "start_time"   : "2025-10-02T14:45:00.000+00:00"
+                                    "assessmentId" : %d,
+                                    "startTime"    : "2025-10-02T14:45:00.000+00:00"
                                 }
                             """.formatted(assessment.getId());
 
@@ -92,8 +92,8 @@ class Session1ControllerIntegrationTest {
                                     """
                                       {
                                         "id"           : %d,
-                                        "assessment_id": %d,
-                                        "start_time"   : "2025-10-02T14:45:00.000+00:00"
+                                        "assessmentId" : %d,
+                                        "startTime"    : "2025-10-02T14:45:00.000+00:00"
                                       }
                                     """.formatted(session1Id, assessment.getId());
 
@@ -128,7 +128,7 @@ class Session1ControllerIntegrationTest {
                     """
                             {
                                 "status"       : 422,
-                                "message"      : "Validation failed: assessment_id: Session assessment_id cannot be null, and start_time: Session start_time cannot be null"
+                                "message"      : "Validation failed: assessmentId: Session assessmentId cannot be null, and startTime: Session startTime cannot be null"
                             }
                             """;
 
@@ -149,13 +149,13 @@ class Session1ControllerIntegrationTest {
             ZonedDateTime zdt = ZonedDateTime.of(2025, 10, 2, 15, 45, 10, 0, ZoneOffset.UTC);
 
             Session1 session11 = session1Repository.save(Session1.builder()
-                    .assessment_id(assessment.getId())
-                    .start_time(Timestamp.from(zdt.toInstant()))
+                    .assessmentId(assessment.getId())
+                    .startTime(Timestamp.from(zdt.toInstant()))
                     .build());
 
             Session1 session12 = session1Repository.save(Session1.builder()
-                    .assessment_id(assessment.getId())
-                    .start_time(Timestamp.from(zdt.toInstant()))
+                    .assessmentId(assessment.getId())
+                    .startTime(Timestamp.from(zdt.toInstant()))
                     .build());
 
             String jsonResponse = mvc.perform(
@@ -169,13 +169,13 @@ class Session1ControllerIntegrationTest {
                 [
                     {
                         "id"           : %d,
-                        "assessment_id": %d,
-                        "start_time"   : "2025-10-02T15:45:10.000+00:00"
+                        "assessmentId" : %d,
+                        "startTime"    : "2025-10-02T15:45:10.000+00:00"
                     },
                     {
                         "id"            : %d,
-                        "assessment_id" : %d,
-                        "start_time"    : "2025-10-02T15:45:10.000+00:00"
+                        "assessmentId"  : %d,
+                        "startTime"     : "2025-10-02T15:45:10.000+00:00"
                     }
                 ]
                 """.formatted(session11.getId(), assessment.getId(), session12.getId(),assessment.getId());
@@ -193,8 +193,8 @@ class Session1ControllerIntegrationTest {
             ZonedDateTime zdt = ZonedDateTime.of(2025, 10, 2, 15, 45, 10, 0, ZoneOffset.UTC);
 
             Session1 session1 = session1Repository.save(Session1.builder()
-                    .assessment_id(assessment.getId())
-                    .start_time(Timestamp.from(zdt.toInstant()))
+                    .assessmentId(assessment.getId())
+                    .startTime(Timestamp.from(zdt.toInstant()))
                     .build());
 
             String jsonResponse = mvc.perform(
@@ -207,8 +207,8 @@ class Session1ControllerIntegrationTest {
             String expectedResponse = """
                                      {
                                         "id"             : %d,
-                                         "assessment_id" : %d,
-                                         "start_time"  : "2025-10-02T15:45:10.000+00:00"
+                                         "assessmentId"  : %d,
+                                         "startTime"   : "2025-10-02T15:45:10.000+00:00"
                                      }
                                     """.formatted(session1.getId(), assessment.getId());
 
@@ -251,15 +251,15 @@ class Session1ControllerIntegrationTest {
         @DisplayName("PUT /session1s -> updates and returns the Session1")
         void update() throws Exception {
             Session1 original = session1Repository.save(Session1.builder()
-                    .assessment_id(assessment.getId())
-                    .start_time(Timestamp.valueOf(LocalDateTime.of(2025, 10, 2, 14, 45, 1)))
+                    .assessmentId(assessment.getId())
+                    .startTime(Timestamp.valueOf(LocalDateTime.of(2025, 10, 2, 14, 45, 1)))
                     .build());
 
             String updateRequest = """
                                 {
                                     "id"            : %d,
-                                    "assessment_id" : %d,
-                                    "start_time"    : "2026-10-02T14:45:00.000+00:00"
+                                    "assessmentId"  : %d,
+                                    "startTime"     : "2026-10-02T14:45:00.000+00:00"
                                  }
                                 """.formatted(original.getId(), assessment.getId());
 
@@ -277,8 +277,8 @@ class Session1ControllerIntegrationTest {
             String expectedResponse = """
                                 {
                                     "id"            : %d,
-                                    "assessment_id" : %d,
-                                    "start_time"    : "2026-10-02T14:45:00.000+00:00"
+                                    "assessmentId"  : %d,
+                                    "startTime"     : "2026-10-02T14:45:00.000+00:00"
                                  }
                                 """.formatted(original.getId(), assessment.getId());
 
@@ -295,8 +295,8 @@ class Session1ControllerIntegrationTest {
             String updateRequest = """
                                  {
                                      "id"            : 999999,
-                                     "assessment_id" : %d,
-                                     "start_time"    : "2025-10-02T14:45:00.000+00:00"
+                                     "assessmentId"  : %d,
+                                     "startTime"     : "2025-10-02T14:45:00.000+00:00"
                                  }
                                  """.formatted(assessment.getId());
 
@@ -335,8 +335,8 @@ class Session1ControllerIntegrationTest {
         @DisplayName("DELETE /session1s/{id} -> deletes the Session1")
         void delete() throws Exception {
             Session1 session1 = session1Repository.save(Session1.builder()
-                    .assessment_id(assessment.getId())
-                    .start_time(Timestamp.valueOf(LocalDateTime.of(2025, 10, 2, 14, 45, 1)))
+                    .assessmentId(assessment.getId())
+                    .startTime(Timestamp.valueOf(LocalDateTime.of(2025, 10, 2, 14, 45, 1)))
                     .build());
 
             String jsonResponse = mvc.perform(

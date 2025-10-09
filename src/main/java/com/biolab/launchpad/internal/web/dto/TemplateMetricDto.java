@@ -6,11 +6,11 @@ import lombok.Builder;
 @Builder
 public record TemplateMetricDto(
         Integer id,
-        @NotNull(message = "Template_metric template_id cannot be null")
-        Integer template_id,
-        @NotNull(message = "Template_metric metric_id cannot be null")
-        Integer metric_id,
-        @NotNull(message = "Template_metric source_id cannot be null")
-        Integer source_id
+        @NotNull(message = "TemplateMetric templateId cannot be null")
+        Integer templateId,
+        @NotNull(message = "TemplateMetric metricId cannot be null")
+        Integer metricId,
+        @NotNull(message = "TemplateMetric sourceId cannot be null")
+        Integer sourceId
 ) { }
 

@@ -27,7 +27,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @DisplayName("Assessment metric Integration Tests")
 class AssessmentMetricControllerIntegrationTest {
 
-    private static final String API = "/api/v1/assessment_metrics";
+    private static final String API = "/api/v1/assessmentMetrics";
 
     @Autowired
     private MockMvc mvc;
@@ -61,19 +61,19 @@ class AssessmentMetricControllerIntegrationTest {
     @DisplayName("Create")
     class CreateTests {
         @Test
-        @DisplayName("POST /assessment_metrics -> creates and returns the new Assessment")
+        @DisplayName("POST /assessmentMetrics -> creates and returns the new Assessment")
         void create() throws Exception {
 
             String request =
                             """ 
                                 {
-                                    "assessment_id": %d,
-                                    "metric_id"    : %d,
-                                    "source_id"    : %d,
-                                    "min_value"    : 1,
-                                    "max_value"    : 2,
-                                    "avg_value"    : 3,
-                                    "last_value"   : 4
+                                    "assessmentId" : %d,
+                                    "metricId"     : %d,
+                                    "sourceId"     : %d,
+                                    "minValue"     : 1,
+                                    "maxValue"     : 2,
+                                    "avgValue"     : 3,
+                                    "lastValue"    : 4
                                 }
                             """.formatted(assessment.getId(), metric.getId(), source.getId());
 
@@ -97,13 +97,13 @@ class AssessmentMetricControllerIntegrationTest {
                                     """
                                       {
                                         "id"           : %d,
-                                        "assessment_id": %d,
-                                        "metric_id"    : %d,
-                                        "source_id"    : %d,
-                                        "min_value"    : 1,
-                                        "max_value"    : 2,
-                                        "avg_value"    : 3,
-                                        "last_value"   : 4
+                                        "assessmentId" : %d,
+                                        "metricId"     : %d,
+                                        "sourceId"     : %d,
+                                        "minValue"     : 1,
+                                        "maxValue"     : 2,
+                                        "avgValue"     : 3,
+                                        "lastValue"    : 4
                                       }
                                     """.formatted(assessmentId, assessment.getId(), metric.getId(), source.getId());
 
@@ -113,7 +113,7 @@ class AssessmentMetricControllerIntegrationTest {
         }
 
         @Test
-        @DisplayName("POST /assessment_metrics with validation message -> returns 422")
+        @DisplayName("POST /assessmentMetrics with validation message -> returns 422")
         void createValidationError() throws Exception {
             String request =
                             """
@@ -138,7 +138,7 @@ class AssessmentMetricControllerIntegrationTest {
                     """
                             {
                                 "status"       : 422,
-                                "message"      : "Validation failed: assessment_id: Assesment_metric assessment_id cannot be null, and metric_id: Assesment_metric metric_id cannot be null, and source_id: Assesment_metric source_id cannot be null"
+                                "message"      : "Validation failed: assessmentId: AssesmentMetric assessmentId cannot be null, and metricId: AssesmentMetric metricId cannot be null, and sourceId: AssesmentMetric sourceId cannot be null"
                             }
                             """;
 
@@ -153,27 +153,27 @@ class AssessmentMetricControllerIntegrationTest {
     class ReadTests {
 
         @Test
-        @DisplayName("GET /assessment_metrics -> returns all assessment_metrics")
+        @DisplayName("GET /assessmentMetrics -> returns all assessmentMetrics")
         void getAll() throws Exception {
 
             AssessmentMetric assessmentMetric1 = assessmentMetricRepository.save(AssessmentMetric.builder()
-                    .assessment_id(assessment.getId())
-                    .metric_id(metric.getId())
-                    .source_id(source.getId())
-                    .min_value(1)
-                    .max_value(2)
-                    .avg_value(3)
-                    .last_value(4)
+                    .assessmentId(assessment.getId())
+                    .metricId(metric.getId())
+                    .sourceId(source.getId())
+                    .minValue(1)
+                    .maxValue(2)
+                    .avgValue(3)
+                    .lastValue(4)
                     .build());
 
             AssessmentMetric assessmentMetric2 = assessmentMetricRepository.save(AssessmentMetric.builder()
-                    .assessment_id(assessment.getId())
-                    .metric_id(metric.getId())
-                    .source_id(source.getId())
-                    .min_value(5)
-                    .max_value(6)
-                    .avg_value(7)
-                    .last_value(8)
+                    .assessmentId(assessment.getId())
+                    .metricId(metric.getId())
+                    .sourceId(source.getId())
+                    .minValue(5)
+                    .maxValue(6)
+                    .avgValue(7)
+                    .lastValue(8)
                     .build());
             
             String jsonResponse = mvc.perform(
@@ -187,23 +187,23 @@ class AssessmentMetricControllerIntegrationTest {
                 [
                     {
                         "id"           : %d,
-                        "assessment_id": %d,
-                        "metric_id"    : %d,
-                        "source_id"    : %d,
-                        "min_value"    : 1,
-                        "max_value"    : 2,
-                        "avg_value"    : 3,
-                        "last_value"   : 4
+                        "assessmentId" : %d,
+                        "metricId"     : %d,
+                        "sourceId"     : %d,
+                        "minValue"     : 1,
+                        "maxValue"     : 2,
+                        "avgValue"     : 3,
+                        "lastValue"    : 4
                     },
                     {
                         "id"           : %d,
-                        "assessment_id": %d,
-                        "metric_id"    : %d,
-                        "source_id"    : %d,
-                        "min_value"    : 5,
-                        "max_value"    : 6,
-                        "avg_value"    : 7,
-                        "last_value"   : 8
+                        "assessmentId" : %d,
+                        "metricId"     : %d,
+                        "sourceId"     : %d,
+                        "minValue"     : 5,
+                        "maxValue"     : 6,
+                        "avgValue"     : 7,
+                        "lastValue"    : 8
                     }
                 ]
                 """.formatted(assessmentMetric1.getId(), assessment.getId(), metric.getId(), source.getId(), assessmentMetric2.getId(),assessment.getId(), metric.getId(), source.getId());
@@ -215,17 +215,17 @@ class AssessmentMetricControllerIntegrationTest {
         }
 
         @Test
-        @DisplayName("GET /assessment_metrics/{id} -> returns assessment by ID")
+        @DisplayName("GET /assessmentMetrics/{id} -> returns assessment by ID")
         void getById() throws Exception {
 
             AssessmentMetric assessmentMetric = assessmentMetricRepository.save(AssessmentMetric.builder()
-                    .assessment_id(assessment.getId())
-                    .metric_id(metric.getId())
-                    .source_id(source.getId())
-                    .min_value(1)
-                    .max_value(2)
-                    .avg_value(3)
-                    .last_value(4)
+                    .assessmentId(assessment.getId())
+                    .metricId(metric.getId())
+                    .sourceId(source.getId())
+                    .minValue(1)
+                    .maxValue(2)
+                    .avgValue(3)
+                    .lastValue(4)
                     .build());
 
             String jsonResponse = mvc.perform(
@@ -238,13 +238,13 @@ class AssessmentMetricControllerIntegrationTest {
             String expectedResponse = """
                                      {
                                         "id"            : %d,
-                                         "assessment_id": %d,
-                                         "metric_id"    : %d,
-                                         "source_id"    : %d,
-                                         "min_value"    : 1,
-                                         "max_value"    : 2,
-                                         "avg_value"    : 3,
-                                         "last_value"   : 4
+                                         "assessmentId" : %d,
+                                         "metricId"     : %d,
+                                         "sourceId"     : %d,
+                                         "minValue"     : 1,
+                                         "maxValue"     : 2,
+                                         "avgValue"     : 3,
+                                         "lastValue"    : 4
                                      }
                                     """.formatted(assessmentMetric.getId(), assessment.getId(), metric.getId(), source.getId());
 
@@ -255,7 +255,7 @@ class AssessmentMetricControllerIntegrationTest {
         }
 
         @Test
-        @DisplayName("GET /assessment_metrics/{id} with unknown ID -> returns 404")
+        @DisplayName("GET /assessmentMetrics/{id} with unknown ID -> returns 404")
         void getByIdValidationError() throws Exception {
             String jsonResponse = mvc.perform(
                             get(API + "/999999")
@@ -267,7 +267,7 @@ class AssessmentMetricControllerIntegrationTest {
             String expectedResponse = """
                 {
                     "status" : 404,
-                    "message": "Assessment_metric not found by id: 999999"
+                    "message": "AssessmentMetric not found by id: 999999"
                 }
                 """;
 
@@ -284,28 +284,28 @@ class AssessmentMetricControllerIntegrationTest {
     class UpdateTests {
 
         @Test
-        @DisplayName("PUT /assessment_metrics -> updates and returns the Assessment")
+        @DisplayName("PUT /assessmentMetrics -> updates and returns the Assessment")
         void update() throws Exception {
             AssessmentMetric original = assessmentMetricRepository.save(AssessmentMetric.builder()
-                    .assessment_id(assessment.getId())
-                    .metric_id(metric.getId())
-                    .source_id(source.getId())
-                    .min_value(1)
-                    .max_value(2)
-                    .avg_value(3)
-                    .last_value(4)
+                    .assessmentId(assessment.getId())
+                    .metricId(metric.getId())
+                    .sourceId(source.getId())
+                    .minValue(1)
+                    .maxValue(2)
+                    .avgValue(3)
+                    .lastValue(4)
                     .build());
 
            String updateRequest = """
                                 {
                                         "id"            : %d,
-                                         "assessment_id": %d,
-                                         "metric_id"    : %d,
-                                         "source_id"    : %d,
-                                         "min_value"    : 4,
-                                         "max_value"    : 5,
-                                         "avg_value"    : 6,
-                                         "last_value"   : 7
+                                         "assessmentId" : %d,
+                                         "metricId"     : %d,
+                                         "sourceId"     : %d,
+                                         "minValue"     : 4,
+                                         "maxValue"     : 5,
+                                         "avgValue"     : 6,
+                                         "lastValue"    : 7
                                      }
                                 """.formatted(original.getId(), assessment.getId(), metric.getId(), source.getId());
 
@@ -323,13 +323,13 @@ class AssessmentMetricControllerIntegrationTest {
             String expectedResponse = """
                                 {
                                     "id"           : %d,
-                                    "assessment_id": %d,
-                                    "metric_id"    : %d,
-                                    "source_id"    : %d,
-                                    "min_value"    : 4,
-                                    "max_value"    : 5,
-                                    "avg_value"    : 6,
-                                    "last_value"   : 7
+                                    "assessmentId" : %d,
+                                    "metricId"     : %d,
+                                    "sourceId"     : %d,
+                                    "minValue"     : 4,
+                                    "maxValue"     : 5,
+                                    "avgValue"     : 6,
+                                    "lastValue"    : 7
                                  }
                                 """.formatted(original.getId(), assessment.getId(), metric.getId(), source.getId());
 
@@ -339,15 +339,15 @@ class AssessmentMetricControllerIntegrationTest {
         }
 
         @Test
-        @DisplayName("PUT /assessment_metrics with invalid id -> returns 404")
+        @DisplayName("PUT /assessmentMetrics with invalid id -> returns 404")
         void updateValidationError() throws Exception {
 
             String updateRequest = """
                                  {
                                      "id"           : 999999,
-                                     "assessment_id": %d,
-                                     "metric_id"    : %d,
-                                     "source_id"    : %d
+                                     "assessmentId" : %d,
+                                     "metricId"     : %d,
+                                     "sourceId"     : %d
                                  }
                                  """.formatted(assessment.getId(), metric.getId(), source.getId());
 
@@ -383,12 +383,12 @@ class AssessmentMetricControllerIntegrationTest {
 
 
         @Test
-        @DisplayName("DELETE /assessment_metrics/{id} -> deletes the Assessment")
+        @DisplayName("DELETE /assessmentMetrics/{id} -> deletes the Assessment")
         void delete() throws Exception {
             AssessmentMetric assessmentMetric = assessmentMetricRepository.save(AssessmentMetric.builder()
-                    .assessment_id(assessment.getId())
-                    .metric_id(metric.getId())
-                    .source_id(source.getId())
+                    .assessmentId(assessment.getId())
+                    .metricId(metric.getId())
+                    .sourceId(source.getId())
                     .build());
 
             String jsonResponse = mvc.perform(
@@ -414,7 +414,7 @@ class AssessmentMetricControllerIntegrationTest {
         }
 
         @Test
-        @DisplayName("DELETE /assessment_metrics/{id} with unknown ID -> returns 404")
+        @DisplayName("DELETE /assessmentMetrics/{id} with unknown ID -> returns 404")
         void deleteValidationError() throws Exception {
             String jsonResponse = mvc.perform(
                             MockMvcRequestBuilders.delete(API + "/999999")

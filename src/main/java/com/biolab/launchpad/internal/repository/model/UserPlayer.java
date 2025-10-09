@@ -4,6 +4,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
+import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
 @Data
@@ -11,8 +12,10 @@ import org.springframework.data.relational.core.mapping.Table;
 @NoArgsConstructor
 @Table("user_player")
 public class UserPlayer extends ID {
-    @NotNull(message = "User_player user_id cannot be null")
-    private Integer user_id;
-    @NotNull(message = "User_player player_id cannot be null")
-    private Integer player_id;
+    @NotNull(message = "UserPlayer userId cannot be null")
+    @Column("user_id")
+    private Integer userId;
+    @NotNull(message = "UserPlayer playerId cannot be null")
+    @Column("player_id")
+    private Integer playerId;
 }

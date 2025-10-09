@@ -13,7 +13,7 @@ import org.w3c.dom.Text;
 @NoArgsConstructor
 @Table("assessment_template")
 public class AssessmentTemplate extends IDName {
-    @NotNull(message = "Assessment_template sport cannot be null")
+    @NotNull(message = "AssessmentTemplate sport cannot be null")
     private String sport;
     private String description;
 }

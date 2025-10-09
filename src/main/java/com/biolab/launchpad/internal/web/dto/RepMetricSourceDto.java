@@ -6,10 +6,10 @@ import lombok.Builder;
 @Builder
 public record RepMetricSourceDto(
         Integer id,
-        @NotNull(message = "Rep_metric_source rep_metric_id cannot be null")
-        Integer rep_metric_id,
-        @NotNull(message = "Rep_metric_source data_source_id cannot be null")
-        Integer data_source_id,
+        @NotNull(message = "RepMetricSource repMetricId cannot be null")
+        Integer repMetricId,
+        @NotNull(message = "RepMetricSource dataSourceId cannot be null")
+        Integer dataSourceId,
         String description
 ) { }
 

@@ -3,6 +3,7 @@ package com.biolab.launchpad.internal.repository.model;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
+import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
 @Data
@@ -10,5 +11,6 @@ import org.springframework.data.relational.core.mapping.Table;
 @NoArgsConstructor
 @Table("report")
 public class Report extends IDName {
-    private String ext_ref;
+    @Column("ext_ref")
+    private String extRef;
 }

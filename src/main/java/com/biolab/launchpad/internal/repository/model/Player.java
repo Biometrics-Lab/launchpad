@@ -4,6 +4,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
+import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
 import java.time.LocalDate;
@@ -14,8 +15,10 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @Table("player")
 public class Player extends IDName {
-    private Integer graduation_year;
-    @NotNull(message = "Player team_id cannot be null")
-    private Integer team_id;
+    @Column("graduation_year")
+    private Integer graduationYear;
+    @NotNull(message = "Player teamId cannot be null")
+    @Column("team_id")
+    private Integer teamId;
     private LocalDate dob;
 }
