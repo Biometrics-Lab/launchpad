@@ -27,12 +27,10 @@ public class EntityFactory {
     private final PlayerRepository                   playerRepository;
     private final AssessmentTemplateRepository       assessmentTemplateRepository;
     private final DataSourceRepository               dataSourceRepository;
-    private final TemplateMetricRepository           templateMetricRepository;
     private final AssessmentRepository               assessmentRepository;
     private final Session1Repository                 session1Repository;
     private final RepRepository                      repRepository;
     private final RepMetricRepository                repMetricRepository;
-    private final RepMetricSourceRepository          repMetricSourceRepository;
 
     public Measurement createMeasurement(String name) {
 
@@ -214,20 +212,7 @@ public class EntityFactory {
         );
     }
 
-    public TemplateMetric createTemplateMetric(String name) {
-        AssessmentTemplate assessmentTemplate = createAssessmentTemplate("AutoAssessmentTemplate");
-        Metric metric                         = createMetric("AutoMetric");
-        DataSource dataSource                 = createDataSource("AutoDataSource");
-        return templateMetricRepository.save(
-                TemplateMetric.builder()
-                        .templateId(assessmentTemplate.getId())
-                        .metricId(metric.getId())
-                        .sourceId(dataSource.getId())
-                        .build()
-        );
-    }
-
-    public Assessment createAssessment(String name) {
+    public Assessment createAssessment() {
         SportDictionary sportDictionary       = createSportDictionary("AutoSportDictionary");
         Player player                         = createPlayer("AutoPlayer");
         AssessmentTemplate assessmentTemplate = createAssessmentTemplate("AutoAssessmentTemplate");
@@ -240,8 +225,8 @@ public class EntityFactory {
         );
     }
 
-    public Session1 createSession1(String name) {
-        Assessment assessment = createAssessment("AutoAssessment");
+    public Session1 createSession1() {
+        Assessment assessment = createAssessment();
         return session1Repository.save(
                 Session1.builder()
                         .assessmentId(assessment.getId())
@@ -250,8 +235,8 @@ public class EntityFactory {
         );
     }
 
-    public Rep createRep(String name) {
-        Session1 session1 = createSession1("AutoSession1");
+    public Rep createRep() {
+        Session1 session1 = createSession1();
         return repRepository.save(
                 Rep.builder()
                         .session1Id(session1.getId())
@@ -260,8 +245,8 @@ public class EntityFactory {
         );
     }
 
-    public RepMetric createRepMetric(String name) {
-        Rep rep       = createRep("AutoRep");
+    public RepMetric createRepMetric() {
+        Rep rep       = createRep();
         Metric metric = createMetric("AutoMetric");
         return repMetricRepository.save(
                 RepMetric.builder()
@@ -271,25 +256,11 @@ public class EntityFactory {
         );
     }
 
-    public RepMetricSource createRepMetricSource(String name) {
-        Metric metric         = createMetric("AutoMetric");
-        DataSource dataSource = createDataSource("AutoDataSource");
-        return repMetricSourceRepository.save(
-                RepMetricSource.builder()
-                        .repMetricId(metric.getId())
-                        .dataSourceId(dataSource.getId())
-                        .description("AutoDescription_"+name)
-                        .build()
-        );
-    }
-
     void cleanup() {
-        repMetricSourceRepository.deleteAll();
         repMetricRepository.deleteAll();
         repRepository.deleteAll();
         session1Repository.deleteAll();
         assessmentRepository.deleteAll();
-        templateMetricRepository.deleteAll();
         dataSourceRepository.deleteAll();
         assessmentTemplateRepository.deleteAll();
         playerRepository.deleteAll();

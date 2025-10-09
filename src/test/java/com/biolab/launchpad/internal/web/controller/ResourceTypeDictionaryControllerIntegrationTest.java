@@ -81,7 +81,7 @@ class ResourceTypeDictionaryControllerIntegrationTest {
                             "name" : "AgeGroup",
                             "description" : "other description"
                         }
-   """.formatted(resourceTypeDictionaryId);
+                    """;
 
             JsonNode expectedResponseNode = objectMapper.readTree(expectedResponse);
 
@@ -332,8 +332,6 @@ class ResourceTypeDictionaryControllerIntegrationTest {
                     .description("other description")
                     .build();
             resourceTypeDictionary.markAsNew(true);
-
-            ResourceTypeDictionary original = resourceTypeDictionaryRepository.save(resourceTypeDictionary);
 
             String jsonResponse = mvc.perform(
                             MockMvcRequestBuilders.delete(API + "/" + resourceTypeDictionary.getId())

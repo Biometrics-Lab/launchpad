@@ -46,7 +46,7 @@ class AssessmentResourceControllerIntegrationTest {
 
     @BeforeEach
     void setUp() {
-        assessment              = factory.createAssessment("assessment");
+        assessment              = factory.createAssessment();
         resourceTypeDictionary  = factory.createResourceTypeDictionary("rTypeDictionary");
     }
 

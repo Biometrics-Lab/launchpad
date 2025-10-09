@@ -3,7 +3,6 @@ package com.biolab.launchpad.internal.web.controller;
 import com.biolab.launchpad.internal.repository.RepResourceRepository;
 import com.biolab.launchpad.internal.repository.model.Rep;
 import com.biolab.launchpad.internal.repository.model.ResourceTypeDictionary;
-import com.biolab.launchpad.internal.repository.model.Session1;
 import com.biolab.launchpad.internal.repository.model.RepResource;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -49,7 +48,7 @@ class RepResourceControllerIntegrationTest {
 
     @BeforeEach
     void setUp() {
-        rep                     = factory.createRep("Jay-Z");
+        rep                     = factory.createRep();
         resourceTypeDictionary  = factory.createResourceTypeDictionary("rTypeDictionary");
     }
 

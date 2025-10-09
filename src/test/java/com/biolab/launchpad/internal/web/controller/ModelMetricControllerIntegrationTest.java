@@ -293,8 +293,6 @@ class ModelMetricControllerIntegrationTest {
 
             assertEquals(expectedNode, responseNode);
 
-            ModelMetric updated = modelMetricRepository.findById(original.getId()).orElseThrow();
-
         }
 
         @Test

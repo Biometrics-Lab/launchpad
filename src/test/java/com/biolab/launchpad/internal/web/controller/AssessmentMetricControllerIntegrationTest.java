@@ -47,7 +47,7 @@ class AssessmentMetricControllerIntegrationTest {
 
     @BeforeEach
     void setUp() {
-        assessment = factory.createAssessment("five");
+        assessment = factory.createAssessment();
         metric     = factory.createMetric("height");
         source     = factory.createDataSource("Dsource");
     }

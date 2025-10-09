@@ -172,7 +172,6 @@ class DataSourceControllerIntegrationTest {
                         "name"         : "avg_exit_velocity",
                         "type"         : "%s",
                         "description"  : "desc"
-                        
                     },
                     {
                         "id"           : %d,

@@ -1,7 +1,6 @@
 package com.biolab.launchpad.internal.web.controller;
 
 import com.biolab.launchpad.internal.repository.SessionResourceRepository;
-import com.biolab.launchpad.internal.repository.model.Assessment;
 import com.biolab.launchpad.internal.repository.model.SessionResource;
 import com.biolab.launchpad.internal.repository.model.ResourceTypeDictionary;
 import com.biolab.launchpad.internal.repository.model.Session1;

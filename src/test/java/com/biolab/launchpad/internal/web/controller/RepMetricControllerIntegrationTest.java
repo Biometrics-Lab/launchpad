@@ -48,7 +48,7 @@ class RepMetricControllerIntegrationTest {
 
     @BeforeEach
     void setUp() {
-        rep    = factory.createRep("eminem");
+        rep    = factory.createRep();
         metric = factory.createMetric("wide");
     }
 

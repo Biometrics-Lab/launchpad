@@ -49,7 +49,7 @@ class Session1ControllerIntegrationTest {
 
     @BeforeEach
     void setUp() {
-        assessment   = factory.createAssessment("six");
+        assessment   = factory.createAssessment();
     }
 
     @AfterEach

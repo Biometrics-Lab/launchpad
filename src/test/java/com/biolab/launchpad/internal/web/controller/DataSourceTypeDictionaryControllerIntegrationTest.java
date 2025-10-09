@@ -81,7 +81,7 @@ class DataSourceTypeDictionaryControllerIntegrationTest {
                             "name"        : "AgeGroup",
                             "description" : "other description"
                         }
-   """.formatted(dataSourceTypeDictionaryId);
+                    """;
 
             JsonNode expectedResponseNode = objectMapper.readTree(expectedResponse);
 
@@ -332,8 +332,6 @@ class DataSourceTypeDictionaryControllerIntegrationTest {
                     .description("other description")
                     .build();
             dataSourceTypeDictionary.markAsNew(true);
-
-            DataSourceTypeDictionary original = dataSourceTypeDictionaryRepository.save(dataSourceTypeDictionary);
 
             String jsonResponse = mvc.perform(
                             MockMvcRequestBuilders.delete(API + "/" + dataSourceTypeDictionary.getId())

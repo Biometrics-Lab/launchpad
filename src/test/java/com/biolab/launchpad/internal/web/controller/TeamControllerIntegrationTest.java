@@ -180,7 +180,6 @@ class TeamControllerIntegrationTest {
                         "organisationId" : %d,
                         "sport"          : "%s",
                         "description"    : "desc"
-                        
                     },
                     {
                         "id"             : %d,

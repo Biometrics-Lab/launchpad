@@ -46,7 +46,7 @@ class RepMetricSourceControllerIntegrationTest {
 
     @BeforeEach
     void setUp() {
-        repMetric   = factory.createRepMetric("rrMetric");
+        repMetric   = factory.createRepMetric();
         dataSource  = factory.createDataSource("dSource");
     }
 

@@ -81,7 +81,7 @@ class SportDictionaryControllerIntegrationTest {
                             "name"        : "AgeGroup",
                             "description" : "other description"
                         }
-                    """.formatted(sportDictionaryId);
+                    """;
 
             JsonNode expectedResponseNode = objectMapper.readTree(expectedResponse);
 
@@ -332,8 +332,6 @@ class SportDictionaryControllerIntegrationTest {
                     .description("other description")
                     .build();
             sportDictionary.markAsNew(true);
-
-            SportDictionary original = sportDictionaryRepository.save(sportDictionary);
 
             String jsonResponse = mvc.perform(
                             MockMvcRequestBuilders.delete(API + "/" + sportDictionary.getId())

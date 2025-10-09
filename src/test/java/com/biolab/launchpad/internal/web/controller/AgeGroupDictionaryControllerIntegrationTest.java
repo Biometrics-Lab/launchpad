@@ -81,7 +81,7 @@ class AgeGroupDictionaryControllerIntegrationTest {
                                              "name"        : "AgeGroup",
                                              "description" : "other description"
                                          }
-                    """.formatted(ageGroupDictionaryId);
+                                     """;
 
             JsonNode expectedResponseNode = objectMapper.readTree(expectedResponse);
 
@@ -332,8 +332,6 @@ class AgeGroupDictionaryControllerIntegrationTest {
                     .description("other description")
                     .build();
             ageGroupDictionary.markAsNew(true);
-
-            AgeGroupDictionary original = ageGroupDictionaryRepository.save(ageGroupDictionary);
 
             String jsonResponse = mvc.perform(
                             MockMvcRequestBuilders.delete(API + "/" + ageGroupDictionary.getId())

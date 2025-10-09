@@ -1,7 +1,6 @@
 package com.biolab.launchpad.internal.web.controller;
 
 import com.biolab.launchpad.internal.repository.UserRepository;
-import com.biolab.launchpad.internal.repository.model.Measurement;
 import com.biolab.launchpad.internal.repository.model.User;
 import com.biolab.launchpad.internal.repository.model.UserRoleDictionary;
 import com.fasterxml.jackson.databind.JsonNode;

@@ -293,8 +293,6 @@ class ModelControllerIntegrationTest {
 
             assertEquals(expectedNode, responseNode);
 
-            Model updated = modelRepository.findById(original.getId()).orElseThrow();
-
         }
 
         @Test

@@ -288,8 +288,6 @@ class UserPlayerControllerIntegrationTest {
 
             assertEquals(expectedNode, responseNode);
 
-            UserPlayer updated = userPlayerRepository.findById(original.getId()).orElseThrow();
-
             user.setName("Us");
 
         }

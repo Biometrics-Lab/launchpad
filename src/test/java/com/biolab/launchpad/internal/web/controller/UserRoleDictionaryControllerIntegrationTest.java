@@ -81,7 +81,7 @@ class UserRoleDictionaryControllerIntegrationTest {
                             "name"        : "AgeGroup",
                             "description" : "other description"
                         }
-   """.formatted(userRoleDictionaryId);
+                    """;
 
             JsonNode expectedResponseNode = objectMapper.readTree(expectedResponse);
 
@@ -332,8 +332,6 @@ class UserRoleDictionaryControllerIntegrationTest {
                     .description("other description")
                     .build();
             userRoleDictionary.markAsNew(true);
-
-            UserRoleDictionary original = userRoleDictionaryRepository.save(userRoleDictionary);
 
             String jsonResponse = mvc.perform(
                             MockMvcRequestBuilders.delete(API + "/" + userRoleDictionary.getId())
