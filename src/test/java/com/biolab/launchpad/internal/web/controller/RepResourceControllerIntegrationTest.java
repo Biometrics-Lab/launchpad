@@ -56,6 +56,7 @@ class RepResourceControllerIntegrationTest {
     @AfterEach
     void tearDown() {
         repResourceRepository.deleteAll();
+        factory.cleanup();
     }
 
     @Nested

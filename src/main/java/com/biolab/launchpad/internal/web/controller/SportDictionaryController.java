@@ -18,7 +18,7 @@ import static com.biolab.launchpad.internal.web.mapper.SportDictionaryMapper.spo
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/sportDictionarys")
+@RequestMapping("/api/v1/sportDictionaries")
 @Log4j2
 public class SportDictionaryController {
 

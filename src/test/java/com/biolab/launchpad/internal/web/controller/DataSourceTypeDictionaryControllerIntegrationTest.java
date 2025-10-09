@@ -30,7 +30,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @DisplayName("DataSourceTypeDictionaryController Integration Tests")
 class DataSourceTypeDictionaryControllerIntegrationTest {
 
-    private static final String API = "/api/v1/dataSourceTypeDictionarys";
+    private static final String API = "/api/v1/dataSourceTypeDictionaries";
 
     @Autowired
     private MockMvc mvc;

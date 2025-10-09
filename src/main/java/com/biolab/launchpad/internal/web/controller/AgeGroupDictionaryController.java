@@ -18,7 +18,7 @@ import static com.biolab.launchpad.internal.web.mapper.AgeGroupDictionaryMapper.
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/ageGroupDictionarys")
+@RequestMapping("/api/v1/ageGroupDictionaries")
 @Log4j2
 public class AgeGroupDictionaryController {
 

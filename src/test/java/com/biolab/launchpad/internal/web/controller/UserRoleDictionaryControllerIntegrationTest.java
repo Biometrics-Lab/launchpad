@@ -28,9 +28,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @DisplayName("UserRoleDictionaryController Integration Tests")
-class UserRoleDictionaryControllerIntegrationTest_ {
+class UserRoleDictionaryControllerIntegrationTest {
 
-    private static final String API = "/api/v1/userRoleDictionarys";
+    private static final String API = "/api/v1/userRoleDictionaries";
 
     @Autowired
     private MockMvc mvc;
@@ -220,7 +220,7 @@ class UserRoleDictionaryControllerIntegrationTest_ {
             String expectedResponse = """
                 {
                     "status" : 404,
-                    "message": "User_role_dictionary not found by id: 999999"
+                    "message": "UserRoleDictionary not found by id: 999999"
                 }
                 """;
 

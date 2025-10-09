@@ -18,7 +18,7 @@ import static com.biolab.launchpad.internal.web.mapper.UserPlayerMapper.userPlay
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/user_players")
+@RequestMapping("/api/v1/userPlayers")
 @Log4j2
 public class UserPlayerController {
 

@@ -53,6 +53,7 @@ class SessionMetricControllerIntegrationTest {
     @AfterEach
     void tearDown() {
         sessionMetricRepository.deleteAll();
+        factory.cleanup();
     }
 
     @Nested

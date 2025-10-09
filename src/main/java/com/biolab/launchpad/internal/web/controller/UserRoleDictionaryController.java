@@ -18,7 +18,7 @@ import static com.biolab.launchpad.internal.web.mapper.UserRoleDictionaryMapper.
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/userRoleDictionarys")
+@RequestMapping("/api/v1/userRoleDictionaries")
 @Log4j2
 public class UserRoleDictionaryController {
 

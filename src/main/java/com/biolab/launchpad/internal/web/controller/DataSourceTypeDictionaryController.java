@@ -18,7 +18,7 @@ import static com.biolab.launchpad.internal.web.mapper.DataSourceTypeDictionaryM
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/dataSourceTypeDictionarys")
+@RequestMapping("/api/v1/dataSourceTypeDictionaries")
 @Log4j2
 public class DataSourceTypeDictionaryController {
 

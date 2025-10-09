@@ -55,6 +55,7 @@ class TemplateMetricControllerIntegrationTest {
     @AfterEach
     void tearDown() {
         templateMetricRepository.deleteAll();
+        factory.cleanup();
     }
 
     @Nested

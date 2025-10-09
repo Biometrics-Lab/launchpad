@@ -53,6 +53,7 @@ class RepMetricSourceControllerIntegrationTest {
     @AfterEach
     void tearDown() {
         repMetricSourceRepository.deleteAll();
+        factory.cleanup();
     }
 
     @Nested

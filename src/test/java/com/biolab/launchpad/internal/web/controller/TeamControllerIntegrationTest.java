@@ -1,13 +1,12 @@
 package com.biolab.launchpad.internal.web.controller;
 
-import com.biolab.launchpad.internal.repository.OrganisationRepository;
+import com.biolab.launchpad.internal.repository.TeamRepository;
 import com.biolab.launchpad.internal.repository.model.Organisation;
+import com.biolab.launchpad.internal.repository.model.Team;
+import com.biolab.launchpad.internal.repository.model.SportDictionary;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -27,10 +26,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
 @AutoConfigureMockMvc
-@DisplayName("OrganisationController Integration Tests")
-class OrganisationControllerIntegrationTest_ {
+@DisplayName("Team Integration Tests")
+class TeamControllerIntegrationTest {
 
-    private static final String API = "/api/v1/organisations";
+    private static final String API = "/api/v1/teams";
 
     @Autowired
     private MockMvc mvc;
@@ -39,26 +38,42 @@ class OrganisationControllerIntegrationTest_ {
     ObjectMapper objectMapper;
 
     @Autowired
-    OrganisationRepository organisationRepository;
+    TeamRepository teamRepository;
+
+    @Autowired
+    EntityFactory factory;
+
+    SportDictionary sportDictionary;
+    Organisation organisation;
+
+    @BeforeEach
+    void setUp() {
+        sportDictionary = factory.createSportDictionary("coker");
+        organisation    = factory.createOrganisation("org");
+    }
 
     @AfterEach
     void tearDown() {
-        organisationRepository.deleteAll();
+        teamRepository.deleteAll();
+        factory.cleanup();
     }
 
     @Nested
     @DisplayName("Create")
     class CreateTests {
         @Test
-        @DisplayName("POST /organisations -> creates and returns the new Organisation")
+        @DisplayName("POST /teams -> creates and returns the new Team")
         void create() throws Exception {
 
             String request =
-                    """
+                            """ 
                                 {
-                                    "name" : "orga"
+                                    "name"           : "avg_team",
+                                    "organisationId" : %d,
+                                    "sport"          : "%s",
+                                    "description"    : "desc"
                                 }
-                            """;
+                            """.formatted(organisation.getId(), sportDictionary.getName());
 
             String jsonResponse = mvc.perform(
                             post(API)
@@ -69,19 +84,23 @@ class OrganisationControllerIntegrationTest_ {
                     .andExpect(status().isOk())
                     .andReturn().getResponse().getContentAsString();
 
+
             JsonNode responseNode = objectMapper.readTree(jsonResponse);
 
-            int organisationId = responseNode.get("id").asInt();
-            assertThat(organisationId).isPositive();
+            int teamId = responseNode.get("id").asInt();
+            assertThat(teamId).isPositive();
 
 
             String expectedResponse =
-                    """
+                    """ 
                             {
-                                        "id"           : %d,
-                                        "name"         : "orga"
+                                        "id"             : %d,
+                                        "name"           : "avg_team",
+                                        "organisationId" : %d,
+                                        "sport"          : "%s",
+                                        "description"    : "desc"
                                     }
-                            """.formatted(organisationId);
+                            """.formatted(teamId, organisation.getId(), sportDictionary.getName());
 
             JsonNode expectedResponseNode = objectMapper.readTree(expectedResponse);
 
@@ -89,15 +108,14 @@ class OrganisationControllerIntegrationTest_ {
         }
 
         @Test
-        @DisplayName("POST /organisations with validation message -> returns 422")
+        @DisplayName("POST /teams with validation message -> returns 422")
         void createValidationError() throws Exception {
-
             String request =
-                    """ 
-                         {
-                               "name" : ""
-                         }
-                    """;
+                            """
+                                {
+                                    "description" : "desc"
+                                }
+                            """;
 
             String jsonResponse = mvc.perform(
                             post(API)
@@ -112,10 +130,10 @@ class OrganisationControllerIntegrationTest_ {
             JsonNode responseNode = objectMapper.readTree(jsonResponse);
 
             String expectedResponse =
-                    """ 
+                    """
                             {
-                                "status"  : 422,
-                                "message" : "Validation failed: name: Name cannot be blank"
+                                "status"       : 422,
+                                "message"      : "Validation failed: name: Name cannot be blank, and organisationId: Team organisationId cannot be null, and sport: Team sport cannot be null"
                             }
                             """;
 
@@ -130,20 +148,25 @@ class OrganisationControllerIntegrationTest_ {
     class ReadTests {
 
         @Test
-        @DisplayName("GET /organisations -> returns all organisations")
+        @DisplayName("GET /teams -> returns all teams")
         void getAll() throws Exception {
 
-            Organisation organisation1 = organisationRepository.save(Organisation.builder()
-                    .name("avg_orga")
+            Team team1 = teamRepository.save(Team.builder()
+                    .name("avg_team")
+                    .organisationId(organisation.getId())
+                    .sport(sportDictionary.getId())
+                    .description("desc")
                     .build());
 
-            Organisation organisation2 = organisationRepository.save(Organisation.builder()
-                    .name("max_orga")
+            Team team2 = teamRepository.save(Team.builder()
+                    .name("max_team")
+                    .organisationId(organisation.getId())
+                    .sport(sportDictionary.getId())
+                    .description("desc")
                     .build());
 
             String jsonResponse = mvc.perform(
                             get(API)
-                                    .contentType(MediaType.APPLICATION_JSON)
                                     .with(httpBasic("biolab", "biolab"))
                     )
                     .andExpect(status().isOk())
@@ -152,15 +175,22 @@ class OrganisationControllerIntegrationTest_ {
             String expectedResponse = """
                 [
                     {
-                        "id"           : %d,
-                        "name"         : "avg_orga"
+                        "id"             : %d,
+                        "name"           : "avg_team",
+                        "organisationId" : %d,
+                        "sport"          : "%s",
+                        "description"    : "desc"
+                        
                     },
                     {
-                        "id"           : %d,
-                        "name"         : "max_orga"
+                        "id"             : %d,
+                        "name"           : "max_team",
+                        "organisationId" : %d,
+                        "sport"          : "%s",
+                        "description"    : "desc"
                     }
                 ]
-                """.formatted(organisation1.getId(), organisation2.getId());
+                """.formatted(team1.getId(), organisation.getId(), sportDictionary.getId(), team2.getId(), organisation.getId(), sportDictionary.getId());
 
             JsonNode expectedNode = objectMapper.readTree(expectedResponse);
             JsonNode actualNode   = objectMapper.readTree(jsonResponse);
@@ -169,15 +199,18 @@ class OrganisationControllerIntegrationTest_ {
         }
 
         @Test
-        @DisplayName("GET /organisations/{id} -> returns organisation by ID")
+        @DisplayName("GET /teams/{id} -> returns team by ID")
         void getById() throws Exception {
 
-            Organisation organisation = organisationRepository.save(Organisation.builder()
-                    .name("orga")
+            Team team = teamRepository.save(Team.builder()
+                    .name("avg_team")
+                    .organisationId(organisation.getId())
+                    .sport(sportDictionary.getId())
+                    .description("desc")
                     .build());
 
             String jsonResponse = mvc.perform(
-                            get(API + "/" + organisation.getId())
+                            get(API + "/" + team.getId())
                                     .with(httpBasic("biolab", "biolab"))
                     )
                     .andExpect(status().isOk())
@@ -185,10 +218,13 @@ class OrganisationControllerIntegrationTest_ {
 
             String expectedResponse = """
                 {
-                    "id"           : %d,
-                    "name"         : "orga"
+                    "id"             : %d,
+                    "name"           : "avg_team",
+                    "organisationId" : %d,
+                    "sport"          : "%s",
+                    "description"    : "desc"
                 }
-                """.formatted(organisation.getId());
+                """.formatted(team.getId(), organisation.getId() ,sportDictionary.getId());
 
             JsonNode expectedNode = objectMapper.readTree(expectedResponse);
             JsonNode actualNode   = objectMapper.readTree(jsonResponse);
@@ -197,7 +233,7 @@ class OrganisationControllerIntegrationTest_ {
         }
 
         @Test
-        @DisplayName("GET /organisations/{id} with unknown ID -> returns 404")
+        @DisplayName("GET /teams/{id} with unknown ID -> returns 404")
         void getByIdValidationError() throws Exception {
             String jsonResponse = mvc.perform(
                             get(API + "/999999")
@@ -209,7 +245,7 @@ class OrganisationControllerIntegrationTest_ {
             String expectedResponse = """
                 {
                     "status" : 404,
-                    "message": "Organisation not found by id: 999999"
+                    "message": "Team not found by id: 999999"
                 }
                 """;
 
@@ -226,18 +262,23 @@ class OrganisationControllerIntegrationTest_ {
     class UpdateTests {
 
         @Test
-        @DisplayName("PUT /organisations -> updates and returns the Organisation")
+        @DisplayName("PUT /teams -> updates and returns the Team")
         void update() throws Exception {
-            Organisation original = organisationRepository.save(Organisation.builder()
-                    .name("orga")
+            Team original = teamRepository.save(Team.builder()
+                    .name("avg_team")
+                    .organisationId(organisation.getId())
+                    .sport(sportDictionary.getId())
                     .build());
 
             String updateRequest = """
                 {
-                    "id"            : %d,
-                    "name"          : "updated_orga"
+                    "id"             : %d,
+                    "name"           : "updated_velocity",
+                    "organisationId" : %d,
+                    "sport"          : "%s",
+                    "description"    : "desc"
                 }
-                """.formatted(original.getId());
+                """.formatted(original.getId(), organisation.getId(), sportDictionary.getId());
 
             String jsonResponse = mvc.perform(
                             put(API)
@@ -252,30 +293,36 @@ class OrganisationControllerIntegrationTest_ {
 
             String expectedResponse = """
                 {
-                    "id"           : %d,
-                    "name"         : "updated_orga"
+                    "id"             : %d,
+                    "name"           : "updated_velocity",
+                    "organisationId" : %d,
+                    "sport"          : "%s",
+                    "description"    : "desc"
                 }
-                """.formatted(original.getId());
+                """.formatted(original.getId(), organisation.getId(), sportDictionary.getId());
 
             JsonNode expectedNode = objectMapper.readTree(expectedResponse);
 
             assertEquals(expectedNode, responseNode);
 
-            Organisation updated = organisationRepository.findById(original.getId()).orElseThrow();
-            assertEquals("updated_orga", updated.getName());
+            Team updated = teamRepository.findById(original.getId()).orElseThrow();
+            assertEquals("updated_velocity", updated.getName());
 
         }
 
         @Test
-        @DisplayName("PUT /organisations with invalid id -> returns 404")
+        @DisplayName("PUT /teams with invalid id -> returns 404")
         void updateValidationError() throws Exception {
 
             String updateRequest = """
                 {
-                    "id"            : 999999,
-                    "name"          : "updated_orga"
+                    "id"             : 999999,
+                    "name"           : "updated_velocity",
+                    "organisationId" : %d,
+                    "sport"          : "%s",
+                    "description"    : "desc"
                 }
-                """;
+                """.formatted(organisation.getId(), sportDictionary.getId());
 
             String jsonResponse = mvc.perform(
                             put(API)
@@ -290,7 +337,7 @@ class OrganisationControllerIntegrationTest_ {
             String expectedResponse = """
                 {
                     "status" : 404,
-                    "message": "OrganisationService. Could not update Organisation by id: 999999"
+                    "message": "TeamService. Could not update Team by id: 999999"
                 }
                 """;
 
@@ -307,15 +354,19 @@ class OrganisationControllerIntegrationTest_ {
     @DisplayName("Delete")
     class DeleteTests {
 
+
         @Test
-        @DisplayName("DELETE /organisations/{id} -> deletes the Organisation")
+        @DisplayName("DELETE /teams/{id} -> deletes the Team")
         void delete() throws Exception {
-            Organisation organisation = organisationRepository.save(Organisation.builder()
-                    .name("orga")
+            Team team = teamRepository.save(Team.builder()
+                    .name("avg_team")
+                    .organisationId(organisation.getId())
+                    .sport(sportDictionary.getId())
+                    .description("desc")
                     .build());
 
             String jsonResponse = mvc.perform(
-                            MockMvcRequestBuilders.delete(API + "/" + organisation.getId())
+                            MockMvcRequestBuilders.delete(API + "/" + team.getId())
                                     .with(httpBasic("biolab", "biolab"))
                     )
                     .andExpect(status().isOk())
@@ -333,11 +384,11 @@ class OrganisationControllerIntegrationTest_ {
 
             assertEquals(expectedNode, actualNode);
 
-            assertFalse(organisationRepository.existsById(organisation.getId()));
+            assertFalse(teamRepository.existsById(team.getId()));
         }
 
         @Test
-        @DisplayName("DELETE /organisations/{id} with unknown ID -> returns 404")
+        @DisplayName("DELETE /teams/{id} with unknown ID -> returns 404")
         void deleteValidationError() throws Exception {
             String jsonResponse = mvc.perform(
                             MockMvcRequestBuilders.delete(API + "/999999")
@@ -349,7 +400,7 @@ class OrganisationControllerIntegrationTest_ {
             String expectedResponse = """
                 {
                     "status" : 404,
-                    "message": "OrganisationService. Could not delete id: 999999"
+                    "message": "TeamService. Could not delete id: 999999"
                 }
                 """;
 
@@ -359,4 +410,5 @@ class OrganisationControllerIntegrationTest_ {
             assertEquals(expectedNode, actualNode);
         }
     }
+
 }

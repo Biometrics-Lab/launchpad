@@ -53,6 +53,7 @@ class MetricControllerIntegrationTest{
     @AfterEach
     void tearDown() {
         metricRepository.deleteAll();
+        factory.cleanup();
     }
 
     @Nested

@@ -1,7 +1,8 @@
 package com.biolab.launchpad.internal.web.controller;
 
-import com.biolab.launchpad.internal.repository.MeasurementRepository;
-import com.biolab.launchpad.internal.repository.model.Measurement;
+import com.biolab.launchpad.internal.repository.PlayerRepository;
+import com.biolab.launchpad.internal.repository.model.Player;
+import com.biolab.launchpad.internal.repository.model.Team;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.*;
@@ -14,21 +15,22 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
+import java.time.LocalDate;
+
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
 @AutoConfigureMockMvc
-@DisplayName("MeasurementController Integration Tests")
-class MeasurementControllerIntegrationTest_ {
+@DisplayName("PlayerController Integration Tests")
+class PlayerControllerIntegrationTest {
 
-    private static final String API = "/api/v1/measurements";
+    private static final String API = "/api/v1/players";
 
     @Autowired
     private MockMvc mvc;
@@ -37,26 +39,40 @@ class MeasurementControllerIntegrationTest_ {
     ObjectMapper objectMapper;
 
     @Autowired
-    MeasurementRepository measurementRepository;
+    PlayerRepository playerRepository;
+
+    @Autowired
+    EntityFactory factory;
+
+    Team team;
+
+    @BeforeEach
+    void setUp() {
+        team = factory.createTeam("team_main");
+    }
 
     @AfterEach
     void tearDown() {
-        measurementRepository.deleteAll();
+        playerRepository.deleteAll();
+        factory.cleanup();
     }
 
     @Nested
     @DisplayName("Create")
     class CreateTests {
         @Test
-        @DisplayName("POST /measurements -> creates and returns the new Measurement")
+        @DisplayName("POST /players -> creates and returns the new Player")
         void create() throws Exception {
 
             String request =
-                    """
+                    """ 
                                 {
-                                    "name" : "launch_angle"
+                                    "name"           : "avg_exit_team",
+                                    "teamId"         : %d,
+                                    "graduationYear" : 2020,
+                                    "dob"            : "1990-05-15"
                                 }
-                            """;
+                            """.formatted(team.getId());
 
             String jsonResponse = mvc.perform(
                             post(API)
@@ -67,19 +83,23 @@ class MeasurementControllerIntegrationTest_ {
                     .andExpect(status().isOk())
                     .andReturn().getResponse().getContentAsString();
 
+
             JsonNode responseNode = objectMapper.readTree(jsonResponse);
 
-            int measurementId = responseNode.get("id").asInt();
-            assertThat(measurementId).isPositive();
+            int playerId = responseNode.get("id").asInt();
+            assertThat(playerId).isPositive();
 
 
             String expectedResponse =
-                    """
+                    """ 
                             {
-                                        "id"     : %d,
-                                        "name"   : "launch_angle"
+                                        "id"             : %d,
+                                        "name"           : "avg_exit_team",
+                                        "teamId"         : %d,
+                                        "graduationYear" : 2020,
+                                        "dob"            : "1990-05-15"
                                     }
-                            """.formatted(measurementId);
+                            """.formatted(playerId, team.getId());
 
             JsonNode expectedResponseNode = objectMapper.readTree(expectedResponse);
 
@@ -87,15 +107,15 @@ class MeasurementControllerIntegrationTest_ {
         }
 
         @Test
-        @DisplayName("POST /measurements with validation message -> returns 422")
+        @DisplayName("POST /players with validation message -> returns 422")
         void createValidationError() throws Exception {
 
             String request =
-                    """ 
-                         {
-                               "name" : ""
-                         }
-                    """;
+                    """
+                                {
+                                    "graduationYear"  : 2020
+                                }
+                            """;
 
             String jsonResponse = mvc.perform(
                             post(API)
@@ -110,10 +130,10 @@ class MeasurementControllerIntegrationTest_ {
             JsonNode responseNode = objectMapper.readTree(jsonResponse);
 
             String expectedResponse =
-                    """ 
+                    """
                             {
-                                "status"  : 422,
-                                "message" : "Validation failed: name: Name cannot be blank"
+                                "status"       : 422,
+                                "message"        : "Validation failed: name: Name cannot be blank, and teamId: Player teamId cannot be null"
                             }
                             """;
 
@@ -128,20 +148,25 @@ class MeasurementControllerIntegrationTest_ {
     class ReadTests {
 
         @Test
-        @DisplayName("GET /measurements -> returns all measurements")
+        @DisplayName("GET /players -> returns all players")
         void getAll() throws Exception {
 
-            Measurement measurement1 = measurementRepository.save(Measurement.builder()
-                    .name("avg_launch_angle")
+            Player player1 = playerRepository.save(Player.builder()
+                    .name("avg_exit_team")
+                    .teamId(team.getId())
+                    .graduationYear(2020)
+                    .dob(LocalDate.of(1990, 5, 15))
                     .build());
 
-            Measurement measurement2 = measurementRepository.save(Measurement.builder()
-                    .name("max_launch_angle")
+            Player player2 = playerRepository.save(Player.builder()
+                    .name("max_entry_velocity")
+                    .teamId(team.getId())
+                    .graduationYear(2020)
+                    .dob(LocalDate.of(1990, 5, 15))
                     .build());
 
             String jsonResponse = mvc.perform(
                             get(API)
-                                    .contentType(MediaType.APPLICATION_JSON)
                                     .with(httpBasic("biolab", "biolab"))
                     )
                     .andExpect(status().isOk())
@@ -150,15 +175,21 @@ class MeasurementControllerIntegrationTest_ {
             String expectedResponse = """
                 [
                     {
-                        "id"     : %d,
-                        "name"   : "avg_launch_angle"
+                        "id"             : %d,
+                        "name"           : "avg_exit_team",
+                        "teamId"         : %d,
+                        "graduationYear" : 2020,
+                        "dob"            : "1990-05-15"
                     },
                     {
-                        "id"     : %d,
-                        "name"   : "max_launch_angle"
+                        "id"             : %d,
+                        "name"           : "max_entry_velocity",
+                        "teamId"         : %d,
+                        "graduationYear" : 2020,
+                        "dob"            : "1990-05-15"
                     }
                 ]
-                """.formatted(measurement1.getId(), measurement2.getId());
+                """.formatted(player1.getId(), team.getId(), player2.getId(), team.getId());
 
             JsonNode expectedNode = objectMapper.readTree(expectedResponse);
             JsonNode actualNode   = objectMapper.readTree(jsonResponse);
@@ -167,15 +198,18 @@ class MeasurementControllerIntegrationTest_ {
         }
 
         @Test
-        @DisplayName("GET /measurements/{id} -> returns measurement by ID")
+        @DisplayName("GET /players/{id} -> returns player by ID")
         void getById() throws Exception {
 
-            Measurement measurement = measurementRepository.save(Measurement.builder()
-                    .name("launch_angle")
+            Player player = playerRepository.save(Player.builder()
+                    .name("avg_exit_team")
+                    .teamId(team.getId())
+                    .graduationYear(2020)
+                    .dob(LocalDate.of(1990, 5, 15))
                     .build());
 
             String jsonResponse = mvc.perform(
-                            get(API + "/" + measurement.getId())
+                            get(API + "/" + player.getId())
                                     .with(httpBasic("biolab", "biolab"))
                     )
                     .andExpect(status().isOk())
@@ -183,10 +217,13 @@ class MeasurementControllerIntegrationTest_ {
 
             String expectedResponse = """
                 {
-                    "id"     : %d,
-                    "name"   : "launch_angle"
+                    "id"             : %d,
+                    "name"           : "avg_exit_team",
+                    "teamId"         : %d,
+                    "graduationYear" : 2020,
+                    "dob"            : "1990-05-15"
                 }
-                """.formatted(measurement.getId());
+                """.formatted(player.getId(), team.getId());
 
             JsonNode expectedNode = objectMapper.readTree(expectedResponse);
             JsonNode actualNode   = objectMapper.readTree(jsonResponse);
@@ -195,7 +232,7 @@ class MeasurementControllerIntegrationTest_ {
         }
 
         @Test
-        @DisplayName("GET /measurements/{id} with unknown ID -> returns 404")
+        @DisplayName("GET /players/{id} with unknown ID -> returns 404")
         void getByIdValidationError() throws Exception {
             String jsonResponse = mvc.perform(
                             get(API + "/999999")
@@ -207,7 +244,7 @@ class MeasurementControllerIntegrationTest_ {
             String expectedResponse = """
                 {
                     "status" : 404,
-                    "message": "Measurement not found by id: 999999"
+                    "message": "Player not found by id: 999999"
                 }
                 """;
 
@@ -224,18 +261,24 @@ class MeasurementControllerIntegrationTest_ {
     class UpdateTests {
 
         @Test
-        @DisplayName("PUT /measurements -> updates and returns the Measurement")
+        @DisplayName("PUT /players -> updates and returns the Player")
         void update() throws Exception {
-            Measurement original = measurementRepository.save(Measurement.builder()
-                    .name("launch_angle")
+            Player original = playerRepository.save(Player.builder()
+                    .name("avg_exit_team")
+                    .teamId(team.getId())
+                    .graduationYear(2020)
+                    .dob(LocalDate.of(1990, 5, 15))
                     .build());
 
             String updateRequest = """
                 {
-                    "id"      : %d,
-                    "name"    : "updated_launch_angle"
+                    "id"             : %d,
+                    "name"           : "upd",
+                    "teamId"         : %d,
+                    "graduationYear" : 2021,
+                    "dob"            : "1990-05-16"
                 }
-                """.formatted(original.getId());
+                """.formatted(original.getId(), team.getId());
 
             String jsonResponse = mvc.perform(
                             put(API)
@@ -250,30 +293,36 @@ class MeasurementControllerIntegrationTest_ {
 
             String expectedResponse = """
                 {
-                    "id"     : %d,
-                    "name"   : "updated_launch_angle"
+                    "id"             : %d,
+                    "name"           : "upd",
+                    "teamId"         : %d,
+                    "graduationYear" : 2021,
+                    "dob"            : "1990-05-16"
                 }
-                """.formatted(original.getId());
+                """.formatted(original.getId(), team.getId());
 
             JsonNode expectedNode = objectMapper.readTree(expectedResponse);
 
             assertEquals(expectedNode, responseNode);
 
-            Measurement updated = measurementRepository.findById(original.getId()).orElseThrow();
-            assertEquals("updated_launch_angle", updated.getName());
+            Player updated = playerRepository.findById(original.getId()).orElseThrow();
+            assertEquals("upd"        , updated.getName());
+            assertEquals(2021         , updated.getGraduationYear());
+            assertEquals("1990-05-16" , updated.getDob().toString());
 
         }
 
         @Test
-        @DisplayName("PUT /measurements with invalid id -> returns 404")
+        @DisplayName("PUT /players with invalid id -> returns 404")
         void updateValidationError() throws Exception {
 
             String updateRequest = """
                 {
-                    "id"      : 999999,
-                    "name"    : "updated_launch_angle"
+                    "id"            : 999999,
+                    "name"          : "upd",
+                    "teamId"        : %d
                 }
-                """;
+                """.formatted(team.getId());
 
             String jsonResponse = mvc.perform(
                             put(API)
@@ -288,7 +337,7 @@ class MeasurementControllerIntegrationTest_ {
             String expectedResponse = """
                 {
                     "status" : 404,
-                    "message": "MeasurementService. Could not update Measurement by id: 999999"
+                    "message": "PlayerService. Could not update Player by id: 999999"
                 }
                 """;
 
@@ -306,14 +355,17 @@ class MeasurementControllerIntegrationTest_ {
     class DeleteTests {
 
         @Test
-        @DisplayName("DELETE /measurements/{id} -> deletes the Measurement")
+        @DisplayName("DELETE /players/{id} -> deletes the Player")
         void delete() throws Exception {
-            Measurement measurement = measurementRepository.save(Measurement.builder()
-                    .name("launch_angle")
+            Player player = playerRepository.save(Player.builder()
+                    .name("avg_exit_team")
+                    .teamId(team.getId())
+                    .graduationYear(2020)
+                    .dob(LocalDate.of(1990, 5, 15))
                     .build());
 
             String jsonResponse = mvc.perform(
-                            MockMvcRequestBuilders.delete(API + "/" + measurement.getId())
+                            MockMvcRequestBuilders.delete(API + "/" + player.getId())
                                     .with(httpBasic("biolab", "biolab"))
                     )
                     .andExpect(status().isOk())
@@ -331,11 +383,11 @@ class MeasurementControllerIntegrationTest_ {
 
             assertEquals(expectedNode, actualNode);
 
-            assertFalse(measurementRepository.existsById(measurement.getId()));
+            assertFalse(playerRepository.existsById(player.getId()));
         }
 
         @Test
-        @DisplayName("DELETE /measurements/{id} with unknown ID -> returns 404")
+        @DisplayName("DELETE /players/{id} with unknown ID -> returns 404")
         void deleteValidationError() throws Exception {
             String jsonResponse = mvc.perform(
                             MockMvcRequestBuilders.delete(API + "/999999")
@@ -347,7 +399,7 @@ class MeasurementControllerIntegrationTest_ {
             String expectedResponse = """
                 {
                     "status" : 404,
-                    "message": "MeasurementService. Could not delete id: 999999"
+                    "message": "PlayerService. Could not delete id: 999999"
                 }
                 """;
 
@@ -357,4 +409,5 @@ class MeasurementControllerIntegrationTest_ {
             assertEquals(expectedNode, actualNode);
         }
     }
+
 }

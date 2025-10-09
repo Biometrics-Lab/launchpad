@@ -56,6 +56,7 @@ class SessionResourceControllerIntegrationTest {
     @AfterEach
     void tearDown() {
         sessionResourceRepository.deleteAll();
+        factory.cleanup();
     }
 
     @Nested

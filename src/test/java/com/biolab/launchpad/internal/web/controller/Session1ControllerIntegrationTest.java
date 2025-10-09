@@ -1,13 +1,11 @@
 package com.biolab.launchpad.internal.web.controller;
 
-import com.biolab.launchpad.internal.repository.model.SportDictionary;
-import com.biolab.launchpad.internal.repository.SportDictionaryRepository;
+import com.biolab.launchpad.internal.repository.Session1Repository;
+import com.biolab.launchpad.internal.repository.model.Assessment;
+import com.biolab.launchpad.internal.repository.model.Session1;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -17,9 +15,12 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
-import static graphql.Assert.assertFalse;
+import java.sql.Timestamp;
+import java.time.*;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -27,10 +28,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
 @AutoConfigureMockMvc
-@DisplayName("SportDictionaryController Integration Tests")
-class SportDictionaryControllerIntegrationTest_ {
+@DisplayName("Session1 Integration Tests")
+class Session1ControllerIntegrationTest {
 
-    private static final String API = "/api/v1/sportDictionarys";
+    private static final String API = "/api/v1/sessions";
 
     @Autowired
     private MockMvc mvc;
@@ -39,27 +40,38 @@ class SportDictionaryControllerIntegrationTest_ {
     ObjectMapper objectMapper;
 
     @Autowired
-    SportDictionaryRepository sportDictionaryRepository;
+    Session1Repository session1Repository;
+
+    @Autowired
+    EntityFactory factory;
+
+    Assessment assessment;
+
+    @BeforeEach
+    void setUp() {
+        assessment   = factory.createAssessment("six");
+    }
 
     @AfterEach
     void tearDown() {
-        sportDictionaryRepository.deleteAll();
+        session1Repository.deleteAll();
+        factory.cleanup();
     }
 
     @Nested
     @DisplayName("Create")
     class CreateTests {
         @Test
-        @DisplayName("POST /ageGroupDictionarys -> creates and returns the new SportDictionary")
+        @DisplayName("POST /session1s -> creates and returns the new Session1")
         void create() throws Exception {
 
             String request =
-                    """
-                        {
-                            "name"        : "AgeGroup",
-                            "description" : "other description"
-                        }
-                    """;
+                            """
+                                {
+                                    "assessmentId" : %d,
+                                    "startTime"    : "2025-10-02T14:45:00.000+00:00"
+                                }
+                            """.formatted(assessment.getId());
 
             String jsonResponse = mvc.perform(
                             post(API)
@@ -70,18 +82,21 @@ class SportDictionaryControllerIntegrationTest_ {
                     .andExpect(status().isOk())
                     .andReturn().getResponse().getContentAsString();
 
+
             JsonNode responseNode = objectMapper.readTree(jsonResponse);
 
-            String sportDictionaryId = responseNode.get("name").asText();
-            assertThat(sportDictionaryId).isNotBlank();
+            int session1Id = responseNode.get("id").asInt();
+            assertThat(session1Id).isPositive();
+
 
             String expectedResponse =
-                    """
-                       {
-                            "name"        : "AgeGroup",
-                            "description" : "other description"
-                        }
-                    """.formatted(sportDictionaryId);
+                                    """
+                                      {
+                                        "id"           : %d,
+                                        "assessmentId" : %d,
+                                        "startTime"    : "2025-10-02T14:45:00.000+00:00"
+                                      }
+                                    """.formatted(session1Id, assessment.getId());
 
             JsonNode expectedResponseNode = objectMapper.readTree(expectedResponse);
 
@@ -89,15 +104,14 @@ class SportDictionaryControllerIntegrationTest_ {
         }
 
         @Test
-        @DisplayName("POST /ageGroupDictionarys with validation message -> returns 422")
+        @DisplayName("POST /session1s with validation message -> returns 422")
         void createValidationError() throws Exception {
-
             String request =
-                    """
-                         {
-                               "name" : ""
-                         }
-                    """;
+                            """
+                                {
+                                    "description" : ""
+                                }
+                            """;
 
             String jsonResponse = mvc.perform(
                             post(API)
@@ -114,8 +128,8 @@ class SportDictionaryControllerIntegrationTest_ {
             String expectedResponse =
                     """
                             {
-                                "status"  : 422,
-                                "message" : "Validation failed: name: Name cannot be blank"
+                                "status"       : 422,
+                                "message"      : "Validation failed: assessmentId: Session assessmentId cannot be null, and startTime: Session startTime cannot be null"
                             }
                             """;
 
@@ -130,27 +144,23 @@ class SportDictionaryControllerIntegrationTest_ {
     class ReadTests {
 
         @Test
-        @DisplayName("GET /ageGroupDictionarys -> returns all sportDictionarys")
+        @DisplayName("GET /session1s -> returns all session1s")
         void getAll() throws Exception {
 
-            SportDictionary sportDictionary1 = SportDictionary.builder()
-                    .name("avg_launch_angle")
-                    .description("other description")
-                    .build();
-            SportDictionary sportDictionary2 = SportDictionary.builder()
-                    .name("max_launch_angle")
-                    .description("other description")
-                    .build();
+            ZonedDateTime zdt = ZonedDateTime.of(2025, 10, 2, 15, 45, 10, 0, ZoneOffset.UTC);
 
-            sportDictionary1.markAsNew(true);
-            sportDictionary2.markAsNew(true);
+            Session1 session11 = session1Repository.save(Session1.builder()
+                    .assessmentId(assessment.getId())
+                    .startTime(Timestamp.from(zdt.toInstant()))
+                    .build());
 
-            sportDictionaryRepository.save(sportDictionary1);
-            sportDictionaryRepository.save(sportDictionary2);
+            Session1 session12 = session1Repository.save(Session1.builder()
+                    .assessmentId(assessment.getId())
+                    .startTime(Timestamp.from(zdt.toInstant()))
+                    .build());
 
             String jsonResponse = mvc.perform(
                             get(API)
-                                    .contentType(MediaType.APPLICATION_JSON)
                                     .with(httpBasic("biolab", "biolab"))
                     )
                     .andExpect(status().isOk())
@@ -159,15 +169,17 @@ class SportDictionaryControllerIntegrationTest_ {
             String expectedResponse = """
                 [
                     {
-                        "name"           : "%s",
-                        "description" : "other description"
+                        "id"           : %d,
+                        "assessmentId" : %d,
+                        "startTime"    : "2025-10-02T15:45:10.000+00:00"
                     },
                     {
-                        "name"           : "%s",
-                        "description" : "other description"
+                        "id"            : %d,
+                        "assessmentId"  : %d,
+                        "startTime"     : "2025-10-02T15:45:10.000+00:00"
                     }
                 ]
-                """.formatted(sportDictionary1.getName(), sportDictionary2.getName());
+                """.formatted(session11.getId(), assessment.getId(), session12.getId(),assessment.getId());
 
             JsonNode expectedNode = objectMapper.readTree(expectedResponse);
             JsonNode actualNode   = objectMapper.readTree(jsonResponse);
@@ -176,30 +188,30 @@ class SportDictionaryControllerIntegrationTest_ {
         }
 
         @Test
-        @DisplayName("GET /ageGroupDictionarys/{id} -> returns sportDictionary by ID")
+        @DisplayName("GET /session1s/{id} -> returns session1 by ID")
         void getById() throws Exception {
 
-            SportDictionary sportDictionary = SportDictionary.builder()
-                    .name("ageGroup")
-                    .description("other description")
-                    .build();
-            sportDictionary.markAsNew(true);
+            ZonedDateTime zdt = ZonedDateTime.of(2025, 10, 2, 15, 45, 10, 0, ZoneOffset.UTC);
 
-            sportDictionaryRepository.save(sportDictionary);
+            Session1 session1 = session1Repository.save(Session1.builder()
+                    .assessmentId(assessment.getId())
+                    .startTime(Timestamp.from(zdt.toInstant()))
+                    .build());
 
             String jsonResponse = mvc.perform(
-                            get(API + "/" + sportDictionary.getId())
-                                    .with(httpBasic("biolab", "biolab"))
+                            get(API + "/" + session1.getId())
+                            .with(httpBasic("biolab", "biolab"))
                     )
                     .andExpect(status().isOk())
                     .andReturn().getResponse().getContentAsString();
 
             String expectedResponse = """
-                                        {
-                                             "name" : "%s",
-                                             "description" : "other description"
-                                         }
-                                        """.formatted(sportDictionary.getName());
+                                     {
+                                        "id"             : %d,
+                                         "assessmentId"  : %d,
+                                         "startTime"   : "2025-10-02T15:45:10.000+00:00"
+                                     }
+                                    """.formatted(session1.getId(), assessment.getId());
 
             JsonNode expectedNode = objectMapper.readTree(expectedResponse);
             JsonNode actualNode   = objectMapper.readTree(jsonResponse);
@@ -208,7 +220,7 @@ class SportDictionaryControllerIntegrationTest_ {
         }
 
         @Test
-        @DisplayName("GET /ageGroupDictionarys/{id} with unknown ID -> returns 404")
+        @DisplayName("GET /session1s/{id} with unknown ID -> returns 404")
         void getByIdValidationError() throws Exception {
             String jsonResponse = mvc.perform(
                             get(API + "/999999")
@@ -220,7 +232,7 @@ class SportDictionaryControllerIntegrationTest_ {
             String expectedResponse = """
                 {
                     "status" : 404,
-                    "message": "Sport_dictionary not found by id: 999999"
+                    "message": "Session not found by id: 999999"
                 }
                 """;
 
@@ -237,23 +249,20 @@ class SportDictionaryControllerIntegrationTest_ {
     class UpdateTests {
 
         @Test
-        @DisplayName("PUT /ageGroupDictionarys -> updates and returns the SportDictionary")
+        @DisplayName("PUT /session1s -> updates and returns the Session1")
         void update() throws Exception {
-
-            SportDictionary sportDictionary = SportDictionary.builder()
-                    .name("ageGroup")
-                    .description("other description")
-                    .build();
-            sportDictionary.markAsNew(true);
-
-            SportDictionary original = sportDictionaryRepository.save(sportDictionary);
+            Session1 original = session1Repository.save(Session1.builder()
+                    .assessmentId(assessment.getId())
+                    .startTime(Timestamp.valueOf(LocalDateTime.of(2025, 10, 2, 14, 45, 1)))
+                    .build());
 
             String updateRequest = """
-                                    {
-                                             "name" : "%s",
-                                             "description" : "updated other description"
-                                    }
-                                    """.formatted(original.getId());
+                                {
+                                    "id"            : %d,
+                                    "assessmentId"  : %d,
+                                    "startTime"     : "2026-10-02T14:45:00.000+00:00"
+                                 }
+                                """.formatted(original.getId(), assessment.getId());
 
             String jsonResponse = mvc.perform(
                             put(API)
@@ -267,31 +276,30 @@ class SportDictionaryControllerIntegrationTest_ {
             JsonNode responseNode = objectMapper.readTree(jsonResponse);
 
             String expectedResponse = """
-                                       {
-                                             "name" : "%s",
-                                             "description" : "updated other description"
-                                        }
-                                       """.formatted(original.getId());
+                                {
+                                    "id"            : %d,
+                                    "assessmentId"  : %d,
+                                    "startTime"     : "2026-10-02T14:45:00.000+00:00"
+                                 }
+                                """.formatted(original.getId(), assessment.getId());
 
             JsonNode expectedNode = objectMapper.readTree(expectedResponse);
 
             assertEquals(expectedNode, responseNode);
 
-            SportDictionary updated = sportDictionaryRepository.findById(original.getId()).orElseThrow();
-            assertEquals("updated other description", updated.getDescription());
-
         }
 
         @Test
-        @DisplayName("PUT /ageGroupDictionarys with invalid id -> returns 404")
+        @DisplayName("PUT /session1s with invalid id -> returns 404")
         void updateValidationError() throws Exception {
 
             String updateRequest = """
-                                    {
-                                          "name" : "999999",
-                                          "description" : "updated other description"
-                                    }
-                                    """;
+                                 {
+                                     "id"            : 999999,
+                                     "assessmentId"  : %d,
+                                     "startTime"     : "2025-10-02T14:45:00.000+00:00"
+                                 }
+                                 """.formatted(assessment.getId());
 
             String jsonResponse = mvc.perform(
                             put(API)
@@ -306,7 +314,7 @@ class SportDictionaryControllerIntegrationTest_ {
             String expectedResponse = """
                 {
                     "status" : 404,
-                    "message": "SportDictionaryService. Could not update SportDictionary by id: 999999"
+                    "message": "Session1Service. Could not update Session1 by id: 999999"
                 }
                 """;
 
@@ -323,20 +331,17 @@ class SportDictionaryControllerIntegrationTest_ {
     @DisplayName("Delete")
     class DeleteTests {
 
+
         @Test
-        @DisplayName("DELETE /ageGroupDictionarys/{id} -> deletes the SportDictionary")
+        @DisplayName("DELETE /session1s/{id} -> deletes the Session1")
         void delete() throws Exception {
-
-            SportDictionary sportDictionary = SportDictionary.builder()
-                    .name("ageGroup")
-                    .description("other description")
-                    .build();
-            sportDictionary.markAsNew(true);
-
-            SportDictionary original = sportDictionaryRepository.save(sportDictionary);
+            Session1 session1 = session1Repository.save(Session1.builder()
+                    .assessmentId(assessment.getId())
+                    .startTime(Timestamp.valueOf(LocalDateTime.of(2025, 10, 2, 14, 45, 1)))
+                    .build());
 
             String jsonResponse = mvc.perform(
-                            MockMvcRequestBuilders.delete(API + "/" + sportDictionary.getId())
+                            MockMvcRequestBuilders.delete(API + "/" + session1.getId())
                                     .with(httpBasic("biolab", "biolab"))
                     )
                     .andExpect(status().isOk())
@@ -354,11 +359,11 @@ class SportDictionaryControllerIntegrationTest_ {
 
             assertEquals(expectedNode, actualNode);
 
-            assertFalse(sportDictionaryRepository.existsById(sportDictionary.getId()));
+            assertFalse(session1Repository.existsById(session1.getId()));
         }
 
         @Test
-        @DisplayName("DELETE /ageGroupDictionarys/{id} with unknown ID -> returns 404")
+        @DisplayName("DELETE /session1s/{id} with unknown ID -> returns 404")
         void deleteValidationError() throws Exception {
             String jsonResponse = mvc.perform(
                             MockMvcRequestBuilders.delete(API + "/999999")
@@ -370,7 +375,7 @@ class SportDictionaryControllerIntegrationTest_ {
             String expectedResponse = """
                 {
                     "status" : 404,
-                    "message": "SportDictionaryService. Could not delete id: 999999"
+                    "message": "Session1Service. Could not delete id: 999999"
                 }
                 """;
 

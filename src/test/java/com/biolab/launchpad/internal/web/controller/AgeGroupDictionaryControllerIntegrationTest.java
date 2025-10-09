@@ -30,7 +30,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @DisplayName("AgeGroupDictionaryController Integration Tests")
 class AgeGroupDictionaryControllerIntegrationTest {
 
-    private static final String API = "/api/v1/ageGroupDictionarys";
+    private static final String API = "/api/v1/ageGroupDictionaries";
 
     @Autowired
     private MockMvc mvc;

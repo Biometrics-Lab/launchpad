@@ -52,6 +52,7 @@ class DataSourceControllerIntegrationTest {
     @AfterEach
     void tearDown() {
         dataSourceRepository.deleteAll();
+        factory.cleanup();
     }
 
     @Nested

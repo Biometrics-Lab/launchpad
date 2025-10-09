@@ -53,6 +53,7 @@ class UserControllerIntegrationTest {
     @AfterEach
     void tearDown() {
         userRepository.deleteAll();
+        factory.cleanup();
     }
 
     @Nested

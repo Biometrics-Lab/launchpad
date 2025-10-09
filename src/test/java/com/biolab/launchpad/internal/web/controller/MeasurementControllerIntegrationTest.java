@@ -1,8 +1,7 @@
 package com.biolab.launchpad.internal.web.controller;
 
-import com.biolab.launchpad.internal.repository.Session1Repository;
-import com.biolab.launchpad.internal.repository.model.Assessment;
-import com.biolab.launchpad.internal.repository.model.Session1;
+import com.biolab.launchpad.internal.repository.MeasurementRepository;
+import com.biolab.launchpad.internal.repository.model.Measurement;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.*;
@@ -15,23 +14,21 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
-import java.sql.Timestamp;
-import java.time.*;
-
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
 @AutoConfigureMockMvc
-@DisplayName("Session1 Integration Tests")
-class Session1ControllerIntegrationTest_ {
+@DisplayName("MeasurementController Integration Tests")
+class MeasurementControllerIntegrationTest {
 
-    private static final String API = "/api/v1/sessions";
+    private static final String API = "/api/v1/measurements";
 
     @Autowired
     private MockMvc mvc;
@@ -40,37 +37,26 @@ class Session1ControllerIntegrationTest_ {
     ObjectMapper objectMapper;
 
     @Autowired
-    Session1Repository session1Repository;
-
-    @Autowired
-    EntityFactory factory;
-
-    Assessment assessment;
-
-    @BeforeEach
-    void setUp() {
-        assessment   = factory.createAssessment("six");
-    }
+    MeasurementRepository measurementRepository;
 
     @AfterEach
     void tearDown() {
-        session1Repository.deleteAll();
+        measurementRepository.deleteAll();
     }
 
     @Nested
     @DisplayName("Create")
     class CreateTests {
         @Test
-        @DisplayName("POST /session1s -> creates and returns the new Session1")
+        @DisplayName("POST /measurements -> creates and returns the new Measurement")
         void create() throws Exception {
 
             String request =
-                            """
+                    """
                                 {
-                                    "assessmentId" : %d,
-                                    "startTime"    : "2025-10-02T14:45:00.000+00:00"
+                                    "name" : "launch_angle"
                                 }
-                            """.formatted(assessment.getId());
+                            """;
 
             String jsonResponse = mvc.perform(
                             post(API)
@@ -81,21 +67,19 @@ class Session1ControllerIntegrationTest_ {
                     .andExpect(status().isOk())
                     .andReturn().getResponse().getContentAsString();
 
-
             JsonNode responseNode = objectMapper.readTree(jsonResponse);
 
-            int session1Id = responseNode.get("id").asInt();
-            assertThat(session1Id).isPositive();
+            int measurementId = responseNode.get("id").asInt();
+            assertThat(measurementId).isPositive();
 
 
             String expectedResponse =
-                                    """
-                                      {
-                                        "id"           : %d,
-                                        "assessmentId" : %d,
-                                        "startTime"    : "2025-10-02T14:45:00.000+00:00"
-                                      }
-                                    """.formatted(session1Id, assessment.getId());
+                    """
+                            {
+                                        "id"     : %d,
+                                        "name"   : "launch_angle"
+                                    }
+                            """.formatted(measurementId);
 
             JsonNode expectedResponseNode = objectMapper.readTree(expectedResponse);
 
@@ -103,14 +87,15 @@ class Session1ControllerIntegrationTest_ {
         }
 
         @Test
-        @DisplayName("POST /session1s with validation message -> returns 422")
+        @DisplayName("POST /measurements with validation message -> returns 422")
         void createValidationError() throws Exception {
+
             String request =
-                            """
-                                {
-                                    "description" : ""
-                                }
-                            """;
+                    """ 
+                         {
+                               "name" : ""
+                         }
+                    """;
 
             String jsonResponse = mvc.perform(
                             post(API)
@@ -125,10 +110,10 @@ class Session1ControllerIntegrationTest_ {
             JsonNode responseNode = objectMapper.readTree(jsonResponse);
 
             String expectedResponse =
-                    """
+                    """ 
                             {
-                                "status"       : 422,
-                                "message"      : "Validation failed: assessmentId: Session assessmentId cannot be null, and startTime: Session startTime cannot be null"
+                                "status"  : 422,
+                                "message" : "Validation failed: name: Name cannot be blank"
                             }
                             """;
 
@@ -143,23 +128,20 @@ class Session1ControllerIntegrationTest_ {
     class ReadTests {
 
         @Test
-        @DisplayName("GET /session1s -> returns all session1s")
+        @DisplayName("GET /measurements -> returns all measurements")
         void getAll() throws Exception {
 
-            ZonedDateTime zdt = ZonedDateTime.of(2025, 10, 2, 15, 45, 10, 0, ZoneOffset.UTC);
-
-            Session1 session11 = session1Repository.save(Session1.builder()
-                    .assessmentId(assessment.getId())
-                    .startTime(Timestamp.from(zdt.toInstant()))
+            Measurement measurement1 = measurementRepository.save(Measurement.builder()
+                    .name("avg_launch_angle")
                     .build());
 
-            Session1 session12 = session1Repository.save(Session1.builder()
-                    .assessmentId(assessment.getId())
-                    .startTime(Timestamp.from(zdt.toInstant()))
+            Measurement measurement2 = measurementRepository.save(Measurement.builder()
+                    .name("max_launch_angle")
                     .build());
 
             String jsonResponse = mvc.perform(
                             get(API)
+                                    .contentType(MediaType.APPLICATION_JSON)
                                     .with(httpBasic("biolab", "biolab"))
                     )
                     .andExpect(status().isOk())
@@ -168,17 +150,15 @@ class Session1ControllerIntegrationTest_ {
             String expectedResponse = """
                 [
                     {
-                        "id"           : %d,
-                        "assessmentId" : %d,
-                        "startTime"    : "2025-10-02T15:45:10.000+00:00"
+                        "id"     : %d,
+                        "name"   : "avg_launch_angle"
                     },
                     {
-                        "id"            : %d,
-                        "assessmentId"  : %d,
-                        "startTime"     : "2025-10-02T15:45:10.000+00:00"
+                        "id"     : %d,
+                        "name"   : "max_launch_angle"
                     }
                 ]
-                """.formatted(session11.getId(), assessment.getId(), session12.getId(),assessment.getId());
+                """.formatted(measurement1.getId(), measurement2.getId());
 
             JsonNode expectedNode = objectMapper.readTree(expectedResponse);
             JsonNode actualNode   = objectMapper.readTree(jsonResponse);
@@ -187,30 +167,26 @@ class Session1ControllerIntegrationTest_ {
         }
 
         @Test
-        @DisplayName("GET /session1s/{id} -> returns session1 by ID")
+        @DisplayName("GET /measurements/{id} -> returns measurement by ID")
         void getById() throws Exception {
 
-            ZonedDateTime zdt = ZonedDateTime.of(2025, 10, 2, 15, 45, 10, 0, ZoneOffset.UTC);
-
-            Session1 session1 = session1Repository.save(Session1.builder()
-                    .assessmentId(assessment.getId())
-                    .startTime(Timestamp.from(zdt.toInstant()))
+            Measurement measurement = measurementRepository.save(Measurement.builder()
+                    .name("launch_angle")
                     .build());
 
             String jsonResponse = mvc.perform(
-                            get(API + "/" + session1.getId())
-                            .with(httpBasic("biolab", "biolab"))
+                            get(API + "/" + measurement.getId())
+                                    .with(httpBasic("biolab", "biolab"))
                     )
                     .andExpect(status().isOk())
                     .andReturn().getResponse().getContentAsString();
 
             String expectedResponse = """
-                                     {
-                                        "id"             : %d,
-                                         "assessmentId"  : %d,
-                                         "startTime"   : "2025-10-02T15:45:10.000+00:00"
-                                     }
-                                    """.formatted(session1.getId(), assessment.getId());
+                {
+                    "id"     : %d,
+                    "name"   : "launch_angle"
+                }
+                """.formatted(measurement.getId());
 
             JsonNode expectedNode = objectMapper.readTree(expectedResponse);
             JsonNode actualNode   = objectMapper.readTree(jsonResponse);
@@ -219,7 +195,7 @@ class Session1ControllerIntegrationTest_ {
         }
 
         @Test
-        @DisplayName("GET /session1s/{id} with unknown ID -> returns 404")
+        @DisplayName("GET /measurements/{id} with unknown ID -> returns 404")
         void getByIdValidationError() throws Exception {
             String jsonResponse = mvc.perform(
                             get(API + "/999999")
@@ -231,7 +207,7 @@ class Session1ControllerIntegrationTest_ {
             String expectedResponse = """
                 {
                     "status" : 404,
-                    "message": "Session not found by id: 999999"
+                    "message": "Measurement not found by id: 999999"
                 }
                 """;
 
@@ -248,20 +224,18 @@ class Session1ControllerIntegrationTest_ {
     class UpdateTests {
 
         @Test
-        @DisplayName("PUT /session1s -> updates and returns the Session1")
+        @DisplayName("PUT /measurements -> updates and returns the Measurement")
         void update() throws Exception {
-            Session1 original = session1Repository.save(Session1.builder()
-                    .assessmentId(assessment.getId())
-                    .startTime(Timestamp.valueOf(LocalDateTime.of(2025, 10, 2, 14, 45, 1)))
+            Measurement original = measurementRepository.save(Measurement.builder()
+                    .name("launch_angle")
                     .build());
 
             String updateRequest = """
-                                {
-                                    "id"            : %d,
-                                    "assessmentId"  : %d,
-                                    "startTime"     : "2026-10-02T14:45:00.000+00:00"
-                                 }
-                                """.formatted(original.getId(), assessment.getId());
+                {
+                    "id"      : %d,
+                    "name"    : "updated_launch_angle"
+                }
+                """.formatted(original.getId());
 
             String jsonResponse = mvc.perform(
                             put(API)
@@ -275,30 +249,31 @@ class Session1ControllerIntegrationTest_ {
             JsonNode responseNode = objectMapper.readTree(jsonResponse);
 
             String expectedResponse = """
-                                {
-                                    "id"            : %d,
-                                    "assessmentId"  : %d,
-                                    "startTime"     : "2026-10-02T14:45:00.000+00:00"
-                                 }
-                                """.formatted(original.getId(), assessment.getId());
+                {
+                    "id"     : %d,
+                    "name"   : "updated_launch_angle"
+                }
+                """.formatted(original.getId());
 
             JsonNode expectedNode = objectMapper.readTree(expectedResponse);
 
             assertEquals(expectedNode, responseNode);
 
+            Measurement updated = measurementRepository.findById(original.getId()).orElseThrow();
+            assertEquals("updated_launch_angle", updated.getName());
+
         }
 
         @Test
-        @DisplayName("PUT /session1s with invalid id -> returns 404")
+        @DisplayName("PUT /measurements with invalid id -> returns 404")
         void updateValidationError() throws Exception {
 
             String updateRequest = """
-                                 {
-                                     "id"            : 999999,
-                                     "assessmentId"  : %d,
-                                     "startTime"     : "2025-10-02T14:45:00.000+00:00"
-                                 }
-                                 """.formatted(assessment.getId());
+                {
+                    "id"      : 999999,
+                    "name"    : "updated_launch_angle"
+                }
+                """;
 
             String jsonResponse = mvc.perform(
                             put(API)
@@ -313,7 +288,7 @@ class Session1ControllerIntegrationTest_ {
             String expectedResponse = """
                 {
                     "status" : 404,
-                    "message": "Session1Service. Could not update Session1 by id: 999999"
+                    "message": "MeasurementService. Could not update Measurement by id: 999999"
                 }
                 """;
 
@@ -330,17 +305,15 @@ class Session1ControllerIntegrationTest_ {
     @DisplayName("Delete")
     class DeleteTests {
 
-
         @Test
-        @DisplayName("DELETE /session1s/{id} -> deletes the Session1")
+        @DisplayName("DELETE /measurements/{id} -> deletes the Measurement")
         void delete() throws Exception {
-            Session1 session1 = session1Repository.save(Session1.builder()
-                    .assessmentId(assessment.getId())
-                    .startTime(Timestamp.valueOf(LocalDateTime.of(2025, 10, 2, 14, 45, 1)))
+            Measurement measurement = measurementRepository.save(Measurement.builder()
+                    .name("launch_angle")
                     .build());
 
             String jsonResponse = mvc.perform(
-                            MockMvcRequestBuilders.delete(API + "/" + session1.getId())
+                            MockMvcRequestBuilders.delete(API + "/" + measurement.getId())
                                     .with(httpBasic("biolab", "biolab"))
                     )
                     .andExpect(status().isOk())
@@ -358,11 +331,11 @@ class Session1ControllerIntegrationTest_ {
 
             assertEquals(expectedNode, actualNode);
 
-            assertFalse(session1Repository.existsById(session1.getId()));
+            assertFalse(measurementRepository.existsById(measurement.getId()));
         }
 
         @Test
-        @DisplayName("DELETE /session1s/{id} with unknown ID -> returns 404")
+        @DisplayName("DELETE /measurements/{id} with unknown ID -> returns 404")
         void deleteValidationError() throws Exception {
             String jsonResponse = mvc.perform(
                             MockMvcRequestBuilders.delete(API + "/999999")
@@ -374,7 +347,7 @@ class Session1ControllerIntegrationTest_ {
             String expectedResponse = """
                 {
                     "status" : 404,
-                    "message": "Session1Service. Could not delete id: 999999"
+                    "message": "MeasurementService. Could not delete id: 999999"
                 }
                 """;
 
@@ -384,5 +357,4 @@ class Session1ControllerIntegrationTest_ {
             assertEquals(expectedNode, actualNode);
         }
     }
-
 }

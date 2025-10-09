@@ -55,6 +55,7 @@ class ModelMetricControllerIntegrationTest {
     @AfterEach
     void tearDown() {
         modelMetricRepository.deleteAll();
+        factory.cleanup();
     }
 
     @Nested

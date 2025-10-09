@@ -18,7 +18,7 @@ import static com.biolab.launchpad.internal.web.mapper.ResourceTypeDictionaryMap
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/resourceTypeDictionarys")
+@RequestMapping("/api/v1/resourceTypeDictionaries")
 @Log4j2
 public class ResourceTypeDictionaryController {
 

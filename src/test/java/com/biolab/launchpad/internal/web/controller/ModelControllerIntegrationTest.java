@@ -55,6 +55,7 @@ class ModelControllerIntegrationTest {
     @AfterEach
     void tearDown() {
         modelRepository.deleteAll();
+        factory.cleanup();
     }
 
     @Nested

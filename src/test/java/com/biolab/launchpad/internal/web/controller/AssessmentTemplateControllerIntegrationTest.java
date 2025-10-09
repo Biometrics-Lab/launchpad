@@ -1,9 +1,8 @@
 package com.biolab.launchpad.internal.web.controller;
 
-import com.biolab.launchpad.internal.repository.TeamRepository;
-import com.biolab.launchpad.internal.repository.model.Organisation;
-import com.biolab.launchpad.internal.repository.model.Team;
+import com.biolab.launchpad.internal.repository.AssessmentTemplateRepository;
 import com.biolab.launchpad.internal.repository.model.SportDictionary;
+import com.biolab.launchpad.internal.repository.model.AssessmentTemplate;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.*;
@@ -23,13 +22,15 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import lombok.extern.log4j.Log4j2;
+@Log4j2
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
 @AutoConfigureMockMvc
-@DisplayName("Team Integration Tests")
-class TeamControllerIntegrationTest_ {
+@DisplayName("AssessmentTemplate Integration Tests")
+class AssessmentTemplateControllerIntegrationTest {
 
-    private static final String API = "/api/v1/teams";
+    private static final String API = "/api/v1/assessmentTemplates";
 
     @Autowired
     private MockMvc mvc;
@@ -38,41 +39,39 @@ class TeamControllerIntegrationTest_ {
     ObjectMapper objectMapper;
 
     @Autowired
-    TeamRepository teamRepository;
+    AssessmentTemplateRepository assessmentTemplateRepository;
 
     @Autowired
     EntityFactory factory;
 
     SportDictionary sportDictionary;
-    Organisation organisation;
 
     @BeforeEach
     void setUp() {
         sportDictionary = factory.createSportDictionary("coker");
-        organisation    = factory.createOrganisation("org");
     }
 
     @AfterEach
     void tearDown() {
-        teamRepository.deleteAll();
+        assessmentTemplateRepository.deleteAll();
+        factory.cleanup();
     }
 
     @Nested
     @DisplayName("Create")
     class CreateTests {
         @Test
-        @DisplayName("POST /teams -> creates and returns the new Team")
+        @DisplayName("POST /assessmentTemplates -> creates and returns the new AssessmentTemplate")
         void create() throws Exception {
 
             String request =
-                            """ 
+                    """ 
                                 {
-                                    "name"           : "avg_team",
-                                    "organisationId" : %d,
-                                    "sport"          : "%s",
-                                    "description"    : "desc"
+                                    "name"         : "avg_exit_velocity",
+                                    "sport"        : "%s",
+                                    "description"  : "desc"
                                 }
-                            """.formatted(organisation.getId(), sportDictionary.getName());
+                            """.formatted(sportDictionary.getName());
 
             String jsonResponse = mvc.perform(
                             post(API)
@@ -86,20 +85,19 @@ class TeamControllerIntegrationTest_ {
 
             JsonNode responseNode = objectMapper.readTree(jsonResponse);
 
-            int teamId = responseNode.get("id").asInt();
-            assertThat(teamId).isPositive();
+            int assessmentTemplateId = responseNode.get("id").asInt();
+            assertThat(assessmentTemplateId).isPositive();
 
 
             String expectedResponse =
                     """ 
                             {
-                                        "id"             : %d,
-                                        "name"           : "avg_team",
-                                        "organisationId" : %d,
-                                        "sport"          : "%s",
-                                        "description"    : "desc"
+                                        "id"           : %d,
+                                        "name"         : "avg_exit_velocity",
+                                        "sport"        : "%s",
+                                        "description"  : "desc"
                                     }
-                            """.formatted(teamId, organisation.getId(), sportDictionary.getName());
+                            """.formatted(assessmentTemplateId, sportDictionary.getId());
 
             JsonNode expectedResponseNode = objectMapper.readTree(expectedResponse);
 
@@ -107,7 +105,7 @@ class TeamControllerIntegrationTest_ {
         }
 
         @Test
-        @DisplayName("POST /teams with validation message -> returns 422")
+        @DisplayName("POST /assessmentTemplates with validation message -> returns 422")
         void createValidationError() throws Exception {
             String request =
                             """
@@ -129,12 +127,12 @@ class TeamControllerIntegrationTest_ {
             JsonNode responseNode = objectMapper.readTree(jsonResponse);
 
             String expectedResponse =
-                    """
-                            {
-                                "status"       : 422,
-                                "message"      : "Validation failed: name: Name cannot be blank, and organisationId: Team organisationId cannot be null, and sport: Team sport cannot be null"
-                            }
-                            """;
+                                    """
+                                        {
+                                            "status"   : 422,
+                                            "message"  : "Validation failed: name: Name cannot be blank, and sport: AssessmentTemplate sport cannot be null"
+                                        }
+                                    """;
 
             JsonNode expectedResponseNode = objectMapper.readTree(expectedResponse);
 
@@ -147,19 +145,17 @@ class TeamControllerIntegrationTest_ {
     class ReadTests {
 
         @Test
-        @DisplayName("GET /teams -> returns all teams")
+        @DisplayName("GET /assessmentTemplates -> returns all assessmentTemplates")
         void getAll() throws Exception {
 
-            Team team1 = teamRepository.save(Team.builder()
-                    .name("avg_team")
-                    .organisationId(organisation.getId())
+            AssessmentTemplate assessmentTemplate1 = assessmentTemplateRepository.save(AssessmentTemplate.builder()
+                    .name("avg_exit_velocity")
                     .sport(sportDictionary.getId())
                     .description("desc")
                     .build());
 
-            Team team2 = teamRepository.save(Team.builder()
-                    .name("max_team")
-                    .organisationId(organisation.getId())
+            AssessmentTemplate assessmentTemplate2 = assessmentTemplateRepository.save(AssessmentTemplate.builder()
+                    .name("max_entry_velocity")
                     .sport(sportDictionary.getId())
                     .description("desc")
                     .build());
@@ -172,24 +168,21 @@ class TeamControllerIntegrationTest_ {
                     .andReturn().getResponse().getContentAsString();
 
             String expectedResponse = """
-                [
-                    {
-                        "id"             : %d,
-                        "name"           : "avg_team",
-                        "organisationId" : %d,
-                        "sport"          : "%s",
-                        "description"    : "desc"
-                        
-                    },
-                    {
-                        "id"             : %d,
-                        "name"           : "max_team",
-                        "organisationId" : %d,
-                        "sport"          : "%s",
-                        "description"    : "desc"
-                    }
-                ]
-                """.formatted(team1.getId(), organisation.getId(), sportDictionary.getId(), team2.getId(), organisation.getId(), sportDictionary.getId());
+                    [
+                        {
+                            "id"           : %d,
+                            "name"         : "avg_exit_velocity",
+                            "sport"        : "%s",
+                            "description"  : "desc"
+                        },
+                        {
+                            "id"           : %d,
+                            "name"         : "max_entry_velocity",
+                            "sport"        : "%s",
+                            "description"  : "desc"
+                        }
+                    ]
+                    """.formatted(assessmentTemplate1.getId(), sportDictionary.getId(), assessmentTemplate2.getId(), sportDictionary.getId());
 
             JsonNode expectedNode = objectMapper.readTree(expectedResponse);
             JsonNode actualNode   = objectMapper.readTree(jsonResponse);
@@ -198,18 +191,17 @@ class TeamControllerIntegrationTest_ {
         }
 
         @Test
-        @DisplayName("GET /teams/{id} -> returns team by ID")
+        @DisplayName("GET /assessmentTemplates/{id} -> returns assessmentTemplate by ID")
         void getById() throws Exception {
 
-            Team team = teamRepository.save(Team.builder()
-                    .name("avg_team")
-                    .organisationId(organisation.getId())
+            AssessmentTemplate assessmentTemplate = assessmentTemplateRepository.save(AssessmentTemplate.builder()
+                    .name("avg_exit_velocity")
                     .sport(sportDictionary.getId())
                     .description("desc")
                     .build());
 
             String jsonResponse = mvc.perform(
-                            get(API + "/" + team.getId())
+                            get(API + "/" + assessmentTemplate.getId())
                                     .with(httpBasic("biolab", "biolab"))
                     )
                     .andExpect(status().isOk())
@@ -217,13 +209,12 @@ class TeamControllerIntegrationTest_ {
 
             String expectedResponse = """
                 {
-                    "id"             : %d,
-                    "name"           : "avg_team",
-                    "organisationId" : %d,
-                    "sport"          : "%s",
-                    "description"    : "desc"
+                    "id"           : %d,
+                    "name"         : "avg_exit_velocity",
+                    "sport"        : "%s",
+                    "description"  : "desc"
                 }
-                """.formatted(team.getId(), organisation.getId() ,sportDictionary.getId());
+                """.formatted(assessmentTemplate.getId(), sportDictionary.getId());
 
             JsonNode expectedNode = objectMapper.readTree(expectedResponse);
             JsonNode actualNode   = objectMapper.readTree(jsonResponse);
@@ -232,7 +223,7 @@ class TeamControllerIntegrationTest_ {
         }
 
         @Test
-        @DisplayName("GET /teams/{id} with unknown ID -> returns 404")
+        @DisplayName("GET /assessmentTemplates/{id} with unknown ID -> returns 404")
         void getByIdValidationError() throws Exception {
             String jsonResponse = mvc.perform(
                             get(API + "/999999")
@@ -244,7 +235,7 @@ class TeamControllerIntegrationTest_ {
             String expectedResponse = """
                 {
                     "status" : 404,
-                    "message": "Team not found by id: 999999"
+                    "message": "AssessmentTemplate not found by id: 999999"
                 }
                 """;
 
@@ -261,23 +252,21 @@ class TeamControllerIntegrationTest_ {
     class UpdateTests {
 
         @Test
-        @DisplayName("PUT /teams -> updates and returns the Team")
+        @DisplayName("PUT /assessmentTemplates -> updates and returns the AssessmentTemplate")
         void update() throws Exception {
-            Team original = teamRepository.save(Team.builder()
-                    .name("avg_team")
-                    .organisationId(organisation.getId())
+            AssessmentTemplate original = assessmentTemplateRepository.save(AssessmentTemplate.builder()
+                    .name("avg_exit_velocity")
                     .sport(sportDictionary.getId())
                     .build());
 
             String updateRequest = """
                 {
-                    "id"             : %d,
-                    "name"           : "updated_velocity",
-                    "organisationId" : %d,
-                    "sport"          : "%s",
-                    "description"    : "desc"
+                    "id"            : %d,
+                    "name"          : "updated_velocity",
+                    "sport"         : "%s",
+                    "description"  : "desc"
                 }
-                """.formatted(original.getId(), organisation.getId(), sportDictionary.getId());
+                """.formatted(original.getId(), sportDictionary.getId());
 
             String jsonResponse = mvc.perform(
                             put(API)
@@ -292,36 +281,34 @@ class TeamControllerIntegrationTest_ {
 
             String expectedResponse = """
                 {
-                    "id"             : %d,
-                    "name"           : "updated_velocity",
-                    "organisationId" : %d,
-                    "sport"          : "%s",
-                    "description"    : "desc"
+                    "id"           : %d,
+                    "name"         : "updated_velocity",
+                    "sport"        : "%s",
+                    "description"  : "desc"
                 }
-                """.formatted(original.getId(), organisation.getId(), sportDictionary.getId());
+                """.formatted(original.getId(), sportDictionary.getId());
 
             JsonNode expectedNode = objectMapper.readTree(expectedResponse);
 
             assertEquals(expectedNode, responseNode);
 
-            Team updated = teamRepository.findById(original.getId()).orElseThrow();
+            AssessmentTemplate updated = assessmentTemplateRepository.findById(original.getId()).orElseThrow();
             assertEquals("updated_velocity", updated.getName());
 
         }
 
         @Test
-        @DisplayName("PUT /teams with invalid id -> returns 404")
+        @DisplayName("PUT /assessmentTemplates with invalid id -> returns 404")
         void updateValidationError() throws Exception {
 
             String updateRequest = """
                 {
-                    "id"             : 999999,
-                    "name"           : "updated_velocity",
-                    "organisationId" : %d,
-                    "sport"          : "%s",
-                    "description"    : "desc"
+                    "id"            : 999999,
+                    "name"          : "updated_velocity",
+                    "sport"         : "%s",
+                    "description"  : "desc"
                 }
-                """.formatted(organisation.getId(), sportDictionary.getId());
+                """.formatted(sportDictionary.getId());
 
             String jsonResponse = mvc.perform(
                             put(API)
@@ -336,7 +323,7 @@ class TeamControllerIntegrationTest_ {
             String expectedResponse = """
                 {
                     "status" : 404,
-                    "message": "TeamService. Could not update Team by id: 999999"
+                    "message": "AssessmentTemplateService. Could not update AssessmentTemplate by id: 999999"
                 }
                 """;
 
@@ -355,17 +342,16 @@ class TeamControllerIntegrationTest_ {
 
 
         @Test
-        @DisplayName("DELETE /teams/{id} -> deletes the Team")
+        @DisplayName("DELETE /assessmentTemplates/{id} -> deletes the AssessmentTemplate")
         void delete() throws Exception {
-            Team team = teamRepository.save(Team.builder()
-                    .name("avg_team")
-                    .organisationId(organisation.getId())
+            AssessmentTemplate assessmentTemplate = assessmentTemplateRepository.save(AssessmentTemplate.builder()
+                    .name("avg_exit_velocity")
                     .sport(sportDictionary.getId())
                     .description("desc")
                     .build());
 
             String jsonResponse = mvc.perform(
-                            MockMvcRequestBuilders.delete(API + "/" + team.getId())
+                            MockMvcRequestBuilders.delete(API + "/" + assessmentTemplate.getId())
                                     .with(httpBasic("biolab", "biolab"))
                     )
                     .andExpect(status().isOk())
@@ -383,11 +369,11 @@ class TeamControllerIntegrationTest_ {
 
             assertEquals(expectedNode, actualNode);
 
-            assertFalse(teamRepository.existsById(team.getId()));
+            assertFalse(assessmentTemplateRepository.existsById(assessmentTemplate.getId()));
         }
 
         @Test
-        @DisplayName("DELETE /teams/{id} with unknown ID -> returns 404")
+        @DisplayName("DELETE /assessmentTemplates/{id} with unknown ID -> returns 404")
         void deleteValidationError() throws Exception {
             String jsonResponse = mvc.perform(
                             MockMvcRequestBuilders.delete(API + "/999999")
@@ -399,7 +385,7 @@ class TeamControllerIntegrationTest_ {
             String expectedResponse = """
                 {
                     "status" : 404,
-                    "message": "TeamService. Could not delete id: 999999"
+                    "message": "AssessmentTemplateService. Could not delete id: 999999"
                 }
                 """;
 
