@@ -4,6 +4,7 @@ import com.biolab.launchpad.internal.repository.AgeGroupDictionaryRepository;
 import com.biolab.launchpad.internal.repository.model.AgeGroupDictionary;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -24,6 +25,7 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+@Log4j2
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -50,7 +52,7 @@ class AgeGroupDictionaryControllerIntegrationTest {
     @DisplayName("Create")
     class CreateTests {
         @Test
-        @DisplayName("POST /ageGroupDictionarys -> creates and returns the new AgeGroupDictionary")
+        @DisplayName("POST /ageGroupDictionaries -> creates and returns the new AgeGroupDictionary")
         void create() throws Exception {
 
             String request =
@@ -89,7 +91,7 @@ class AgeGroupDictionaryControllerIntegrationTest {
         }
 
         @Test
-        @DisplayName("POST /ageGroupDictionarys with validation message -> returns 422")
+        @DisplayName("POST /ageGroupDictionaries with validation message -> returns 422")
         void createValidationError() throws Exception {
 
             String request =
@@ -130,7 +132,7 @@ class AgeGroupDictionaryControllerIntegrationTest {
     class ReadTests {
 
         @Test
-        @DisplayName("GET /ageGroupDictionarys -> returns all ageGroupDictionarys")
+        @DisplayName("GET /ageGroupDictionaries -> returns all ageGroupDictionaries")
         void getAll() throws Exception {
 
             AgeGroupDictionary ageGroupDictionary1 = AgeGroupDictionary.builder()
@@ -176,7 +178,7 @@ class AgeGroupDictionaryControllerIntegrationTest {
         }
 
         @Test
-        @DisplayName("GET /ageGroupDictionarys/{id} -> returns ageGroupDictionary by ID")
+        @DisplayName("GET /ageGroupDictionaries/{id} -> returns ageGroupDictionary by ID")
         void getById() throws Exception {
 
             AgeGroupDictionary ageGroupDictionary = AgeGroupDictionary.builder()
@@ -208,7 +210,7 @@ class AgeGroupDictionaryControllerIntegrationTest {
         }
 
         @Test
-        @DisplayName("GET /ageGroupDictionarys/{id} with unknown ID -> returns 404")
+        @DisplayName("GET /ageGroupDictionaries/{id} with unknown ID -> returns 404")
         void getByIdValidationError() throws Exception {
             String jsonResponse = mvc.perform(
                             get(API + "/999999")
@@ -237,7 +239,7 @@ class AgeGroupDictionaryControllerIntegrationTest {
     class UpdateTests {
 
         @Test
-        @DisplayName("PUT /ageGroupDictionarys -> updates and returns the AgeGroupDictionary")
+        @DisplayName("PUT /ageGroupDictionaries -> updates and returns the AgeGroupDictionary")
         void update() throws Exception {
 
             AgeGroupDictionary ageGroupDictionary = AgeGroupDictionary.builder()
@@ -283,7 +285,7 @@ class AgeGroupDictionaryControllerIntegrationTest {
         }
 
         @Test
-        @DisplayName("PUT /ageGroupDictionarys with invalid id -> returns 404")
+        @DisplayName("PUT /ageGroupDictionaries with invalid id -> returns 404")
         void updateValidationError() throws Exception {
 
             String updateRequest = """
@@ -324,14 +326,16 @@ class AgeGroupDictionaryControllerIntegrationTest {
     class DeleteTests {
 
         @Test
-        @DisplayName("DELETE /ageGroupDictionarys/{id} -> deletes the AgeGroupDictionary")
+        @DisplayName("DELETE /ageGroupDictionaries/{id} -> deletes the AgeGroupDictionary")
         void delete() throws Exception {
 
             AgeGroupDictionary ageGroupDictionary = AgeGroupDictionary.builder()
-                    .name("ageGroup")
+                    .name("ageGroup11")
                     .description("other description")
                     .build();
             ageGroupDictionary.markAsNew(true);
+
+            ageGroupDictionaryRepository.save(ageGroupDictionary);
 
             String jsonResponse = mvc.perform(
                             MockMvcRequestBuilders.delete(API + "/" + ageGroupDictionary.getId())
@@ -356,7 +360,7 @@ class AgeGroupDictionaryControllerIntegrationTest {
         }
 
         @Test
-        @DisplayName("DELETE /ageGroupDictionarys/{id} with unknown ID -> returns 404")
+        @DisplayName("DELETE /ageGroupDictionaries/{id} with unknown ID -> returns 404")
         void deleteValidationError() throws Exception {
             String jsonResponse = mvc.perform(
                             MockMvcRequestBuilders.delete(API + "/999999")

@@ -333,6 +333,8 @@ class ResourceTypeDictionaryControllerIntegrationTest {
                     .build();
             resourceTypeDictionary.markAsNew(true);
 
+            resourceTypeDictionaryRepository.save(resourceTypeDictionary);
+
             String jsonResponse = mvc.perform(
                             MockMvcRequestBuilders.delete(API + "/" + resourceTypeDictionary.getId())
                                     .with(httpBasic("biolab", "biolab"))

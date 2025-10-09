@@ -333,6 +333,8 @@ class DataSourceTypeDictionaryControllerIntegrationTest {
                     .build();
             dataSourceTypeDictionary.markAsNew(true);
 
+            dataSourceTypeDictionaryRepository.save(dataSourceTypeDictionary);
+
             String jsonResponse = mvc.perform(
                             MockMvcRequestBuilders.delete(API + "/" + dataSourceTypeDictionary.getId())
                                     .with(httpBasic("biolab", "biolab"))

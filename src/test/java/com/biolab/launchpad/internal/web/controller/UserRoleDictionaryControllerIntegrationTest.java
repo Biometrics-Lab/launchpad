@@ -333,6 +333,8 @@ class UserRoleDictionaryControllerIntegrationTest {
                     .build();
             userRoleDictionary.markAsNew(true);
 
+            userRoleDictionaryRepository.save(userRoleDictionary);
+
             String jsonResponse = mvc.perform(
                             MockMvcRequestBuilders.delete(API + "/" + userRoleDictionary.getId())
                                     .with(httpBasic("biolab", "biolab"))

@@ -333,6 +333,8 @@ class SportDictionaryControllerIntegrationTest {
                     .build();
             sportDictionary.markAsNew(true);
 
+            sportDictionaryRepository.save(sportDictionary);
+
             String jsonResponse = mvc.perform(
                             MockMvcRequestBuilders.delete(API + "/" + sportDictionary.getId())
                                     .with(httpBasic("biolab", "biolab"))
