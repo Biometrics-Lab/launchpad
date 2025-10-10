@@ -6,14 +6,14 @@ import lombok.Builder;
 @Builder
 public record AssessmentMetricDto(
         Integer id,
-        @NotNull(message = "Assesment_metric assessment_id cannot be null")
-        Integer assessment_id,
-        @NotNull(message = "Assesment_metric metric_id cannot be null")
-        Integer metric_id,
-        @NotNull(message = "Assesment_metric source_id cannot be null")
-        Integer source_id,
-        Number min_value,
-        Number max_value,
-        Number avg_value,
-        Number last_value
+        @NotNull(message = "AssesmentMetric assessmentId cannot be null")
+        Integer assessmentId,
+        @NotNull(message = "AssesmentMetric metricId cannot be null")
+        Integer metricId,
+        @NotNull(message = "AssesmentMetric sourceId cannot be null")
+        Integer sourceId,
+        Number minValue,
+        Number maxValue,
+        Number avgValue,
+        Number lastValue
 ){}

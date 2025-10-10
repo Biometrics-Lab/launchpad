@@ -18,7 +18,7 @@ import static com.biolab.launchpad.internal.web.mapper.SessionResourceMapper.ses
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/session_resources")
+@RequestMapping("/api/v1/sessionResources")
 @Log4j2
 public class SessionResourceController {
 
@@ -41,8 +41,8 @@ public class SessionResourceController {
         if (session_resourceOptional.isPresent()) {
             return session_resourceOptional.get();
         } else {
-            log.warn("Could not find session_resource with id {}", id);
-            throw new NotFoundByException("Session_resource not found by id: %d", id);
+            log.warn("Could not find sessionResource with id {}", id);
+            throw new NotFoundByException("SessionResource not found by id: %d", id);
         }
     }
 

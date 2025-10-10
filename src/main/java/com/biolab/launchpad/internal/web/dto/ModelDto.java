@@ -8,7 +8,7 @@ public record ModelDto (
         Integer id,
         @NotNull(message = "Model sport cannot be null")
         String sport,
-        @NotNull(message = "Model age_group cannot be null")
-        String age_group,
+        @NotNull(message = "Model ageGroup cannot be null")
+        String ageGroup,
         String description
 ){}

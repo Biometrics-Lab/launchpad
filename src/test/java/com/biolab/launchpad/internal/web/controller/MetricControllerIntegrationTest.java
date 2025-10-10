@@ -1,6 +1,5 @@
 package com.biolab.launchpad.internal.web.controller;
 
-import com.biolab.launchpad.internal.repository.MeasurementRepository;
 import com.biolab.launchpad.internal.repository.MetricRepository;
 import com.biolab.launchpad.internal.repository.model.Measurement;
 import com.biolab.launchpad.internal.repository.model.Metric;
@@ -28,7 +27,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @DisplayName("MetricController Integration Tests")
-class MetricControllerIntegrationTest {
+class MetricControllerIntegrationTest{
 
     private static final String API = "/api/v1/metrics";
 
@@ -39,25 +38,22 @@ class MetricControllerIntegrationTest {
     ObjectMapper objectMapper;
 
     @Autowired
-    MeasurementRepository measurementRepository;
-    @Autowired
     MetricRepository metricRepository;
+
+    @Autowired
+    EntityFactory factory;
 
     Measurement mph;
 
     @BeforeEach
     void setUp() {
-        mph = measurementRepository.save(
-                Measurement.builder()
-                        .name("Mph")
-                        .build()
-        );
+        mph = factory.createMeasurement("Mph");
     }
 
     @AfterEach
     void tearDown() {
         metricRepository.deleteAll();
-        measurementRepository.deleteAll();
+        factory.cleanup();
     }
 
     @Nested
@@ -68,7 +64,7 @@ class MetricControllerIntegrationTest {
         void create() throws Exception {
 
             String request =
-                    """ 
+                            """ 
                                 {
                                     "name"         : "avg_exit_velocity",
                                     "measurementId": %d,
@@ -93,14 +89,14 @@ class MetricControllerIntegrationTest {
 
 
             String expectedResponse =
-                    """ 
-                            {
+                                    """ 
+                                    {
                                         "id"           : %d,
                                         "name"         : "avg_exit_velocity",
                                         "measurementId": %d,
                                         "negate"       : false
                                     }
-                            """.formatted(metricId, mph.getId());
+                                    """.formatted(metricId, mph.getId());
 
             JsonNode expectedResponseNode = objectMapper.readTree(expectedResponse);
 
@@ -112,9 +108,9 @@ class MetricControllerIntegrationTest {
         void createValidationError() throws Exception {
 
             String request =
-                    """ 
+                            """
                                 {
-                                    "negate"       : true
+                                    "negate" : true
                                 }
                             """;
 
@@ -131,10 +127,10 @@ class MetricControllerIntegrationTest {
             JsonNode responseNode = objectMapper.readTree(jsonResponse);
 
             String expectedResponse =
-                    """ 
+                            """
                             {
-                                "status"       : 422,
-                                "message"        : "Validation failed: measurementId: Measurement ID cannot be null, and name: Name cannot be blank"
+                                "status"  : 422,
+                                "message" : "Validation failed: measurementId: MeasurementId cannot be null, and name: Name cannot be blank"
                             }
                             """;
 
@@ -172,21 +168,21 @@ class MetricControllerIntegrationTest {
                     .andReturn().getResponse().getContentAsString();
 
             String expectedResponse = """
-                [
-                    {
-                        "id"           : %d,
-                        "name"         : "avg_exit_velocity",
-                        "measurementId": %d,
-                        "negate"       : false
-                    },
-                    {
-                        "id"           : %d,
-                        "name"         : "max_entry_velocity",
-                        "measurementId": %d,
-                        "negate"       : true
-                    }
-                ]
-                """.formatted(metric1.getId(), mph.getId(), metric2.getId(), mph.getId());
+                    [
+                        {
+                            "id"           : %d,
+                            "name"         : "avg_exit_velocity",
+                            "measurementId": %d,
+                            "negate"       : false
+                        },
+                        {
+                            "id"           : %d,
+                            "name"         : "max_entry_velocity",
+                            "measurementId": %d,
+                            "negate"       : true
+                        }
+                    ]
+                    """.formatted(metric1.getId(), mph.getId(), metric2.getId(), mph.getId());
 
             JsonNode expectedNode = objectMapper.readTree(expectedResponse);
             JsonNode actualNode   = objectMapper.readTree(jsonResponse);
@@ -212,13 +208,13 @@ class MetricControllerIntegrationTest {
                     .andReturn().getResponse().getContentAsString();
 
             String expectedResponse = """
-                {
-                    "id"           : %d,
-                    "name"         : "avg_exit_velocity",
-                    "measurementId": %d,
-                    "negate"       : false
-                }
-                """.formatted(metric.getId(), mph.getId());
+                    {
+                        "id"           : %d,
+                        "name"         : "avg_exit_velocity",
+                        "measurementId": %d,
+                        "negate"       : false
+                    }
+                    """.formatted(metric.getId(), mph.getId());
 
             JsonNode expectedNode = objectMapper.readTree(expectedResponse);
             JsonNode actualNode   = objectMapper.readTree(jsonResponse);
@@ -237,11 +233,11 @@ class MetricControllerIntegrationTest {
                     .andReturn().getResponse().getContentAsString();
 
             String expectedResponse = """
-                {
-                    "status" : 404,
-                    "message": "Metric not found by id: 999999"
-                }
-                """;
+                    {
+                        "status" : 404,
+                        "message": "Metric not found by id: 999999"
+                    }
+                    """;
 
             JsonNode expectedNode = objectMapper.readTree(expectedResponse);
             JsonNode actualNode   = objectMapper.readTree(jsonResponse);
@@ -265,13 +261,13 @@ class MetricControllerIntegrationTest {
                     .build());
 
             String updateRequest = """
-                {
-                    "id"            : %d,
-                    "name"          : "updated_velocity",
-                    "measurementId" : %d,
-                    "negate"        : false
-                }
-                """.formatted(original.getId(), mph.getId());
+                    {
+                        "id"            : %d,
+                        "name"          : "updated_velocity",
+                        "measurementId" : %d,
+                        "negate"        : false
+                    }
+                    """.formatted(original.getId(), mph.getId());
 
             String jsonResponse = mvc.perform(
                             put(API)
@@ -285,13 +281,13 @@ class MetricControllerIntegrationTest {
             JsonNode responseNode = objectMapper.readTree(jsonResponse);
 
             String expectedResponse = """
-                {
-                    "id"           : %d,
-                    "name"         : "updated_velocity",
-                    "measurementId": %d,
-                    "negate"       : false
-                }
-                """.formatted(original.getId(), mph.getId());
+                    {
+                        "id"           : %d,
+                        "name"         : "updated_velocity",
+                        "measurementId": %d,
+                        "negate"       : false
+                    }
+                    """.formatted(original.getId(), mph.getId());
 
             JsonNode expectedNode = objectMapper.readTree(expectedResponse);
 
@@ -308,12 +304,12 @@ class MetricControllerIntegrationTest {
         void updateValidationError() throws Exception {
 
             String updateRequest = """
-                {
-                    "id"            : 999999,
-                    "name"          : "updated_velocity",
-                    "measurementId": %d
-                }
-                """.formatted(mph.getId());
+                    {
+                        "id"            : 999999,
+                        "name"          : "updated_velocity",
+                        "measurementId": %d
+                    }
+                    """.formatted(mph.getId());
 
             String jsonResponse = mvc.perform(
                             put(API)
@@ -326,11 +322,11 @@ class MetricControllerIntegrationTest {
 
 
             String expectedResponse = """
-                {
-                    "status" : 404,
-                    "message": "MetricService. Could not update Metric by id: 999999"
-                }
-                """;
+                    {
+                        "status" : 404,
+                        "message": "MetricService. Could not update Metric by id: 999999"
+                    }
+                    """;
 
             JsonNode expectedNode = objectMapper.readTree(expectedResponse);
             JsonNode actualNode   = objectMapper.readTree(jsonResponse);
@@ -362,11 +358,11 @@ class MetricControllerIntegrationTest {
                     .andReturn().getResponse().getContentAsString();
 
             String expectedResponse = """
-                {
-                    "status" : 200,
-                    "message": "Success"
-                }
-                """;
+                    {
+                        "status" : 200,
+                        "message": "Success"
+                    }
+                    """;
 
             JsonNode expectedNode = objectMapper.readTree(expectedResponse);
             JsonNode actualNode   = objectMapper.readTree(jsonResponse);
@@ -387,11 +383,11 @@ class MetricControllerIntegrationTest {
                     .andReturn().getResponse().getContentAsString();
 
             String expectedResponse = """
-                {
-                    "status" : 404,
-                    "message": "MetricService. Could not delete id: 999999"
-                }
-                """;
+                    {
+                        "status" : 404,
+                        "message": "MetricService. Could not delete id: 999999"
+                    }
+                    """;
 
             JsonNode expectedNode = objectMapper.readTree(expectedResponse);
             JsonNode actualNode   = objectMapper.readTree(jsonResponse);
@@ -399,5 +395,4 @@ class MetricControllerIntegrationTest {
             assertEquals(expectedNode, actualNode);
         }
     }
-
 }

@@ -5,14 +5,16 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Data;
 
+import java.time.LocalDate;
+
 @Builder
 public record PlayerDto(
         Integer id,
         @NotBlank(message = "Name cannot be blank")
         String name,
-        Integer graduation_year,
-        @NotNull(message = "Player team_id cannot be null")
-        Integer team_id,
-        Data dob
+        Integer graduationYear,
+        @NotNull(message = "Player teamId cannot be null")
+        Integer teamId,
+        LocalDate dob
 ) { }
 

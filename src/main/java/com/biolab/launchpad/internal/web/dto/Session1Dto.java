@@ -8,9 +8,9 @@ import java.sql.Timestamp;
 @Builder
 public record Session1Dto(
         Integer id,
-        @NotNull(message = "Session assessment_id cannot be null")
-        Integer assessment_id,
-        @NotNull(message = "Session start_time cannot be null")
-        Timestamp start_time
+        @NotNull(message = "Session assessmentId cannot be null")
+        Integer assessmentId,
+        @NotNull(message = "Session startTime cannot be null")
+        Timestamp startTime
 ) { }
 

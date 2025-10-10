@@ -12,7 +12,7 @@ import org.springframework.data.relational.core.mapping.Table;
 @NoArgsConstructor
 @Table("data_source")
 public class DataSource extends IDName {
-    @NotNull(message = "Data_source type cannot be null")
+    @NotNull(message = "DataSource type cannot be null")
     private String type;
     private String description;
 }

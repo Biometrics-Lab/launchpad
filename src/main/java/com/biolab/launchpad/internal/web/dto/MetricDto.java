@@ -9,7 +9,7 @@ public record MetricDto(
         Integer id,
         @NotBlank(message = "Name cannot be blank")
         String name,
-        @NotNull(message = "Measurement ID cannot be null")
+        @NotNull(message = "MeasurementId cannot be null")
         Integer measurementId,
         boolean negate
 ) { }

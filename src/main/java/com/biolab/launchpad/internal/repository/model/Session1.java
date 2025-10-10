@@ -4,6 +4,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
+import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
 import java.sql.Timestamp;
@@ -13,8 +14,10 @@ import java.sql.Timestamp;
 @NoArgsConstructor
 @Table("session1")
 public class Session1 extends ID {
-    @NotNull(message = "Session assessment_id cannot be null")
-    private Integer assessment_id;
-    @NotNull(message = "Session start_time cannot be null")
-    private Timestamp start_time;
+    @NotNull(message = "Session assessmentId cannot be null")
+    @Column("assessment_id")
+    private Integer assessmentId;
+    @NotNull(message = "Session startTime cannot be null")
+    @Column("start_time")
+    private Timestamp startTime;
 }

@@ -18,7 +18,7 @@ import static com.biolab.launchpad.internal.web.mapper.AssessmentResourceMapper.
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/assessment_resources")
+@RequestMapping("/api/v1/assessmentResources")
 @Log4j2
 public class AssessmentResourceController {
 
@@ -41,8 +41,8 @@ public class AssessmentResourceController {
         if (assessment_resourceOptional.isPresent()) {
             return assessment_resourceOptional.get();
         } else {
-            log.warn("Could not find assessment_resource with id {}", id);
-            throw new NotFoundByException("Assessment_resource not found by id: %d", id);
+            log.warn("Could not find assessmentResource with id {}", id);
+            throw new NotFoundByException("AssessmentResource not found by id: %d", id);
         }
     }
 

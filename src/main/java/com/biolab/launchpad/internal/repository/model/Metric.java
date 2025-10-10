@@ -11,7 +11,7 @@ import org.springframework.data.relational.core.mapping.Table;
 @NoArgsConstructor
 @Table("metric")
 public class Metric extends IDName {
-    @NotNull(message = "Measurement ID cannot be null")
+    @NotNull(message = "MeasurementId cannot be null")
     private Integer measurementId;
     private boolean negate;
 }

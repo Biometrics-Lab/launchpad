@@ -9,8 +9,8 @@ public record TeamDto(
         Integer id,
         @NotBlank(message = "Name cannot be blank")
         String name,
-        @NotNull(message = "Team organisation_id cannot be null")
-        Integer organisation_id,
+        @NotNull(message = "Team organisationId cannot be null")
+        Integer organisationId,
         @NotNull(message = "Team sport cannot be null")
         String sport,
         String description

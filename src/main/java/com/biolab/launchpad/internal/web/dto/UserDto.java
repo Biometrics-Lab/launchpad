@@ -10,5 +10,5 @@ public record UserDto(
         @NotBlank(message = "Name cannot be blank")
         String name,
         @NotNull(message = "User role cannot be null")
-        Integer role
+        String role
 ){}

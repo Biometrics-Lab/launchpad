@@ -9,7 +9,7 @@ public record DataSourceDto(
         Integer id,
         @NotBlank(message = "Name cannot be blank")
         String name,
-        @NotNull(message = "Data_source type cannot be null")
+        @NotNull(message = "DataSource type cannot be null")
         String type,
         String description
 ){}

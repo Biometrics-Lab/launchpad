@@ -52,7 +52,7 @@ class MeasurementControllerIntegrationTest {
         void create() throws Exception {
 
             String request =
-                    """ 
+                    """
                                 {
                                     "name" : "launch_angle"
                                 }
@@ -74,10 +74,10 @@ class MeasurementControllerIntegrationTest {
 
 
             String expectedResponse =
-                    """ 
+                    """
                             {
-                                        "id"           : %d,
-                                        "name"         : "launch_angle"
+                                        "id"     : %d,
+                                        "name"   : "launch_angle"
                                     }
                             """.formatted(measurementId);
 
@@ -150,12 +150,12 @@ class MeasurementControllerIntegrationTest {
             String expectedResponse = """
                 [
                     {
-                        "id"           : %d,
-                        "name"         : "avg_launch_angle"
+                        "id"     : %d,
+                        "name"   : "avg_launch_angle"
                     },
                     {
-                        "id"           : %d,
-                        "name"         : "max_launch_angle"
+                        "id"     : %d,
+                        "name"   : "max_launch_angle"
                     }
                 ]
                 """.formatted(measurement1.getId(), measurement2.getId());
@@ -183,8 +183,8 @@ class MeasurementControllerIntegrationTest {
 
             String expectedResponse = """
                 {
-                    "id"           : %d,
-                    "name"         : "launch_angle"
+                    "id"     : %d,
+                    "name"   : "launch_angle"
                 }
                 """.formatted(measurement.getId());
 
@@ -232,8 +232,8 @@ class MeasurementControllerIntegrationTest {
 
             String updateRequest = """
                 {
-                    "id"            : %d,
-                    "name"          : "updated_launch_angle"
+                    "id"      : %d,
+                    "name"    : "updated_launch_angle"
                 }
                 """.formatted(original.getId());
 
@@ -250,8 +250,8 @@ class MeasurementControllerIntegrationTest {
 
             String expectedResponse = """
                 {
-                    "id"           : %d,
-                    "name"         : "updated_launch_angle"
+                    "id"     : %d,
+                    "name"   : "updated_launch_angle"
                 }
                 """.formatted(original.getId());
 
@@ -270,8 +270,8 @@ class MeasurementControllerIntegrationTest {
 
             String updateRequest = """
                 {
-                    "id"            : 999999,
-                    "name"          : "updated_launch_angle"
+                    "id"      : 999999,
+                    "name"    : "updated_launch_angle"
                 }
                 """;
 
@@ -357,7 +357,4 @@ class MeasurementControllerIntegrationTest {
             assertEquals(expectedNode, actualNode);
         }
     }
-
-
-
 }

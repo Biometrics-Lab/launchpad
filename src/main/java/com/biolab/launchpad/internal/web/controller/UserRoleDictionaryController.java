@@ -18,7 +18,7 @@ import static com.biolab.launchpad.internal.web.mapper.UserRoleDictionaryMapper.
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/user_role_dictionarys")
+@RequestMapping("/api/v1/userRoleDictionaries")
 @Log4j2
 public class UserRoleDictionaryController {
 
@@ -41,8 +41,8 @@ public class UserRoleDictionaryController {
         if (userRoleDictionaryOptional.isPresent()) {
             return userRoleDictionaryOptional.get();
         } else {
-            log.warn("Could not find user_role_dictionary with id {}", id);
-            throw new NotFoundByException("User_role_dictionary not found by id: %d", id);
+            log.warn("Could not find userRoleDictionary with id {}", id);
+            throw new NotFoundByException("UserRoleDictionary not found by id: %s", id);
         }
     }
 

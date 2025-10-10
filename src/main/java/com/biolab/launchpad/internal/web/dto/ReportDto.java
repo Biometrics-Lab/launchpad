@@ -8,6 +8,6 @@ public record ReportDto(
         Integer id,
         @NotBlank(message = "Name cannot be blank")
         String name,
-        String ext_ref
+        String extRef
 ) { }
 

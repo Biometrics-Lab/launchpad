@@ -6,10 +6,10 @@ import lombok.Builder;
 @Builder
 public record AssessmentResourceDto(
         Integer id,
-        @NotNull(message = "Assessment_resource assessment_id cannot be null")
-        Integer assessment_id,
-        @NotNull(message = "Assessment_resource type cannot be null")
+        @NotNull(message = "AssessmentResource assessmentId cannot be null")
+        Integer assessmentId,
+        @NotNull(message = "AssessmentResource type cannot be null")
         String type,
-        @NotNull(message = "Assessment_resource url cannot be null")
+        @NotNull(message = "AssessmentResource url cannot be null")
         String url
 ){}

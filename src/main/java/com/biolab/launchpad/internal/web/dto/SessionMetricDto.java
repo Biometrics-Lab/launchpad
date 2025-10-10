@@ -6,12 +6,12 @@ import lombok.Builder;
 @Builder
 public record SessionMetricDto(
         Integer id,
-        @NotNull(message = "session_metric session_id cannot be null")
-        Integer session_id,
-        @NotNull(message = "session_metric metric_id cannot be null")
-        Integer metric_id,
-        Number min_value,
-        Number max_value,
-        Number avg_value
+        @NotNull(message = "SessionMetric sessionId cannot be null")
+        Integer session1Id,
+        @NotNull(message = "SessionMetric metricId cannot be null")
+        Integer metricId,
+        Number minValue,
+        Number maxValue,
+        Number avgValue
 ) { }
 

@@ -6,8 +6,8 @@ import lombok.Builder;
 @Builder
 public record UserPlayerDto(
         Integer id,
-        @NotNull(message = "User_player user_id cannot be null")
-        Integer user_id,
-        @NotNull(message = "User_player player_id cannot be null")
-        Integer player_id
+        @NotNull(message = "UserPlayer userId cannot be null")
+        Integer userId,
+        @NotNull(message = "UserPlayer playerId cannot be null")
+        Integer playerId
 ){}

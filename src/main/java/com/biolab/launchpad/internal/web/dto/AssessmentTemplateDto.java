@@ -10,7 +10,7 @@ public record AssessmentTemplateDto(
         Integer id,
         @NotBlank(message = "Name cannot be blank")
         String name,
-        @NotNull(message = "Assessment_template sport cannot be null")
+        @NotNull(message = "AssessmentTemplate sport cannot be null")
         String sport,
-        Text description
+        String description
 ){}

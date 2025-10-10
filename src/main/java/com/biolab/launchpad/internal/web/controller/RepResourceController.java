@@ -18,7 +18,7 @@ import static com.biolab.launchpad.internal.web.mapper.RepResourceMapper.repReso
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/rep_resources")
+@RequestMapping("/api/v1/repResources")
 @Log4j2
 public class RepResourceController {
 
@@ -41,8 +41,8 @@ public class RepResourceController {
         if (rep_resourceOptional.isPresent()) {
             return rep_resourceOptional.get();
         } else {
-            log.warn("Could not find rep_resource with id {}", id);
-            throw new NotFoundByException("Rep_resource not found by id: %d", id);
+            log.warn("Could not find repResource with id {}", id);
+            throw new NotFoundByException("RepResource not found by id: %d", id);
         }
     }
 

@@ -18,7 +18,7 @@ import static com.biolab.launchpad.internal.web.mapper.AssessmentMetricMapper.as
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/assessment_metrics")
+@RequestMapping("/api/v1/assessmentMetrics")
 @Log4j2
 public class AssessmentMetricController {
 
@@ -42,7 +42,7 @@ public class AssessmentMetricController {
             return assessment_metricOptional.get();
         } else {
             log.warn("Could not find assessment_metric with id {}", id);
-            throw new NotFoundByException("Assessment_metric not found by id: %d", id);
+            throw new NotFoundByException("AssessmentMetric not found by id: %d", id);
         }
     }
 

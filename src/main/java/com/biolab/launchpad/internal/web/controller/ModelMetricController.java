@@ -18,7 +18,7 @@ import static com.biolab.launchpad.internal.web.mapper.ModelMetricMapper.modelMe
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/model_metrics")
+@RequestMapping("/api/v1/modelMetrics")
 @Log4j2
 public class ModelMetricController {
 
@@ -41,8 +41,8 @@ public class ModelMetricController {
         if (model_metricOptional.isPresent()) {
             return model_metricOptional.get();
         } else {
-            log.warn("Could not find model_metric with id {}", id);
-            throw new NotFoundByException("Model_metric not found by id: %d", id);
+            log.warn("Could not find modelMetric with id {}", id);
+            throw new NotFoundByException("ModelMetric not found by id: %d", id);
         }
     }
 
