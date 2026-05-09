@@ -3,7 +3,6 @@ package com.biolab.launchpad.internal.web.dto;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
-import org.w3c.dom.Text;
 
 @Builder
 public record AssessmentTemplateDto(
