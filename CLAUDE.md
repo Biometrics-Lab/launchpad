@@ -7,6 +7,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - Before starting any ticket, fetch it from Notion and check the **"Blocked by"** relation property. If any blocker is not Done, tell the user which tickets must be completed first and do not start implementation.
 - Always create a new branch from `develop` when starting a ticket. Branch format: `feature/BL-{ticket-number}-ticket-name` (e.g. `feature/BL-59-condition-conditionalmetric`).
 - Before creating the branch: check for uncommitted changes (`git status`). If any exist — stop and tell the user. If clean: `git checkout develop` → `git pull` → `git checkout -b feature/BL-{ticket-number}-ticket-name`.
+- Before declaring a ticket done: re-fetch it from Notion, go through every checklist item one by one, confirm each is complete. Only report done when every checkbox is verified.
 
 ## Commands
 

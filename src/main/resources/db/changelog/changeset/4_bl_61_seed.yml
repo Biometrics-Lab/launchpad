@@ -1,0 +1,113 @@
+databaseChangeLog:
+  - changeSet:
+      id: 4-BL-61-seed-blast-motion
+      author: roman.vakulenko
+      changes:
+        # ensure 'Baseball' sport exists (name is PK — safe ON CONFLICT)
+        - sql:
+            sql: |
+              INSERT INTO sport_dictionary (name, description)
+              VALUES ('Baseball', 'Baseball sport')
+              ON CONFLICT (name) DO NOTHING
+
+        # ensure 'Hitting from T' condition exists
+        - sql:
+            sql: |
+              INSERT INTO condition (name, sport)
+              SELECT 'Hitting from T', 'Baseball'
+              WHERE NOT EXISTS (SELECT 1 FROM condition WHERE name = 'Hitting from T')
+
+        # measurements
+        - sql:
+            sql: |
+              INSERT INTO measurement (name)
+              SELECT 'Velocity' WHERE NOT EXISTS (SELECT 1 FROM measurement WHERE name = 'Velocity')
+        - sql:
+            sql: |
+              INSERT INTO measurement (name)
+              SELECT 'Angle' WHERE NOT EXISTS (SELECT 1 FROM measurement WHERE name = 'Angle')
+        - sql:
+            sql: |
+              INSERT INTO measurement (name)
+              SELECT 'Duration' WHERE NOT EXISTS (SELECT 1 FROM measurement WHERE name = 'Duration')
+
+        # metrics
+        - sql:
+            sql: |
+              INSERT INTO metric (name, measurement_id, negate)
+              SELECT 'Bat Speed', (SELECT id FROM measurement WHERE name = 'Velocity'), false
+              WHERE NOT EXISTS (SELECT 1 FROM metric WHERE name = 'Bat Speed')
+        - sql:
+            sql: |
+              INSERT INTO metric (name, measurement_id, negate)
+              SELECT 'Attack Angle', (SELECT id FROM measurement WHERE name = 'Angle'), false
+              WHERE NOT EXISTS (SELECT 1 FROM metric WHERE name = 'Attack Angle')
+        - sql:
+            sql: |
+              INSERT INTO metric (name, measurement_id, negate)
+              SELECT 'Time to Impact', (SELECT id FROM measurement WHERE name = 'Duration'), false
+              WHERE NOT EXISTS (SELECT 1 FROM metric WHERE name = 'Time to Impact')
+
+        # integration
+        - sql:
+            sql: |
+              INSERT INTO integration (name)
+              SELECT 'Blast Motion' WHERE NOT EXISTS (SELECT 1 FROM integration WHERE name = 'Blast Motion')
+
+        # conditional_metrics
+        - sql:
+            sql: |
+              INSERT INTO conditional_metric (name, condition_id, metric_id)
+              SELECT 'Bat Speed',
+                (SELECT id FROM condition WHERE name = 'Hitting from T'),
+                (SELECT id FROM metric WHERE name = 'Bat Speed')
+              WHERE NOT EXISTS (SELECT 1 FROM conditional_metric WHERE name = 'Bat Speed'
+                AND metric_id = (SELECT id FROM metric WHERE name = 'Bat Speed'))
+        - sql:
+            sql: |
+              INSERT INTO conditional_metric (name, condition_id, metric_id)
+              SELECT 'Attack Angle',
+                (SELECT id FROM condition WHERE name = 'Hitting from T'),
+                (SELECT id FROM metric WHERE name = 'Attack Angle')
+              WHERE NOT EXISTS (SELECT 1 FROM conditional_metric WHERE name = 'Attack Angle'
+                AND metric_id = (SELECT id FROM metric WHERE name = 'Attack Angle'))
+        - sql:
+            sql: |
+              INSERT INTO conditional_metric (name, condition_id, metric_id)
+              SELECT 'Time to Impact',
+                (SELECT id FROM condition WHERE name = 'Hitting from T'),
+                (SELECT id FROM metric WHERE name = 'Time to Impact')
+              WHERE NOT EXISTS (SELECT 1 FROM conditional_metric WHERE name = 'Time to Impact'
+                AND metric_id = (SELECT id FROM metric WHERE name = 'Time to Impact'))
+
+        # data_sources (one per Blast Motion metric)
+        - sql:
+            sql: |
+              INSERT INTO data_source (type, integration_id, metric_id, content)
+              SELECT 'JSON_CONFIG',
+                (SELECT id FROM integration WHERE name = 'Blast Motion'),
+                (SELECT id FROM metric WHERE name = 'Bat Speed'),
+                '{"path": "$.batSpeed"}'
+              WHERE NOT EXISTS (SELECT 1 FROM data_source
+                WHERE integration_id = (SELECT id FROM integration WHERE name = 'Blast Motion')
+                AND metric_id = (SELECT id FROM metric WHERE name = 'Bat Speed'))
+        - sql:
+            sql: |
+              INSERT INTO data_source (type, integration_id, metric_id, content)
+              SELECT 'JSON_CONFIG',
+                (SELECT id FROM integration WHERE name = 'Blast Motion'),
+                (SELECT id FROM metric WHERE name = 'Attack Angle'),
+                '{"path": "$.attackAngle"}'
+              WHERE NOT EXISTS (SELECT 1 FROM data_source
+                WHERE integration_id = (SELECT id FROM integration WHERE name = 'Blast Motion')
+                AND metric_id = (SELECT id FROM metric WHERE name = 'Attack Angle'))
+        - sql:
+            sql: |
+              INSERT INTO data_source (type, integration_id, metric_id, content)
+              SELECT 'JSON_CONFIG',
+                (SELECT id FROM integration WHERE name = 'Blast Motion'),
+                (SELECT id FROM metric WHERE name = 'Time to Impact'),
+                '{"path": "$.timeToContact"}'
+              WHERE NOT EXISTS (SELECT 1 FROM data_source
+                WHERE integration_id = (SELECT id FROM integration WHERE name = 'Blast Motion')
+                AND metric_id = (SELECT id FROM metric WHERE name = 'Time to Impact'))
