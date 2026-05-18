@@ -132,8 +132,8 @@ class PlayerControllerIntegrationTest {
             String expectedResponse =
                     """
                             {
-                                "status"       : 422,
-                                "message"        : "Validation failed: name: Name cannot be blank, and teamId: Player teamId cannot be null"
+                                "status"  : 422,
+                                "message" : "Validation failed: name: Name cannot be blank"
                             }
                             """;
 
@@ -318,9 +318,10 @@ class PlayerControllerIntegrationTest {
 
             String updateRequest = """
                 {
-                    "id"            : 999999,
-                    "name"          : "upd",
-                    "teamId"        : %d
+                    "id"             : 999999,
+                    "name"           : "upd",
+                    "teamId"         : %d,
+                    "graduationYear" : 2020
                 }
                 """.formatted(team.getId());
 
