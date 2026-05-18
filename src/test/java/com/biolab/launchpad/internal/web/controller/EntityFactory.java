@@ -31,6 +31,8 @@ public class EntityFactory {
     private final Session1Repository                 session1Repository;
     private final RepRepository                      repRepository;
     private final RepMetricRepository                repMetricRepository;
+    private final ConditionRepository                conditionRepository;
+    private final ConditionalMetricRepository        conditionalMetricRepository;
 
     public Measurement createMeasurement(String name) {
 
@@ -245,19 +247,43 @@ public class EntityFactory {
         );
     }
 
+    public Condition createCondition(String name) {
+        SportDictionary sportDictionary = createSportDictionary("AutoSport");
+        return conditionRepository.save(
+                Condition.builder()
+                        .name(name)
+                        .sport(sportDictionary.getId())
+                        .build()
+        );
+    }
+
+    public ConditionalMetric createConditionalMetric() {
+        Condition condition = createCondition("AutoCondition");
+        Metric metric       = createMetric("AutoMetric");
+        return conditionalMetricRepository.save(
+                ConditionalMetric.builder()
+                        .name("AutoConditionalMetric")
+                        .conditionId(condition.getId())
+                        .metricId(metric.getId())
+                        .build()
+        );
+    }
+
     public RepMetric createRepMetric() {
-        Rep rep       = createRep();
-        Metric metric = createMetric("AutoMetric");
+        Rep rep                               = createRep();
+        ConditionalMetric conditionalMetric   = createConditionalMetric();
         return repMetricRepository.save(
                 RepMetric.builder()
                         .repId(rep.getId())
-                        .metricId(metric.getId())
+                        .conditionalMetricId(conditionalMetric.getId())
                         .build()
         );
     }
 
     void cleanup() {
         repMetricRepository.deleteAll();
+        conditionalMetricRepository.deleteAll();
+        conditionRepository.deleteAll();
         repRepository.deleteAll();
         session1Repository.deleteAll();
         assessmentRepository.deleteAll();

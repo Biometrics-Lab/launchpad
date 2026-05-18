@@ -1,16 +1,13 @@
 package com.biolab.launchpad.internal.web.dto;
 
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 
 @Builder
-public record AssessmentTemplateDto(
+public record ConditionDto(
         Integer id,
         @NotBlank(message = "Name cannot be blank")
         String name,
-        @NotNull(message = "AssessmentTemplate sport cannot be null")
         String sport,
-        String description,
-        Integer conditionId
-){}
+        Integer templateId
+) {}

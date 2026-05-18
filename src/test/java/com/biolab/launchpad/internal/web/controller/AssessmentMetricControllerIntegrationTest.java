@@ -41,15 +41,15 @@ class AssessmentMetricControllerIntegrationTest {
     @Autowired
     EntityFactory factory;
 
-    Assessment assessment;
-    Metric     metric;
-    DataSource source;
+    Assessment        assessment;
+    ConditionalMetric conditionalMetric;
+    DataSource        source;
 
     @BeforeEach
     void setUp() {
-        assessment = factory.createAssessment();
-        metric     = factory.createMetric("height");
-        source     = factory.createDataSource("Dsource");
+        assessment        = factory.createAssessment();
+        conditionalMetric = factory.createConditionalMetric();
+        source            = factory.createDataSource("Dsource");
     }
 
     @AfterEach
@@ -62,21 +62,21 @@ class AssessmentMetricControllerIntegrationTest {
     @DisplayName("Create")
     class CreateTests {
         @Test
-        @DisplayName("POST /assessmentMetrics -> creates and returns the new Assessment")
+        @DisplayName("POST /assessmentMetrics -> creates and returns the new AssessmentMetric")
         void create() throws Exception {
 
             String request =
-                            """ 
+                            """
                                 {
-                                    "assessmentId" : %d,
-                                    "metricId"     : %d,
-                                    "sourceId"     : %d,
-                                    "minValue"     : 1,
-                                    "maxValue"     : 2,
-                                    "avgValue"     : 3,
-                                    "lastValue"    : 4
+                                    "assessmentId"        : %d,
+                                    "conditionalMetricId" : %d,
+                                    "sourceId"            : %d,
+                                    "minValue"            : 1,
+                                    "maxValue"            : 2,
+                                    "avgValue"            : 3,
+                                    "lastValue"           : 4
                                 }
-                            """.formatted(assessment.getId(), metric.getId(), source.getId());
+                            """.formatted(assessment.getId(), conditionalMetric.getId(), source.getId());
 
             String jsonResponse = mvc.perform(
                             post(API)
@@ -90,23 +90,23 @@ class AssessmentMetricControllerIntegrationTest {
 
             JsonNode responseNode = objectMapper.readTree(jsonResponse);
 
-            int assessmentId = responseNode.get("id").asInt();
-            assertThat(assessmentId).isPositive();
-
+            int id = responseNode.get("id").asInt();
+            assertThat(id).isPositive();
 
             String expectedResponse =
                                     """
                                       {
-                                        "id"           : %d,
-                                        "assessmentId" : %d,
-                                        "metricId"     : %d,
-                                        "sourceId"     : %d,
-                                        "minValue"     : 1,
-                                        "maxValue"     : 2,
-                                        "avgValue"     : 3,
-                                        "lastValue"    : 4
+                                        "id"                  : %d,
+                                        "assessmentId"        : %d,
+                                        "conditionalMetricId" : %d,
+                                        "sourceId"            : %d,
+                                        "minValue"            : 1,
+                                        "maxValue"            : 2,
+                                        "avgValue"            : 3,
+                                        "lastValue"           : 4,
+                                        "description"         : null
                                       }
-                                    """.formatted(assessmentId, assessment.getId(), metric.getId(), source.getId());
+                                    """.formatted(id, assessment.getId(), conditionalMetric.getId(), source.getId());
 
             JsonNode expectedResponseNode = objectMapper.readTree(expectedResponse);
 
@@ -114,7 +114,7 @@ class AssessmentMetricControllerIntegrationTest {
         }
 
         @Test
-        @DisplayName("POST /assessmentMetrics with validation message -> returns 422")
+        @DisplayName("POST /assessmentMetrics with validation error -> returns 422")
         void createValidationError() throws Exception {
             String request =
                             """
@@ -138,8 +138,8 @@ class AssessmentMetricControllerIntegrationTest {
             String expectedResponse =
                     """
                             {
-                                "status"       : 422,
-                                "message"      : "Validation failed: assessmentId: AssesmentMetric assessmentId cannot be null, and metricId: AssesmentMetric metricId cannot be null, and sourceId: AssesmentMetric sourceId cannot be null"
+                                "status"  : 422,
+                                "message" : "Validation failed: assessmentId: AssesmentMetric assessmentId cannot be null, and conditionalMetricId: AssesmentMetric conditionalMetricId cannot be null, and sourceId: AssesmentMetric sourceId cannot be null"
                             }
                             """;
 
@@ -159,7 +159,7 @@ class AssessmentMetricControllerIntegrationTest {
 
             AssessmentMetric assessmentMetric1 = assessmentMetricRepository.save(AssessmentMetric.builder()
                     .assessmentId(assessment.getId())
-                    .metricId(metric.getId())
+                    .conditionalMetricId(conditionalMetric.getId())
                     .sourceId(source.getId())
                     .minValue(1)
                     .maxValue(2)
@@ -169,14 +169,14 @@ class AssessmentMetricControllerIntegrationTest {
 
             AssessmentMetric assessmentMetric2 = assessmentMetricRepository.save(AssessmentMetric.builder()
                     .assessmentId(assessment.getId())
-                    .metricId(metric.getId())
+                    .conditionalMetricId(conditionalMetric.getId())
                     .sourceId(source.getId())
                     .minValue(5)
                     .maxValue(6)
                     .avgValue(7)
                     .lastValue(8)
                     .build());
-            
+
             String jsonResponse = mvc.perform(
                             get(API)
                                     .with(httpBasic("biolab", "biolab"))
@@ -187,27 +187,30 @@ class AssessmentMetricControllerIntegrationTest {
             String expectedResponse = """
                 [
                     {
-                        "id"           : %d,
-                        "assessmentId" : %d,
-                        "metricId"     : %d,
-                        "sourceId"     : %d,
-                        "minValue"     : 1,
-                        "maxValue"     : 2,
-                        "avgValue"     : 3,
-                        "lastValue"    : 4
+                        "id"                  : %d,
+                        "assessmentId"        : %d,
+                        "conditionalMetricId" : %d,
+                        "sourceId"            : %d,
+                        "minValue"            : 1,
+                        "maxValue"            : 2,
+                        "avgValue"            : 3,
+                        "lastValue"           : 4,
+                        "description"         : null
                     },
                     {
-                        "id"           : %d,
-                        "assessmentId" : %d,
-                        "metricId"     : %d,
-                        "sourceId"     : %d,
-                        "minValue"     : 5,
-                        "maxValue"     : 6,
-                        "avgValue"     : 7,
-                        "lastValue"    : 8
+                        "id"                  : %d,
+                        "assessmentId"        : %d,
+                        "conditionalMetricId" : %d,
+                        "sourceId"            : %d,
+                        "minValue"            : 5,
+                        "maxValue"            : 6,
+                        "avgValue"            : 7,
+                        "lastValue"           : 8,
+                        "description"         : null
                     }
                 ]
-                """.formatted(assessmentMetric1.getId(), assessment.getId(), metric.getId(), source.getId(), assessmentMetric2.getId(),assessment.getId(), metric.getId(), source.getId());
+                """.formatted(assessmentMetric1.getId(), assessment.getId(), conditionalMetric.getId(), source.getId(),
+                              assessmentMetric2.getId(), assessment.getId(), conditionalMetric.getId(), source.getId());
 
             JsonNode expectedNode = objectMapper.readTree(expectedResponse);
             JsonNode actualNode   = objectMapper.readTree(jsonResponse);
@@ -216,12 +219,12 @@ class AssessmentMetricControllerIntegrationTest {
         }
 
         @Test
-        @DisplayName("GET /assessmentMetrics/{id} -> returns assessment by ID")
+        @DisplayName("GET /assessmentMetrics/{id} -> returns assessmentMetric by ID")
         void getById() throws Exception {
 
             AssessmentMetric assessmentMetric = assessmentMetricRepository.save(AssessmentMetric.builder()
                     .assessmentId(assessment.getId())
-                    .metricId(metric.getId())
+                    .conditionalMetricId(conditionalMetric.getId())
                     .sourceId(source.getId())
                     .minValue(1)
                     .maxValue(2)
@@ -238,16 +241,17 @@ class AssessmentMetricControllerIntegrationTest {
 
             String expectedResponse = """
                                      {
-                                        "id"            : %d,
-                                         "assessmentId" : %d,
-                                         "metricId"     : %d,
-                                         "sourceId"     : %d,
-                                         "minValue"     : 1,
-                                         "maxValue"     : 2,
-                                         "avgValue"     : 3,
-                                         "lastValue"    : 4
+                                        "id"                  : %d,
+                                        "assessmentId"        : %d,
+                                        "conditionalMetricId" : %d,
+                                        "sourceId"            : %d,
+                                        "minValue"            : 1,
+                                        "maxValue"            : 2,
+                                        "avgValue"            : 3,
+                                        "lastValue"           : 4,
+                                        "description"         : null
                                      }
-                                    """.formatted(assessmentMetric.getId(), assessment.getId(), metric.getId(), source.getId());
+                                    """.formatted(assessmentMetric.getId(), assessment.getId(), conditionalMetric.getId(), source.getId());
 
             JsonNode expectedNode = objectMapper.readTree(expectedResponse);
             JsonNode actualNode   = objectMapper.readTree(jsonResponse);
@@ -285,11 +289,11 @@ class AssessmentMetricControllerIntegrationTest {
     class UpdateTests {
 
         @Test
-        @DisplayName("PUT /assessmentMetrics -> updates and returns the Assessment")
+        @DisplayName("PUT /assessmentMetrics -> updates and returns the AssessmentMetric")
         void update() throws Exception {
             AssessmentMetric original = assessmentMetricRepository.save(AssessmentMetric.builder()
                     .assessmentId(assessment.getId())
-                    .metricId(metric.getId())
+                    .conditionalMetricId(conditionalMetric.getId())
                     .sourceId(source.getId())
                     .minValue(1)
                     .maxValue(2)
@@ -299,16 +303,16 @@ class AssessmentMetricControllerIntegrationTest {
 
            String updateRequest = """
                                 {
-                                        "id"            : %d,
-                                         "assessmentId" : %d,
-                                         "metricId"     : %d,
-                                         "sourceId"     : %d,
-                                         "minValue"     : 4,
-                                         "maxValue"     : 5,
-                                         "avgValue"     : 6,
-                                         "lastValue"    : 7
-                                     }
-                                """.formatted(original.getId(), assessment.getId(), metric.getId(), source.getId());
+                                    "id"                  : %d,
+                                    "assessmentId"        : %d,
+                                    "conditionalMetricId" : %d,
+                                    "sourceId"            : %d,
+                                    "minValue"            : 4,
+                                    "maxValue"            : 5,
+                                    "avgValue"            : 6,
+                                    "lastValue"           : 7
+                                }
+                                """.formatted(original.getId(), assessment.getId(), conditionalMetric.getId(), source.getId());
 
             String jsonResponse = mvc.perform(
                             put(API)
@@ -323,16 +327,17 @@ class AssessmentMetricControllerIntegrationTest {
 
             String expectedResponse = """
                                 {
-                                    "id"           : %d,
-                                    "assessmentId" : %d,
-                                    "metricId"     : %d,
-                                    "sourceId"     : %d,
-                                    "minValue"     : 4,
-                                    "maxValue"     : 5,
-                                    "avgValue"     : 6,
-                                    "lastValue"    : 7
+                                    "id"                  : %d,
+                                    "assessmentId"        : %d,
+                                    "conditionalMetricId" : %d,
+                                    "sourceId"            : %d,
+                                    "minValue"            : 4,
+                                    "maxValue"            : 5,
+                                    "avgValue"            : 6,
+                                    "lastValue"           : 7,
+                                    "description"         : null
                                  }
-                                """.formatted(original.getId(), assessment.getId(), metric.getId(), source.getId());
+                                """.formatted(original.getId(), assessment.getId(), conditionalMetric.getId(), source.getId());
 
             JsonNode expectedNode = objectMapper.readTree(expectedResponse);
 
@@ -345,12 +350,12 @@ class AssessmentMetricControllerIntegrationTest {
 
             String updateRequest = """
                                  {
-                                     "id"           : 999999,
-                                     "assessmentId" : %d,
-                                     "metricId"     : %d,
-                                     "sourceId"     : %d
+                                     "id"                  : 999999,
+                                     "assessmentId"        : %d,
+                                     "conditionalMetricId" : %d,
+                                     "sourceId"            : %d
                                  }
-                                 """.formatted(assessment.getId(), metric.getId(), source.getId());
+                                 """.formatted(assessment.getId(), conditionalMetric.getId(), source.getId());
 
             String jsonResponse = mvc.perform(
                             put(API)
@@ -382,13 +387,12 @@ class AssessmentMetricControllerIntegrationTest {
     @DisplayName("Delete")
     class DeleteTests {
 
-
         @Test
-        @DisplayName("DELETE /assessmentMetrics/{id} -> deletes the Assessment")
+        @DisplayName("DELETE /assessmentMetrics/{id} -> deletes the AssessmentMetric")
         void delete() throws Exception {
             AssessmentMetric assessmentMetric = assessmentMetricRepository.save(AssessmentMetric.builder()
                     .assessmentId(assessment.getId())
-                    .metricId(metric.getId())
+                    .conditionalMetricId(conditionalMetric.getId())
                     .sourceId(source.getId())
                     .build());
 

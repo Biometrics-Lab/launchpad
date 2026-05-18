@@ -210,3 +210,41 @@ databaseChangeLog:
               - column:
                   name: description
                   value: CSV data export file
+
+        # condition
+        - insert:
+            tableName: condition
+            columns:
+              - column:
+                  name: name
+                  value: Hitting from T
+              - column:
+                  name: sport
+                  value: Baseball
+        - insert:
+            tableName: condition
+            columns:
+              - column:
+                  name: name
+                  value: Pitching machine 60ft
+              - column:
+                  name: sport
+                  value: Baseball
+        - insert:
+            tableName: condition
+            columns:
+              - column:
+                  name: name
+                  value: Live at-bat
+              - column:
+                  name: sport
+                  value: Baseball
+        - insert:
+            tableName: condition
+            columns:
+              - column:
+                  name: name
+                  value: Flat ground
+              - column:
+                  name: sport
+                  value: Baseball

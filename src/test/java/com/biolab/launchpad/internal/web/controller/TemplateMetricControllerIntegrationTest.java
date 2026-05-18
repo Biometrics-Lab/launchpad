@@ -42,14 +42,14 @@ class TemplateMetricControllerIntegrationTest {
     EntityFactory factory;
 
     AssessmentTemplate template;
-    Metric         metric;
-    DataSource     source;
+    ConditionalMetric  conditionalMetric;
+    DataSource         source;
 
     @BeforeEach
     void setUp() {
-        template = factory.createAssessmentTemplate("template");
-        metric   = factory.createMetric("metric");
-        source   = factory.createDataSource("source");
+        template          = factory.createAssessmentTemplate("template");
+        conditionalMetric = factory.createConditionalMetric();
+        source            = factory.createDataSource("source");
     }
 
     @AfterEach
@@ -66,13 +66,13 @@ class TemplateMetricControllerIntegrationTest {
         void create() throws Exception {
 
             String request =
-                            """ 
+                            """
                                 {
-                                    "templateId" : %d,
-                                    "metricId"   : %d,
-                                    "sourceId"   : %d
+                                    "templateId"          : %d,
+                                    "conditionalMetricId" : %d,
+                                    "sourceId"            : %d
                                 }
-                            """.formatted(template.getId(), metric.getId(), source.getId());
+                            """.formatted(template.getId(), conditionalMetric.getId(), source.getId());
 
             String jsonResponse = mvc.perform(
                             post(API)
@@ -86,19 +86,20 @@ class TemplateMetricControllerIntegrationTest {
 
             JsonNode responseNode = objectMapper.readTree(jsonResponse);
 
-            int templateMetricId = responseNode.get("id").asInt();
-            assertThat(templateMetricId).isPositive();
-
+            int id = responseNode.get("id").asInt();
+            assertThat(id).isPositive();
 
             String expectedResponse =
                                     """
                                       {
-                                        "id"         : %d,
-                                        "templateId" : %d,
-                                        "metricId"   : %d,
-                                        "sourceId"   : %d
+                                        "id"                  : %d,
+                                        "templateId"          : %d,
+                                        "conditionalMetricId" : %d,
+                                        "sourceId"            : %d,
+                                        "dataSourceId"        : null,
+                                        "description"         : null
                                       }
-                                    """.formatted(templateMetricId, template.getId(), metric.getId(), source.getId());
+                                    """.formatted(id, template.getId(), conditionalMetric.getId(), source.getId());
 
             JsonNode expectedResponseNode = objectMapper.readTree(expectedResponse);
 
@@ -106,7 +107,7 @@ class TemplateMetricControllerIntegrationTest {
         }
 
         @Test
-        @DisplayName("POST /templateMetrics with validation message -> returns 422")
+        @DisplayName("POST /templateMetrics with validation error -> returns 422")
         void createValidationError() throws Exception {
             String request =
                             """
@@ -130,8 +131,8 @@ class TemplateMetricControllerIntegrationTest {
             String expectedResponse =
                     """
                             {
-                                "status"       : 422,
-                                "message"      : "Validation failed: metricId: TemplateMetric metricId cannot be null, and sourceId: TemplateMetric sourceId cannot be null, and templateId: TemplateMetric templateId cannot be null"
+                                "status"  : 422,
+                                "message" : "Validation failed: conditionalMetricId: TemplateMetric conditionalMetricId cannot be null, and sourceId: TemplateMetric sourceId cannot be null, and templateId: TemplateMetric templateId cannot be null"
                             }
                             """;
 
@@ -151,13 +152,13 @@ class TemplateMetricControllerIntegrationTest {
 
             TemplateMetric templateMetric1 = templateMetricRepository.save(TemplateMetric.builder()
                     .templateId(template.getId())
-                    .metricId(metric.getId())
+                    .conditionalMetricId(conditionalMetric.getId())
                     .sourceId(source.getId())
                     .build());
 
             TemplateMetric templateMetric2 = templateMetricRepository.save(TemplateMetric.builder()
                     .templateId(template.getId())
-                    .metricId(metric.getId())
+                    .conditionalMetricId(conditionalMetric.getId())
                     .sourceId(source.getId())
                     .build());
 
@@ -171,19 +172,24 @@ class TemplateMetricControllerIntegrationTest {
             String expectedResponse = """
                 [
                     {
-                        "id"         : %d,
-                        "templateId" : %d,
-                        "metricId"   : %d,
-                        "sourceId"   : %d
+                        "id"                  : %d,
+                        "templateId"          : %d,
+                        "conditionalMetricId" : %d,
+                        "sourceId"            : %d,
+                        "dataSourceId"        : null,
+                        "description"         : null
                     },
                     {
-                        "id"         : %d,
-                        "templateId" : %d,
-                        "metricId"   : %d,
-                        "sourceId"   : %d
+                        "id"                  : %d,
+                        "templateId"          : %d,
+                        "conditionalMetricId" : %d,
+                        "sourceId"            : %d,
+                        "dataSourceId"        : null,
+                        "description"         : null
                     }
                 ]
-                """.formatted(templateMetric1.getId(), template.getId(), metric.getId(), source.getId(), templateMetric2.getId(),template.getId(), metric.getId(), source.getId());
+                """.formatted(templateMetric1.getId(), template.getId(), conditionalMetric.getId(), source.getId(),
+                              templateMetric2.getId(), template.getId(), conditionalMetric.getId(), source.getId());
 
             JsonNode expectedNode = objectMapper.readTree(expectedResponse);
             JsonNode actualNode   = objectMapper.readTree(jsonResponse);
@@ -197,7 +203,7 @@ class TemplateMetricControllerIntegrationTest {
 
             TemplateMetric templateMetric = templateMetricRepository.save(TemplateMetric.builder()
                     .templateId(template.getId())
-                    .metricId(metric.getId())
+                    .conditionalMetricId(conditionalMetric.getId())
                     .sourceId(source.getId())
                     .build());
 
@@ -210,12 +216,14 @@ class TemplateMetricControllerIntegrationTest {
 
             String expectedResponse = """
                                      {
-                                        "id"          : %d,
-                                         "templateId" : %d,
-                                         "metricId"   : %d,
-                                         "sourceId"   : %d
+                                        "id"                  : %d,
+                                        "templateId"          : %d,
+                                        "conditionalMetricId" : %d,
+                                        "sourceId"            : %d,
+                                        "dataSourceId"        : null,
+                                        "description"         : null
                                      }
-                                    """.formatted(templateMetric.getId(), template.getId(), metric.getId(), source.getId());
+                                    """.formatted(templateMetric.getId(), template.getId(), conditionalMetric.getId(), source.getId());
 
             JsonNode expectedNode = objectMapper.readTree(expectedResponse);
             JsonNode actualNode   = objectMapper.readTree(jsonResponse);
@@ -257,19 +265,19 @@ class TemplateMetricControllerIntegrationTest {
         void update() throws Exception {
             TemplateMetric original = templateMetricRepository.save(TemplateMetric.builder()
                     .templateId(template.getId())
-                    .metricId(metric.getId())
+                    .conditionalMetricId(conditionalMetric.getId())
                     .sourceId(source.getId())
                     .build());
 
-            metric = factory.createMetric("updated");
+            ConditionalMetric updated_cm = factory.createConditionalMetric();
             String updateRequest = """
                                 {
-                                    "id"          : %d,
-                                    "templateId"  : %d,
-                                    "metricId"    : %d,
-                                    "sourceId"    : %d
+                                    "id"                  : %d,
+                                    "templateId"          : %d,
+                                    "conditionalMetricId" : %d,
+                                    "sourceId"            : %d
                                  }
-                                """.formatted(original.getId(), template.getId(), metric.getId(), source.getId());
+                                """.formatted(original.getId(), template.getId(), updated_cm.getId(), source.getId());
 
             String jsonResponse = mvc.perform(
                             put(API)
@@ -284,19 +292,21 @@ class TemplateMetricControllerIntegrationTest {
 
             String expectedResponse = """
                                 {
-                                    "id"          : %d,
-                                    "templateId"  : %d,
-                                    "metricId"    : %d,
-                                    "sourceId"    : %d
+                                    "id"                  : %d,
+                                    "templateId"          : %d,
+                                    "conditionalMetricId" : %d,
+                                    "sourceId"            : %d,
+                                    "dataSourceId"        : null,
+                                    "description"         : null
                                  }
-                                """.formatted(original.getId(), template.getId(), metric.getId(), source.getId());
+                                """.formatted(original.getId(), template.getId(), updated_cm.getId(), source.getId());
 
             JsonNode expectedNode = objectMapper.readTree(expectedResponse);
 
             assertEquals(expectedNode, responseNode);
 
             TemplateMetric updated = templateMetricRepository.findById(original.getId()).orElseThrow();
-            assertEquals(updated.getMetricId(), metric.getId());
+            assertEquals(updated.getConditionalMetricId(), updated_cm.getId());
 
         }
 
@@ -306,12 +316,12 @@ class TemplateMetricControllerIntegrationTest {
 
             String updateRequest = """
                                  {
-                                     "id"             : 999999,
-                                     "templateId"  : %d,
-                                     "metricId"    : %d,
-                                     "sourceId"    : %d
+                                     "id"                  : 999999,
+                                     "templateId"          : %d,
+                                     "conditionalMetricId" : %d,
+                                     "sourceId"            : %d
                                  }
-                                 """.formatted(template.getId(), metric.getId(), source.getId());
+                                 """.formatted(template.getId(), conditionalMetric.getId(), source.getId());
 
             String jsonResponse = mvc.perform(
                             put(API)
@@ -343,13 +353,12 @@ class TemplateMetricControllerIntegrationTest {
     @DisplayName("Delete")
     class DeleteTests {
 
-
         @Test
         @DisplayName("DELETE /templateMetrics/{id} -> deletes the TemplateMetric")
         void delete() throws Exception {
             TemplateMetric templateMetric = templateMetricRepository.save(TemplateMetric.builder()
                     .templateId(template.getId())
-                    .metricId(metric.getId())
+                    .conditionalMetricId(conditionalMetric.getId())
                     .sourceId(source.getId())
                     .build());
 

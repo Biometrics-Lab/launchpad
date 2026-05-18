@@ -15,10 +15,13 @@ public class TemplateMetric extends ID {
     @NotNull(message = "TemplateMetric templateId cannot be null")
     @Column("template_id")
     private Integer templateId;
-    @NotNull(message = "TemplateMetric metricId cannot be null")
-    @Column("metric_id")
-    private Integer metricId;
+    @NotNull(message = "TemplateMetric conditionalMetricId cannot be null")
+    @Column("conditional_metric_id")
+    private Integer conditionalMetricId;
     @NotNull(message = "TemplateMetric sourceId cannot be null")
     @Column("source_id")
     private Integer sourceId;
+    @Column("data_source_id")
+    private Integer dataSourceId;
+    private String description;
 }

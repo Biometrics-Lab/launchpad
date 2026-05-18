@@ -15,9 +15,9 @@ public class AssessmentMetric extends ID {
     @NotNull(message = "AssesmentMetric assessmentId cannot be null")
     @Column("assessment_id")
     private Integer assessmentId;
-    @NotNull(message = "AssesmentMetric metricId cannot be null")
-    @Column("metric_id")
-    private Integer metricId;
+    @NotNull(message = "AssesmentMetric conditionalMetricId cannot be null")
+    @Column("conditional_metric_id")
+    private Integer conditionalMetricId;
     @NotNull(message = "AssesmentMetric sourceId cannot be null")
     @Column("source_id")
     private Integer sourceId;
@@ -29,4 +29,5 @@ public class AssessmentMetric extends ID {
     private Number avgValue;
     @Column("last_value")
     private Number lastValue;
+    private String description;
 }
