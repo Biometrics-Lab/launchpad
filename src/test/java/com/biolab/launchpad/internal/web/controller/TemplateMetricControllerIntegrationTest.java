@@ -49,7 +49,7 @@ class TemplateMetricControllerIntegrationTest {
     void setUp() {
         template          = factory.createAssessmentTemplate("template");
         conditionalMetric = factory.createConditionalMetric();
-        source            = factory.createDataSource("source");
+        source            = factory.createDataSource();
     }
 
     @AfterEach

@@ -1,0 +1,94 @@
+databaseChangeLog:
+  - changeSet:
+      id: 3-BL-61-1
+      author: roman.vakulenko
+      changes:
+        # integration
+        - createTable:
+            tableName: integration
+            columns:
+              - column:
+                  name: id
+                  type: integer
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: name
+                  type: varchar(100)
+                  constraints:
+                    nullable: false
+
+        # data_source: drop FK to data_source_type_dictionary, drop name + description,
+        # add integration_id, metric_id, content
+        - dropForeignKeyConstraint:
+            baseTableName: data_source
+            constraintName: fk_data_source_data_source_type_dictionary
+
+        - dropColumn:
+            tableName: data_source
+            columnName: name
+
+        - dropColumn:
+            tableName: data_source
+            columnName: description
+
+        - addColumn:
+            tableName: data_source
+            columns:
+              - column:
+                  name: integration_id
+                  type: integer
+                  constraints:
+                    nullable: true
+
+        - addColumn:
+            tableName: data_source
+            columns:
+              - column:
+                  name: metric_id
+                  type: integer
+                  constraints:
+                    nullable: true
+
+        - addColumn:
+            tableName: data_source
+            columns:
+              - column:
+                  name: content
+                  type: text
+                  constraints:
+                    nullable: true
+
+        - addForeignKeyConstraint:
+            baseTableName: data_source
+            baseColumnNames: integration_id
+            referencedTableName: integration
+            referencedColumnNames: id
+            constraintName: fk_data_source_integration
+
+        - addForeignKeyConstraint:
+            baseTableName: data_source
+            baseColumnNames: metric_id
+            referencedTableName: metric
+            referencedColumnNames: id
+            constraintName: fk_data_source_metric
+
+        # assessment_metric: rename source_id -> data_source_id
+        - dropForeignKeyConstraint:
+            baseTableName: assessment_metric
+            constraintName: fk_assessment_metric_data_source
+
+        - renameColumn:
+            tableName: assessment_metric
+            oldColumnName: source_id
+            newColumnName: data_source_id
+            columnDataType: integer
+
+        - addForeignKeyConstraint:
+            baseTableName: assessment_metric
+            baseColumnNames: data_source_id
+            referencedTableName: data_source
+            referencedColumnNames: id
+            constraintName: fk_assessment_metric_data_source

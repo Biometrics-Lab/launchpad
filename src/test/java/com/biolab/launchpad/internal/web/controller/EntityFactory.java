@@ -27,6 +27,7 @@ public class EntityFactory {
     private final PlayerRepository                   playerRepository;
     private final AssessmentTemplateRepository       assessmentTemplateRepository;
     private final DataSourceRepository               dataSourceRepository;
+    private final IntegrationRepository              integrationRepository;
     private final AssessmentRepository               assessmentRepository;
     private final Session1Repository                 session1Repository;
     private final RepRepository                      repRepository;
@@ -203,13 +204,22 @@ public class EntityFactory {
         );
     }
 
-    public DataSource createDataSource(String name) {
-        DataSourceTypeDictionary dataSourceTypeDictionary = createDataSourceTypeDictionary("AutoDataSource");
+    public Integration createIntegration(String name) {
+        return integrationRepository.save(
+                Integration.builder()
+                        .name(name)
+                        .build()
+        );
+    }
+
+    public DataSource createDataSource() {
+        Integration integration = createIntegration("AutoIntegration");
+        Metric metric           = createMetric("AutoMetric");
         return dataSourceRepository.save(
                 DataSource.builder()
-                        .name(name)
-                        .type(dataSourceTypeDictionary.getId())
-                        .description("AutoDescription_"+name)
+                        .integrationId(integration.getId())
+                        .metricId(metric.getId())
+                        .type("JSON_CONFIG")
                         .build()
         );
     }
@@ -288,6 +298,7 @@ public class EntityFactory {
         session1Repository.deleteAll();
         assessmentRepository.deleteAll();
         dataSourceRepository.deleteAll();
+        integrationRepository.deleteAll();
         assessmentTemplateRepository.deleteAll();
         playerRepository.deleteAll();
         userRepository.deleteAll();

@@ -1,9 +1,7 @@
 package com.biolab.launchpad.internal.web.controller;
 
-import com.biolab.launchpad.internal.repository.DataSourceRepository;
-import com.biolab.launchpad.internal.repository.model.DataSource;
+import com.biolab.launchpad.internal.repository.IntegrationRepository;
 import com.biolab.launchpad.internal.repository.model.Integration;
-import com.biolab.launchpad.internal.repository.model.Metric;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.*;
@@ -26,10 +24,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
 @AutoConfigureMockMvc
-@DisplayName("DataSource Integration Tests")
-class DataSourceControllerIntegrationTest {
+@DisplayName("Integration Integration Tests")
+class IntegrationControllerIntegrationTest {
 
-    private static final String API = "/api/v1/dataSources";
+    private static final String API = "/api/v1/integrations";
 
     @Autowired
     private MockMvc mvc;
@@ -38,23 +36,13 @@ class DataSourceControllerIntegrationTest {
     ObjectMapper objectMapper;
 
     @Autowired
-    DataSourceRepository dataSourceRepository;
+    IntegrationRepository integrationRepository;
 
     @Autowired
     EntityFactory factory;
 
-    Integration integration;
-    Metric      metric;
-
-    @BeforeEach
-    void setUp() {
-        integration = factory.createIntegration("BlastMotion");
-        metric      = factory.createMetric("ExitVelocity");
-    }
-
     @AfterEach
     void tearDown() {
-        dataSourceRepository.deleteAll();
         factory.cleanup();
     }
 
@@ -62,17 +50,14 @@ class DataSourceControllerIntegrationTest {
     @DisplayName("Create")
     class CreateTests {
         @Test
-        @DisplayName("POST /dataSources -> creates and returns the new DataSource")
+        @DisplayName("POST /integrations -> creates and returns the new Integration")
         void create() throws Exception {
 
             String request = """
                     {
-                        "integrationId" : %d,
-                        "metricId"      : %d,
-                        "type"          : "JSON_CONFIG",
-                        "content"       : "{\\"path\\": \\"$.exitVelocity\\"}"
+                        "name" : "Blast Motion"
                     }
-                    """.formatted(integration.getId(), metric.getId());
+                    """;
 
             String jsonResponse = mvc.perform(
                             post(API)
@@ -85,28 +70,25 @@ class DataSourceControllerIntegrationTest {
 
             JsonNode responseNode = objectMapper.readTree(jsonResponse);
 
-            int dataSourceId = responseNode.get("id").asInt();
-            assertThat(dataSourceId).isPositive();
+            int id = responseNode.get("id").asInt();
+            assertThat(id).isPositive();
 
             String expectedResponse = """
                     {
-                        "id"            : %d,
-                        "integrationId" : %d,
-                        "metricId"      : %d,
-                        "type"          : "JSON_CONFIG",
-                        "content"       : "{\\"path\\": \\"$.exitVelocity\\"}"
+                        "id"   : %d,
+                        "name" : "Blast Motion"
                     }
-                    """.formatted(dataSourceId, integration.getId(), metric.getId());
+                    """.formatted(id);
 
             assertEquals(objectMapper.readTree(expectedResponse), responseNode);
         }
 
         @Test
-        @DisplayName("POST /dataSources with validation error -> returns 400")
+        @DisplayName("POST /integrations with blank name -> returns 400")
         void createValidationError() throws Exception {
             String request = """
                     {
-                        "content" : "some content"
+                        "name" : ""
                     }
                     """;
 
@@ -121,7 +103,14 @@ class DataSourceControllerIntegrationTest {
 
             JsonNode responseNode = objectMapper.readTree(jsonResponse);
 
-            assertThat(responseNode.get("status").asInt()).isEqualTo(422);
+            String expectedResponse = """
+                    {
+                        "status"  : 422,
+                        "message" : "Validation failed: name: Name cannot be blank"
+                    }
+                    """;
+
+            assertEquals(objectMapper.readTree(expectedResponse), responseNode);
         }
     }
 
@@ -130,21 +119,11 @@ class DataSourceControllerIntegrationTest {
     class ReadTests {
 
         @Test
-        @DisplayName("GET /dataSources -> returns all dataSources")
+        @DisplayName("GET /integrations -> returns all integrations")
         void getAll() throws Exception {
 
-            DataSource ds1 = dataSourceRepository.save(DataSource.builder()
-                    .integrationId(integration.getId())
-                    .metricId(metric.getId())
-                    .type("JSON_CONFIG")
-                    .build());
-
-            DataSource ds2 = dataSourceRepository.save(DataSource.builder()
-                    .integrationId(integration.getId())
-                    .metricId(metric.getId())
-                    .type("SCRIPT")
-                    .content("return payload.speed;")
-                    .build());
+            Integration i1 = integrationRepository.save(Integration.builder().name("Blast Motion").build());
+            Integration i2 = integrationRepository.save(Integration.builder().name("Rapsodo").build());
 
             String jsonResponse = mvc.perform(
                             get(API).with(httpBasic("biolab", "biolab"))
@@ -154,59 +133,35 @@ class DataSourceControllerIntegrationTest {
 
             String expectedResponse = """
                     [
-                        {
-                            "id"            : %d,
-                            "integrationId" : %d,
-                            "metricId"      : %d,
-                            "type"          : "JSON_CONFIG",
-                            "content"       : null
-                        },
-                        {
-                            "id"            : %d,
-                            "integrationId" : %d,
-                            "metricId"      : %d,
-                            "type"          : "SCRIPT",
-                            "content"       : "return payload.speed;"
-                        }
+                        { "id" : %d, "name" : "Blast Motion" },
+                        { "id" : %d, "name" : "Rapsodo" }
                     ]
-                    """.formatted(ds1.getId(), integration.getId(), metric.getId(),
-                                  ds2.getId(), integration.getId(), metric.getId());
+                    """.formatted(i1.getId(), i2.getId());
 
             assertEquals(objectMapper.readTree(expectedResponse), objectMapper.readTree(jsonResponse));
         }
 
         @Test
-        @DisplayName("GET /dataSources/{id} -> returns dataSource by ID")
+        @DisplayName("GET /integrations/{id} -> returns integration by ID")
         void getById() throws Exception {
 
-            DataSource ds = dataSourceRepository.save(DataSource.builder()
-                    .integrationId(integration.getId())
-                    .metricId(metric.getId())
-                    .type("MAPPING")
-                    .content("exit_velocity")
-                    .build());
+            Integration integration = integrationRepository.save(Integration.builder().name("Blast Motion").build());
 
             String jsonResponse = mvc.perform(
-                            get(API + "/" + ds.getId()).with(httpBasic("biolab", "biolab"))
+                            get(API + "/" + integration.getId()).with(httpBasic("biolab", "biolab"))
                     )
                     .andExpect(status().isOk())
                     .andReturn().getResponse().getContentAsString();
 
             String expectedResponse = """
-                    {
-                        "id"            : %d,
-                        "integrationId" : %d,
-                        "metricId"      : %d,
-                        "type"          : "MAPPING",
-                        "content"       : "exit_velocity"
-                    }
-                    """.formatted(ds.getId(), integration.getId(), metric.getId());
+                    { "id" : %d, "name" : "Blast Motion" }
+                    """.formatted(integration.getId());
 
             assertEquals(objectMapper.readTree(expectedResponse), objectMapper.readTree(jsonResponse));
         }
 
         @Test
-        @DisplayName("GET /dataSources/{id} with unknown ID -> returns 404")
+        @DisplayName("GET /integrations/{id} with unknown ID -> returns 404")
         void getByIdNotFound() throws Exception {
             String jsonResponse = mvc.perform(
                             get(API + "/999999").with(httpBasic("biolab", "biolab"))
@@ -217,7 +172,7 @@ class DataSourceControllerIntegrationTest {
             String expectedResponse = """
                     {
                         "status" : 404,
-                        "message": "DataSource not found by id: 999999"
+                        "message": "Integration not found by id: 999999"
                     }
                     """;
 
@@ -230,23 +185,16 @@ class DataSourceControllerIntegrationTest {
     class UpdateTests {
 
         @Test
-        @DisplayName("PUT /dataSources -> updates and returns the DataSource")
+        @DisplayName("PUT /integrations -> updates and returns the Integration")
         void update() throws Exception {
-            DataSource original = dataSourceRepository.save(DataSource.builder()
-                    .integrationId(integration.getId())
-                    .metricId(metric.getId())
-                    .type("JSON_CONFIG")
-                    .build());
+            Integration original = integrationRepository.save(Integration.builder().name("Blast Motion").build());
 
             String updateRequest = """
                     {
-                        "id"            : %d,
-                        "integrationId" : %d,
-                        "metricId"      : %d,
-                        "type"          : "SCRIPT",
-                        "content"       : "return payload.v;"
+                        "id"   : %d,
+                        "name" : "Blast Motion v2"
                     }
-                    """.formatted(original.getId(), integration.getId(), metric.getId());
+                    """.formatted(original.getId());
 
             String jsonResponse = mvc.perform(
                             put(API)
@@ -259,31 +207,26 @@ class DataSourceControllerIntegrationTest {
 
             String expectedResponse = """
                     {
-                        "id"            : %d,
-                        "integrationId" : %d,
-                        "metricId"      : %d,
-                        "type"          : "SCRIPT",
-                        "content"       : "return payload.v;"
+                        "id"   : %d,
+                        "name" : "Blast Motion v2"
                     }
-                    """.formatted(original.getId(), integration.getId(), metric.getId());
+                    """.formatted(original.getId());
 
             assertEquals(objectMapper.readTree(expectedResponse), objectMapper.readTree(jsonResponse));
 
-            DataSource updated = dataSourceRepository.findById(original.getId()).orElseThrow();
-            assertEquals("SCRIPT", updated.getType());
+            Integration updated = integrationRepository.findById(original.getId()).orElseThrow();
+            assertEquals("Blast Motion v2", updated.getName());
         }
 
         @Test
-        @DisplayName("PUT /dataSources with invalid id -> returns 404")
+        @DisplayName("PUT /integrations with invalid id -> returns 404")
         void updateNotFound() throws Exception {
             String updateRequest = """
                     {
-                        "id"            : 999999,
-                        "integrationId" : %d,
-                        "metricId"      : %d,
-                        "type"          : "JSON_CONFIG"
+                        "id"   : 999999,
+                        "name" : "Blast Motion"
                     }
-                    """.formatted(integration.getId(), metric.getId());
+                    """;
 
             String jsonResponse = mvc.perform(
                             put(API)
@@ -297,7 +240,7 @@ class DataSourceControllerIntegrationTest {
             String expectedResponse = """
                     {
                         "status" : 404,
-                        "message": "DataSourceService. Could not update DataSource by id: 999999"
+                        "message": "IntegrationService. Could not update Integration by id: 999999"
                     }
                     """;
 
@@ -310,16 +253,12 @@ class DataSourceControllerIntegrationTest {
     class DeleteTests {
 
         @Test
-        @DisplayName("DELETE /dataSources/{id} -> deletes the DataSource")
+        @DisplayName("DELETE /integrations/{id} -> deletes the Integration")
         void delete() throws Exception {
-            DataSource ds = dataSourceRepository.save(DataSource.builder()
-                    .integrationId(integration.getId())
-                    .metricId(metric.getId())
-                    .type("JSON_CONFIG")
-                    .build());
+            Integration integration = integrationRepository.save(Integration.builder().name("Blast Motion").build());
 
             String jsonResponse = mvc.perform(
-                            MockMvcRequestBuilders.delete(API + "/" + ds.getId())
+                            MockMvcRequestBuilders.delete(API + "/" + integration.getId())
                                     .with(httpBasic("biolab", "biolab"))
                     )
                     .andExpect(status().isOk())
@@ -333,11 +272,11 @@ class DataSourceControllerIntegrationTest {
                     """;
 
             assertEquals(objectMapper.readTree(expectedResponse), objectMapper.readTree(jsonResponse));
-            assertFalse(dataSourceRepository.existsById(ds.getId()));
+            assertFalse(integrationRepository.existsById(integration.getId()));
         }
 
         @Test
-        @DisplayName("DELETE /dataSources/{id} with unknown ID -> returns 404")
+        @DisplayName("DELETE /integrations/{id} with unknown ID -> returns 404")
         void deleteNotFound() throws Exception {
             String jsonResponse = mvc.perform(
                             MockMvcRequestBuilders.delete(API + "/999999")
@@ -349,7 +288,7 @@ class DataSourceControllerIntegrationTest {
             String expectedResponse = """
                     {
                         "status" : 404,
-                        "message": "DataSourceService. Could not delete id: 999999"
+                        "message": "IntegrationService. Could not delete id: 999999"
                     }
                     """;
 
