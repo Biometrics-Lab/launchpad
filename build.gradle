@@ -3,6 +3,7 @@ plugins {
 	id 'org.springframework.boot' version '3.5.3'
 	id 'io.spring.dependency-management' version '1.1.7'
 	id 'org.asciidoctor.jvm.convert' version '3.3.2'
+	id 'org.liquibase.gradle' version '2.2.2'
 }
 
 group = 'com.biolab'
@@ -81,6 +82,11 @@ dependencies {
 	testCompileOnly 'org.projectlombok:lombok'
 	testAnnotationProcessor 'org.projectlombok:lombok'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+	liquibaseRuntime 'org.liquibase:liquibase-core:4.31.1'
+	liquibaseRuntime 'org.postgresql:postgresql:42.7.7'
+	liquibaseRuntime 'org.yaml:snakeyaml:2.4'
+	liquibaseRuntime 'info.picocli:picocli:4.7.6'
 }
 
 dependencyManagement {
@@ -119,4 +125,59 @@ tasks.register('dropDB', Exec) {
 	workingDir 'src/main/resources/db/scripts/'
 	//on linux
 	commandLine './drop-db.sh'
+}
+
+liquibase {
+	activities {
+		main {
+			url               'jdbc:postgresql://localhost:5432/biolab'
+			username          'biolab'
+			password          'biolab'
+			changelogFile     'db/changelog/biolab.changelog.yml'
+			searchPath        "${projectDir}/src/main/resources"
+			defaultSchemaName 'biolab'
+			driver            'org.postgresql.Driver'
+		}
+	}
+	runList = 'main'
+}
+
+// Drops the local biolab DB — terminates active connections first, uses IF EXISTS so it's safe on a clean machine
+tasks.register('dropDBLocal', Exec) {
+	group = 'db'
+	description = 'Drop the local biolab database'
+	commandLine 'bash', '-c', '''
+		psql -d postgres -c "SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = 'biolab' AND pid <> pg_backend_pid();" 2>/dev/null || true
+		psql -d postgres -c "DROP DATABASE IF EXISTS biolab;" 2>/dev/null || true
+		psql -d postgres -c "DROP ROLE IF EXISTS biolab;" 2>/dev/null || true
+	'''
+	ignoreExitValue = true
+}
+
+// Creates the DB, user, and schema using the existing init SQL scripts
+tasks.register('initDBLocal', Exec) {
+	group = 'db'
+	description = 'Create local biolab database, user, and schema'
+	dependsOn 'dropDBLocal'
+	workingDir 'src/main/resources/db/scripts'
+	commandLine 'bash', '-c',
+		'psql -d postgres -f initalize-db.sql && psql -U biolab -d biolab -f initalize-db-scheme.sql'
+}
+
+// Liquibase 'update' must run after the DB is created
+tasks.named('update') {
+	mustRunAfter 'initDBLocal'
+}
+
+// Drop → init → Liquibase migrations → seed dev data
+tasks.register('seedDB') {
+	group = 'db'
+	description = 'Reset the local database and populate it with development seed data'
+	dependsOn 'initDBLocal', 'update'
+	doLast {
+		exec {
+			commandLine 'psql', '-U', 'biolab', '-d', 'biolab',
+				'-f', "${projectDir}/src/test/resources/db/seed-data.sql"
+		}
+	}
 }
