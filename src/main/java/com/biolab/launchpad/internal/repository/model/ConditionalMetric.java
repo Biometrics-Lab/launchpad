@@ -10,13 +10,12 @@ import org.springframework.data.relational.core.mapping.Table;
 @Data
 @SuperBuilder
 @NoArgsConstructor
-@Table("rep_metric")
-public class RepMetric extends ID {
-    @NotNull(message = "RepMetric repId cannot be null")
-    @Column("rep_id")
-    private Integer repId;
-    @NotNull(message = "RepMetric conditionalMetricId cannot be null")
-    @Column("conditional_metric_id")
-    private Integer conditionalMetricId;
-    private Number value;
+@Table("conditional_metric")
+public class ConditionalMetric extends IDName {
+    @NotNull(message = "ConditionalMetric conditionId cannot be null")
+    @Column("condition_id")
+    private Integer conditionId;
+    @NotNull(message = "ConditionalMetric metricId cannot be null")
+    @Column("metric_id")
+    private Integer metricId;
 }

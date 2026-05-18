@@ -23,4 +23,6 @@ public class Assessment  extends ID {
     @NotNull(message = "Assessment templateId cannot be null")
     @Column("template_id")
     private Integer templateId;
+    @Column("condition_id")
+    private Integer conditionId;
 }

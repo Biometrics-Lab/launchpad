@@ -41,13 +41,13 @@ class SessionMetricControllerIntegrationTest {
     @Autowired
     EntityFactory factory;
 
-    Session1 session1;
-    Metric   metric;
+    Session1          session1;
+    ConditionalMetric conditionalMetric;
 
     @BeforeEach
     void setUp() {
-        session1 = factory.createSession1();
-        metric   = factory.createMetric("weight");
+        session1          = factory.createSession1();
+        conditionalMetric = factory.createConditionalMetric();
     }
 
     @AfterEach
@@ -60,19 +60,19 @@ class SessionMetricControllerIntegrationTest {
     @DisplayName("Create")
     class CreateTests {
         @Test
-        @DisplayName("POST /sessionMetrics -> creates and returns the new Session")
+        @DisplayName("POST /sessionMetrics -> creates and returns the new SessionMetric")
         void create() throws Exception {
 
             String request =
-                            """ 
+                            """
                                 {
-                                    "session1Id"   : %d,
-                                    "metricId"     : %d,
-                                    "minValue"     : 1,
-                                    "maxValue"     : 2,
-                                    "avgValue"     : 3
+                                    "session1Id"          : %d,
+                                    "conditionalMetricId" : %d,
+                                    "minValue"            : 1,
+                                    "maxValue"            : 2,
+                                    "avgValue"            : 3
                                 }
-                            """.formatted(session1.getId(), metric.getId());
+                            """.formatted(session1.getId(), conditionalMetric.getId());
 
             String jsonResponse = mvc.perform(
                             post(API)
@@ -86,20 +86,20 @@ class SessionMetricControllerIntegrationTest {
 
             JsonNode responseNode = objectMapper.readTree(jsonResponse);
 
-            int sessionId = responseNode.get("id").asInt();
-            assertThat(sessionId).isPositive();
+            int id = responseNode.get("id").asInt();
+            assertThat(id).isPositive();
 
             String expectedResponse =
                                     """
                                       {
-                                        "id"           : %d,
-                                        "session1Id"   : %d,
-                                        "metricId"     : %d,
-                                        "minValue"     : 1,
-                                        "maxValue"     : 2,
-                                        "avgValue"     : 3
+                                        "id"                  : %d,
+                                        "session1Id"          : %d,
+                                        "conditionalMetricId" : %d,
+                                        "minValue"            : 1,
+                                        "maxValue"            : 2,
+                                        "avgValue"            : 3
                                       }
-                                    """.formatted(sessionId, session1.getId(), metric.getId());
+                                    """.formatted(id, session1.getId(), conditionalMetric.getId());
 
             JsonNode expectedResponseNode = objectMapper.readTree(expectedResponse);
 
@@ -107,7 +107,7 @@ class SessionMetricControllerIntegrationTest {
         }
 
         @Test
-        @DisplayName("POST /sessionMetrics with validation message -> returns 422")
+        @DisplayName("POST /sessionMetrics with validation error -> returns 422")
         void createValidationError() throws Exception {
             String request =
                             """
@@ -131,8 +131,8 @@ class SessionMetricControllerIntegrationTest {
             String expectedResponse =
                     """
                             {
-                                "status"       : 422,
-                                "message"      : "Validation failed: metricId: SessionMetric metricId cannot be null, and session1Id: SessionMetric sessionId cannot be null"
+                                "status"  : 422,
+                                "message" : "Validation failed: conditionalMetricId: SessionMetric conditionalMetricId cannot be null, and session1Id: SessionMetric sessionId cannot be null"
                             }
                             """;
 
@@ -152,7 +152,7 @@ class SessionMetricControllerIntegrationTest {
 
             SessionMetric sessionMetric1 = sessionMetricRepository.save(SessionMetric.builder()
                     .session1Id(session1.getId())
-                    .metricId(metric.getId())
+                    .conditionalMetricId(conditionalMetric.getId())
                     .minValue(1)
                     .maxValue(2)
                     .avgValue(3)
@@ -160,12 +160,12 @@ class SessionMetricControllerIntegrationTest {
 
             SessionMetric sessionMetric2 = sessionMetricRepository.save(SessionMetric.builder()
                     .session1Id(session1.getId())
-                    .metricId(metric.getId())
+                    .conditionalMetricId(conditionalMetric.getId())
                     .minValue(5)
                     .maxValue(6)
                     .avgValue(7)
                     .build());
-            
+
             String jsonResponse = mvc.perform(
                             get(API)
                                     .with(httpBasic("biolab", "biolab"))
@@ -176,23 +176,24 @@ class SessionMetricControllerIntegrationTest {
             String expectedResponse = """
                 [
                     {
-                        "id"           : %d,
-                        "session1Id"   : %d,
-                        "metricId"     : %d,
-                        "minValue"     : 1,
-                        "maxValue"     : 2,
-                        "avgValue"     : 3
+                        "id"                  : %d,
+                        "session1Id"          : %d,
+                        "conditionalMetricId" : %d,
+                        "minValue"            : 1,
+                        "maxValue"            : 2,
+                        "avgValue"            : 3
                    },
                     {
-                        "id"           : %d,
-                        "session1Id"   : %d,
-                        "metricId"     : %d,
-                        "minValue"     : 5,
-                        "maxValue"     : 6,
-                        "avgValue"     : 7
+                        "id"                  : %d,
+                        "session1Id"          : %d,
+                        "conditionalMetricId" : %d,
+                        "minValue"            : 5,
+                        "maxValue"            : 6,
+                        "avgValue"            : 7
                     }
                 ]
-                """.formatted(sessionMetric1.getId(), session1.getId(), metric.getId(), sessionMetric2.getId(),session1.getId(), metric.getId());
+                """.formatted(sessionMetric1.getId(), session1.getId(), conditionalMetric.getId(),
+                              sessionMetric2.getId(), session1.getId(), conditionalMetric.getId());
 
             JsonNode expectedNode = objectMapper.readTree(expectedResponse);
             JsonNode actualNode   = objectMapper.readTree(jsonResponse);
@@ -201,12 +202,12 @@ class SessionMetricControllerIntegrationTest {
         }
 
         @Test
-        @DisplayName("GET /sessionMetrics/{id} -> returns session by ID")
+        @DisplayName("GET /sessionMetrics/{id} -> returns sessionMetric by ID")
         void getById() throws Exception {
 
             SessionMetric sessionMetric = sessionMetricRepository.save(SessionMetric.builder()
                     .session1Id(session1.getId())
-                    .metricId(metric.getId())
+                    .conditionalMetricId(conditionalMetric.getId())
                     .minValue(1)
                     .maxValue(2)
                     .avgValue(3)
@@ -221,14 +222,14 @@ class SessionMetricControllerIntegrationTest {
 
             String expectedResponse = """
                                      {
-                                        "id"            : %d,
-                                         "session1Id"   : %d,
-                                         "metricId"     : %d,
-                                         "minValue"     : 1,
-                                         "maxValue"     : 2,
-                                         "avgValue"     : 3
+                                        "id"                  : %d,
+                                        "session1Id"          : %d,
+                                        "conditionalMetricId" : %d,
+                                        "minValue"            : 1,
+                                        "maxValue"            : 2,
+                                        "avgValue"            : 3
                                      }
-                                    """.formatted(sessionMetric.getId(), session1.getId(), metric.getId());
+                                    """.formatted(sessionMetric.getId(), session1.getId(), conditionalMetric.getId());
 
             JsonNode expectedNode = objectMapper.readTree(expectedResponse);
             JsonNode actualNode   = objectMapper.readTree(jsonResponse);
@@ -266,11 +267,11 @@ class SessionMetricControllerIntegrationTest {
     class UpdateTests {
 
         @Test
-        @DisplayName("PUT /sessionMetrics -> updates and returns the Session")
+        @DisplayName("PUT /sessionMetrics -> updates and returns the SessionMetric")
         void update() throws Exception {
             SessionMetric original = sessionMetricRepository.save(SessionMetric.builder()
                     .session1Id(session1.getId())
-                    .metricId(metric.getId())
+                    .conditionalMetricId(conditionalMetric.getId())
                     .minValue(1)
                     .maxValue(2)
                     .avgValue(3)
@@ -278,14 +279,14 @@ class SessionMetricControllerIntegrationTest {
 
            String updateRequest = """
                                 {
-                                   "id"           : %d,
-                                   "session1Id"   : %d,
-                                   "metricId"     : %d,
-                                   "minValue"     : 4,
-                                   "maxValue"     : 5,
-                                   "avgValue"     : 6
+                                   "id"                  : %d,
+                                   "session1Id"          : %d,
+                                   "conditionalMetricId" : %d,
+                                   "minValue"            : 4,
+                                   "maxValue"            : 5,
+                                   "avgValue"            : 6
                                 }
-                                """.formatted(original.getId(), session1.getId(), metric.getId());
+                                """.formatted(original.getId(), session1.getId(), conditionalMetric.getId());
 
             String jsonResponse = mvc.perform(
                             put(API)
@@ -300,14 +301,14 @@ class SessionMetricControllerIntegrationTest {
 
             String expectedResponse = """
                                 {
-                                    "id"           : %d,
-                                    "session1Id"   : %d,
-                                    "metricId"     : %d,
-                                    "minValue"     : 4,
-                                    "maxValue"     : 5,
-                                    "avgValue"     : 6
+                                    "id"                  : %d,
+                                    "session1Id"          : %d,
+                                    "conditionalMetricId" : %d,
+                                    "minValue"            : 4,
+                                    "maxValue"            : 5,
+                                    "avgValue"            : 6
                                  }
-                                """.formatted(original.getId(), session1.getId(), metric.getId());
+                                """.formatted(original.getId(), session1.getId(), conditionalMetric.getId());
 
             JsonNode expectedNode = objectMapper.readTree(expectedResponse);
 
@@ -320,11 +321,11 @@ class SessionMetricControllerIntegrationTest {
 
             String updateRequest = """
                                  {
-                                     "id"           : 999999,
-                                     "session1Id"   : %d,
-                                     "metricId"     : %d
+                                     "id"                  : 999999,
+                                     "session1Id"          : %d,
+                                     "conditionalMetricId" : %d
                                  }
-                                 """.formatted(session1.getId(), metric.getId());
+                                 """.formatted(session1.getId(), conditionalMetric.getId());
 
             String jsonResponse = mvc.perform(
                             put(API)
@@ -356,13 +357,12 @@ class SessionMetricControllerIntegrationTest {
     @DisplayName("Delete")
     class DeleteTests {
 
-
         @Test
-        @DisplayName("DELETE /sessionMetrics/{id} -> deletes the Session")
+        @DisplayName("DELETE /sessionMetrics/{id} -> deletes the SessionMetric")
         void delete() throws Exception {
             SessionMetric sessionMetric = sessionMetricRepository.save(SessionMetric.builder()
                     .session1Id(session1.getId())
-                    .metricId(metric.getId())
+                    .conditionalMetricId(conditionalMetric.getId())
                     .build());
 
             String jsonResponse = mvc.perform(

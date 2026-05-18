@@ -5,12 +5,12 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 
 @Builder
-public record AssessmentTemplateDto(
+public record ConditionalMetricDto(
         Integer id,
         @NotBlank(message = "Name cannot be blank")
         String name,
-        @NotNull(message = "AssessmentTemplate sport cannot be null")
-        String sport,
-        String description,
-        Integer conditionId
-){}
+        @NotNull(message = "ConditionalMetric conditionId cannot be null")
+        Integer conditionId,
+        @NotNull(message = "ConditionalMetric metricId cannot be null")
+        Integer metricId
+) {}

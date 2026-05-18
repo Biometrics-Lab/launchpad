@@ -93,10 +93,11 @@ class AssessmentControllerIntegrationTest {
             String expectedResponse =
                                     """
                                       {
-                                        "id"         : %d,
-                                        "templateId" : %d,
-                                        "sport"      : "%s",
-                                        "playerId"   : %d
+                                        "id"          : %d,
+                                        "templateId"  : %d,
+                                        "sport"       : "%s",
+                                        "playerId"    : %d,
+                                        "conditionId" : null
                                       }
                                     """.formatted(assessmentId, template.getId(), sport.getId(), player.getId());
 
@@ -171,19 +172,21 @@ class AssessmentControllerIntegrationTest {
             String expectedResponse = """
                 [
                     {
-                        "id"         : %d,
-                        "templateId" : %d,
-                        "sport"      : "%s",
-                        "playerId"   : %d
+                        "id"          : %d,
+                        "templateId"  : %d,
+                        "sport"       : "%s",
+                        "playerId"    : %d,
+                        "conditionId" : null
                     },
                     {
-                        "id"         : %d,
-                        "templateId" : %d,
-                        "sport"      : "%s",
-                        "playerId"   : %d
+                        "id"          : %d,
+                        "templateId"  : %d,
+                        "sport"       : "%s",
+                        "playerId"    : %d,
+                        "conditionId" : null
                     }
                 ]
-                """.formatted(assessment1.getId(), template.getId(), sport.getId(), player.getId(), assessment2.getId(),template.getId(), sport.getId(), player.getId());
+                """.formatted(assessment1.getId(), template.getId(), sport.getId(), player.getId(), assessment2.getId(), template.getId(), sport.getId(), player.getId());
 
             JsonNode expectedNode = objectMapper.readTree(expectedResponse);
             JsonNode actualNode   = objectMapper.readTree(jsonResponse);
@@ -211,9 +214,10 @@ class AssessmentControllerIntegrationTest {
             String expectedResponse = """
                                      {
                                         "id"          : %d,
-                                         "templateId" : %d,
-                                         "sport"      : "%s",
-                                         "playerId"   : %d
+                                        "templateId"  : %d,
+                                        "sport"       : "%s",
+                                        "playerId"    : %d,
+                                        "conditionId" : null
                                      }
                                     """.formatted(assessment.getId(), template.getId(), sport.getId(), player.getId());
 
@@ -287,7 +291,8 @@ class AssessmentControllerIntegrationTest {
                                     "id"          : %d,
                                     "templateId"  : %d,
                                     "sport"       : "%s",
-                                    "playerId"    : %d
+                                    "playerId"    : %d,
+                                    "conditionId" : null
                                  }
                                 """.formatted(original.getId(), template.getId(), sport.getId(), player.getId());
 

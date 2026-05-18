@@ -36,7 +36,7 @@ databaseChangeLog:
                   constraints:
                     nullable: false
               - column:
-                  name: metric_id
+                  name: conditional_metric_id
                   type: integer
                   constraints:
                     nullable: false
@@ -65,6 +65,11 @@ databaseChangeLog:
                   type: number
                   constraints:
                     nullable: true
+              - column:
+                  name: description
+                  type: varchar(250)
+                  constraints:
+                    nullable: true
         #  assessment
         - createTable:
             tableName: assessment
@@ -91,6 +96,11 @@ databaseChangeLog:
                   type: integer
                   constraints:
                     nullable: false
+              - column:
+                  name: condition_id
+                  type: integer
+                  constraints:
+                    nullable: true
         #  assessment_resource
         - createTable:
             tableName: assessment_resource
@@ -143,6 +153,63 @@ databaseChangeLog:
                   type: text
                   constraints:
                     nullable: true
+              - column:
+                  name: condition_id
+                  type: integer
+                  constraints:
+                    nullable: true
+        # condition
+        - createTable:
+            tableName: condition
+            columns:
+              - column:
+                  name: id
+                  type: integer
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: name
+                  type: varchar(100)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: sport
+                  type: varchar(50)
+                  constraints:
+                    nullable: true
+              - column:
+                  name: template_id
+                  type: integer
+                  constraints:
+                    nullable: true
+        # conditional_metric
+        - createTable:
+            tableName: conditional_metric
+            columns:
+              - column:
+                  name: id
+                  type: integer
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: name
+                  type: varchar(100)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: condition_id
+                  type: integer
+                  constraints:
+                    nullable: false
+              - column:
+                  name: metric_id
+                  type: integer
+                  constraints:
+                    nullable: false
         # data_source
         - createTable:
             tableName: data_source
@@ -363,7 +430,7 @@ databaseChangeLog:
                   constraints:
                     nullable: false
               - column:
-                  name: metric_id
+                  name: conditional_metric_id
                   type: integer
                   constraints:
                     nullable: false
@@ -498,7 +565,7 @@ databaseChangeLog:
                   constraints:
                     nullable: false
               - column:
-                  name: metric_id
+                  name: conditional_metric_id
                   type: integer
                   constraints:
                     nullable: false
@@ -606,7 +673,7 @@ databaseChangeLog:
                   constraints:
                     nullable: false
               - column:
-                  name: metric_id
+                  name: conditional_metric_id
                   type: integer
                   constraints:
                     nullable: false
@@ -615,6 +682,16 @@ databaseChangeLog:
                   type: integer
                   constraints:
                     nullable: false
+              - column:
+                  name: data_source_id
+                  type: integer
+                  constraints:
+                    nullable: true
+              - column:
+                  name: description
+                  type: varchar(250)
+                  constraints:
+                    nullable: true
         # user
         - createTable:
             tableName: user
@@ -760,6 +837,39 @@ databaseChangeLog:
             referencedTableName: sport_dictionary
             referencedColumnNames: name
             constraintName: fk_assessment_template_sport_dictionary
+        # condition
+        - addForeignKeyConstraint:
+            baseTableName: condition
+            baseColumnNames: sport
+            referencedTableName: sport_dictionary
+            referencedColumnNames: name
+            constraintName: fk_condition_sport_dictionary
+        - addForeignKeyConstraint:
+            baseTableName: condition
+            baseColumnNames: template_id
+            referencedTableName: assessment_template
+            referencedColumnNames: id
+            constraintName: fk_condition_assessment_template
+        # conditional_metric
+        - addForeignKeyConstraint:
+            baseTableName: conditional_metric
+            baseColumnNames: condition_id
+            referencedTableName: condition
+            referencedColumnNames: id
+            constraintName: fk_conditional_metric_condition
+        - addForeignKeyConstraint:
+            baseTableName: conditional_metric
+            baseColumnNames: metric_id
+            referencedTableName: metric
+            referencedColumnNames: id
+            constraintName: fk_conditional_metric_metric
+        # assessment_template condition_id
+        - addForeignKeyConstraint:
+            baseTableName: assessment_template
+            baseColumnNames: condition_id
+            referencedTableName: condition
+            referencedColumnNames: id
+            constraintName: fk_assessment_template_condition
         # template_metric
         - addForeignKeyConstraint:
             baseTableName: template_metric
@@ -769,16 +879,22 @@ databaseChangeLog:
             constraintName: fk_template_metric_assessment_template
         - addForeignKeyConstraint:
             baseTableName: template_metric
-            baseColumnNames: metric_id
-            referencedTableName: metric
+            baseColumnNames: conditional_metric_id
+            referencedTableName: conditional_metric
             referencedColumnNames: id
-            constraintName: fk_template_metric_metric
+            constraintName: fk_template_metric_conditional_metric
         - addForeignKeyConstraint:
             baseTableName: template_metric
             baseColumnNames: source_id
             referencedTableName: data_source
             referencedColumnNames: id
             constraintName: fk_template_metric_data_source
+        - addForeignKeyConstraint:
+            baseTableName: template_metric
+            baseColumnNames: data_source_id
+            referencedTableName: data_source
+            referencedColumnNames: id
+            constraintName: fk_template_metric_data_source_2
         # assessment
         - addForeignKeyConstraint:
             baseTableName: assessment
@@ -798,6 +914,12 @@ databaseChangeLog:
             referencedTableName: assessment_template
             referencedColumnNames: id
             constraintName: fk_assessment_assessment_template
+        - addForeignKeyConstraint:
+            baseTableName: assessment
+            baseColumnNames: condition_id
+            referencedTableName: condition
+            referencedColumnNames: id
+            constraintName: fk_assessment_condition
         # assessment_metric
         - addForeignKeyConstraint:
             baseTableName: assessment_metric
@@ -807,10 +929,10 @@ databaseChangeLog:
             constraintName: fk_assessment_metric_assessment
         - addForeignKeyConstraint:
             baseTableName: assessment_metric
-            baseColumnNames: metric_id
-            referencedTableName: metric
+            baseColumnNames: conditional_metric_id
+            referencedTableName: conditional_metric
             referencedColumnNames: id
-            constraintName: fk_assessment_metric_metric
+            constraintName: fk_assessment_metric_conditional_metric
         - addForeignKeyConstraint:
             baseTableName: assessment_metric
             baseColumnNames: source_id
@@ -840,10 +962,10 @@ databaseChangeLog:
             constraintName: fk_session_metric_session
         - addForeignKeyConstraint:
             baseTableName: session_metric
-            baseColumnNames: metric_id
-            referencedTableName: metric
+            baseColumnNames: conditional_metric_id
+            referencedTableName: conditional_metric
             referencedColumnNames: id
-            constraintName: fk_session_metric_metric
+            constraintName: fk_session_metric_conditional_metric
         # rep_metric
         - addForeignKeyConstraint:
             baseTableName: rep_metric
@@ -853,10 +975,10 @@ databaseChangeLog:
             constraintName: fk_rep_metric_rep
         - addForeignKeyConstraint:
             baseTableName: rep_metric
-            baseColumnNames: metric_id
-            referencedTableName: metric
+            baseColumnNames: conditional_metric_id
+            referencedTableName: conditional_metric
             referencedColumnNames: id
-            constraintName: fk_rep_metric_metric
+            constraintName: fk_rep_metric_conditional_metric
         # rep_metric_source
         - addForeignKeyConstraint:
             baseTableName: rep_metric_source

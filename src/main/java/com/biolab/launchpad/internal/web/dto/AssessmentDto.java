@@ -12,5 +12,6 @@ public record AssessmentDto (
         @NotNull(message = "Assessment sport cannot be null")
         String sport,
         @NotNull(message = "Assessment templateId cannot be null")
-        Integer templateId
+        Integer templateId,
+        Integer conditionId
 ){}

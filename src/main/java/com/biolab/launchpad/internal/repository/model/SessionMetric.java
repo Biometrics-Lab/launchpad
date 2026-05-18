@@ -15,9 +15,9 @@ public class SessionMetric extends ID {
     @NotNull(message = "SessionMetric sessionId cannot be null")
     @Column("session1_id")
     private Integer session1Id;
-    @NotNull(message = "SessionMetric metricId cannot be null")
-    @Column("metric_id")
-    private Integer metricId;
+    @NotNull(message = "SessionMetric conditionalMetricId cannot be null")
+    @Column("conditional_metric_id")
+    private Integer conditionalMetricId;
     @Column("min_value")
     private Number minValue;
     @Column("max_value")

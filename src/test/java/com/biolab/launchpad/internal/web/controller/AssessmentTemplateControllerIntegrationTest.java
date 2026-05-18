@@ -90,12 +90,13 @@ class AssessmentTemplateControllerIntegrationTest {
 
 
             String expectedResponse =
-                    """ 
+                    """
                             {
                                         "id"           : %d,
                                         "name"         : "avg_exit_velocity",
                                         "sport"        : "%s",
-                                        "description"  : "desc"
+                                        "description"  : "desc",
+                                        "conditionId"  : null
                                     }
                             """.formatted(assessmentTemplateId, sportDictionary.getId());
 
@@ -173,13 +174,15 @@ class AssessmentTemplateControllerIntegrationTest {
                             "id"           : %d,
                             "name"         : "avg_exit_velocity",
                             "sport"        : "%s",
-                            "description"  : "desc"
+                            "description"  : "desc",
+                            "conditionId"  : null
                         },
                         {
                             "id"           : %d,
                             "name"         : "max_entry_velocity",
                             "sport"        : "%s",
-                            "description"  : "desc"
+                            "description"  : "desc",
+                            "conditionId"  : null
                         }
                     ]
                     """.formatted(assessmentTemplate1.getId(), sportDictionary.getId(), assessmentTemplate2.getId(), sportDictionary.getId());
@@ -212,7 +215,8 @@ class AssessmentTemplateControllerIntegrationTest {
                     "id"           : %d,
                     "name"         : "avg_exit_velocity",
                     "sport"        : "%s",
-                    "description"  : "desc"
+                    "description"  : "desc",
+                    "conditionId"  : null
                 }
                 """.formatted(assessmentTemplate.getId(), sportDictionary.getId());
 
@@ -284,7 +288,8 @@ class AssessmentTemplateControllerIntegrationTest {
                     "id"           : %d,
                     "name"         : "updated_velocity",
                     "sport"        : "%s",
-                    "description"  : "desc"
+                    "description"  : "desc",
+                    "conditionId"  : null
                 }
                 """.formatted(original.getId(), sportDictionary.getId());
 

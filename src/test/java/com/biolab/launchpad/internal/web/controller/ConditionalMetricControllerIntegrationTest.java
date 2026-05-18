@@ -1,9 +1,9 @@
 package com.biolab.launchpad.internal.web.controller;
 
-import com.biolab.launchpad.internal.repository.RepMetricRepository;
+import com.biolab.launchpad.internal.repository.ConditionalMetricRepository;
+import com.biolab.launchpad.internal.repository.model.Condition;
 import com.biolab.launchpad.internal.repository.model.ConditionalMetric;
-import com.biolab.launchpad.internal.repository.model.Rep;
-import com.biolab.launchpad.internal.repository.model.RepMetric;
+import com.biolab.launchpad.internal.repository.model.Metric;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.*;
@@ -26,10 +26,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
 @AutoConfigureMockMvc
-@DisplayName("Rep metric Integration Tests")
-class RepMetricControllerIntegrationTest {
+@DisplayName("ConditionalMetric Integration Tests")
+class ConditionalMetricControllerIntegrationTest {
 
-    private static final String API = "/api/v1/repMetrics";
+    private static final String API = "/api/v1/conditionalMetrics";
 
     @Autowired
     private MockMvc mvc;
@@ -38,23 +38,23 @@ class RepMetricControllerIntegrationTest {
     ObjectMapper objectMapper;
 
     @Autowired
-    RepMetricRepository repMetricRepository;
+    ConditionalMetricRepository conditionalMetricRepository;
 
     @Autowired
     EntityFactory factory;
 
-    Rep               rep;
-    ConditionalMetric conditionalMetric;
+    Condition condition;
+    Metric    metric;
 
     @BeforeEach
     void setUp() {
-        rep               = factory.createRep();
-        conditionalMetric = factory.createConditionalMetric();
+        condition = factory.createCondition("AutoCondition");
+        metric    = factory.createMetric("AutoMetric");
     }
 
     @AfterEach
     void tearDown() {
-        repMetricRepository.deleteAll();
+        conditionalMetricRepository.deleteAll();
         factory.cleanup();
     }
 
@@ -62,17 +62,16 @@ class RepMetricControllerIntegrationTest {
     @DisplayName("Create")
     class CreateTests {
         @Test
-        @DisplayName("POST /repMetrics -> creates and returns the new RepMetric")
+        @DisplayName("POST /conditionalMetrics -> creates and returns the new ConditionalMetric")
         void create() throws Exception {
 
-            String request =
-                            """
-                                {
-                                    "repId"               : %d,
-                                    "conditionalMetricId" : %d,
-                                    "value"               : 3
-                                }
-                            """.formatted(rep.getId(), conditionalMetric.getId());
+            String request = """
+                    {
+                        "name"        : "Exit velocity from T",
+                        "conditionId" : %d,
+                        "metricId"    : %d
+                    }
+                    """.formatted(condition.getId(), metric.getId());
 
             String jsonResponse = mvc.perform(
                             post(API)
@@ -83,21 +82,19 @@ class RepMetricControllerIntegrationTest {
                     .andExpect(status().isOk())
                     .andReturn().getResponse().getContentAsString();
 
-
             JsonNode responseNode = objectMapper.readTree(jsonResponse);
 
             int id = responseNode.get("id").asInt();
             assertThat(id).isPositive();
 
-            String expectedResponse =
-                                    """
-                                      {
-                                        "id"                  : %d,
-                                        "repId"               : %d,
-                                        "conditionalMetricId" : %d,
-                                        "value"               : 3
-                                      }
-                                    """.formatted(id, rep.getId(), conditionalMetric.getId());
+            String expectedResponse = """
+                    {
+                        "id"          : %d,
+                        "name"        : "Exit velocity from T",
+                        "conditionId" : %d,
+                        "metricId"    : %d
+                    }
+                    """.formatted(id, condition.getId(), metric.getId());
 
             JsonNode expectedResponseNode = objectMapper.readTree(expectedResponse);
 
@@ -105,14 +102,11 @@ class RepMetricControllerIntegrationTest {
         }
 
         @Test
-        @DisplayName("POST /repMetrics with validation error -> returns 422")
+        @DisplayName("POST /conditionalMetrics with validation error -> returns 422")
         void createValidationError() throws Exception {
-            String request =
-                            """
-                                {
-                                    "description" : ""
-                                }
-                            """;
+            String request = """
+                    {}
+                    """;
 
             String jsonResponse = mvc.perform(
                             post(API)
@@ -123,16 +117,14 @@ class RepMetricControllerIntegrationTest {
                     .andExpect(status().isBadRequest())
                     .andReturn().getResponse().getContentAsString();
 
-
             JsonNode responseNode = objectMapper.readTree(jsonResponse);
 
-            String expectedResponse =
-                    """
-                            {
-                                "status"  : 422,
-                                "message" : "Validation failed: conditionalMetricId: RepMetric conditionalMetricId cannot be null, and repId: RepMetric repId cannot be null"
-                            }
-                            """;
+            String expectedResponse = """
+                    {
+                        "status"  : 422,
+                        "message" : "Validation failed: conditionId: ConditionalMetric conditionId cannot be null, and metricId: ConditionalMetric metricId cannot be null, and name: Name cannot be blank"
+                    }
+                    """;
 
             JsonNode expectedResponseNode = objectMapper.readTree(expectedResponse);
 
@@ -145,19 +137,19 @@ class RepMetricControllerIntegrationTest {
     class ReadTests {
 
         @Test
-        @DisplayName("GET /repMetrics -> returns all repMetrics")
+        @DisplayName("GET /conditionalMetrics -> returns all conditionalMetrics")
         void getAll() throws Exception {
 
-            RepMetric repMetric1 = repMetricRepository.save(RepMetric.builder()
-                    .repId(rep.getId())
-                    .conditionalMetricId(conditionalMetric.getId())
-                    .value(3)
+            ConditionalMetric cm1 = conditionalMetricRepository.save(ConditionalMetric.builder()
+                    .name("Exit velocity from T")
+                    .conditionId(condition.getId())
+                    .metricId(metric.getId())
                     .build());
 
-            RepMetric repMetric2 = repMetricRepository.save(RepMetric.builder()
-                    .repId(rep.getId())
-                    .conditionalMetricId(conditionalMetric.getId())
-                    .value(7)
+            ConditionalMetric cm2 = conditionalMetricRepository.save(ConditionalMetric.builder()
+                    .name("Spin rate pitching machine")
+                    .conditionId(condition.getId())
+                    .metricId(metric.getId())
                     .build());
 
             String jsonResponse = mvc.perform(
@@ -168,22 +160,22 @@ class RepMetricControllerIntegrationTest {
                     .andReturn().getResponse().getContentAsString();
 
             String expectedResponse = """
-                [
-                    {
-                        "id"                  : %d,
-                        "repId"               : %d,
-                        "conditionalMetricId" : %d,
-                        "value"               : 3
-                   },
-                    {
-                        "id"                  : %d,
-                        "repId"               : %d,
-                        "conditionalMetricId" : %d,
-                        "value"               : 7
-                    }
-                ]
-                """.formatted(repMetric1.getId(), rep.getId(), conditionalMetric.getId(),
-                              repMetric2.getId(), rep.getId(), conditionalMetric.getId());
+                    [
+                        {
+                            "id"          : %d,
+                            "name"        : "Exit velocity from T",
+                            "conditionId" : %d,
+                            "metricId"    : %d
+                        },
+                        {
+                            "id"          : %d,
+                            "name"        : "Spin rate pitching machine",
+                            "conditionId" : %d,
+                            "metricId"    : %d
+                        }
+                    ]
+                    """.formatted(cm1.getId(), condition.getId(), metric.getId(),
+                                  cm2.getId(), condition.getId(), metric.getId());
 
             JsonNode expectedNode = objectMapper.readTree(expectedResponse);
             JsonNode actualNode   = objectMapper.readTree(jsonResponse);
@@ -192,30 +184,30 @@ class RepMetricControllerIntegrationTest {
         }
 
         @Test
-        @DisplayName("GET /repMetrics/{id} -> returns repMetric by ID")
+        @DisplayName("GET /conditionalMetrics/{id} -> returns conditionalMetric by ID")
         void getById() throws Exception {
 
-            RepMetric repMetric = repMetricRepository.save(RepMetric.builder()
-                    .repId(rep.getId())
-                    .conditionalMetricId(conditionalMetric.getId())
-                    .value(3)
+            ConditionalMetric cm = conditionalMetricRepository.save(ConditionalMetric.builder()
+                    .name("Exit velocity from T")
+                    .conditionId(condition.getId())
+                    .metricId(metric.getId())
                     .build());
 
             String jsonResponse = mvc.perform(
-                            get(API + "/" + repMetric.getId())
+                            get(API + "/" + cm.getId())
                                     .with(httpBasic("biolab", "biolab"))
                     )
                     .andExpect(status().isOk())
                     .andReturn().getResponse().getContentAsString();
 
             String expectedResponse = """
-                                     {
-                                        "id"                  : %d,
-                                        "repId"               : %d,
-                                        "conditionalMetricId" : %d,
-                                        "value"               : 3
-                                     }
-                                    """.formatted(repMetric.getId(), rep.getId(), conditionalMetric.getId());
+                    {
+                        "id"          : %d,
+                        "name"        : "Exit velocity from T",
+                        "conditionId" : %d,
+                        "metricId"    : %d
+                    }
+                    """.formatted(cm.getId(), condition.getId(), metric.getId());
 
             JsonNode expectedNode = objectMapper.readTree(expectedResponse);
             JsonNode actualNode   = objectMapper.readTree(jsonResponse);
@@ -224,8 +216,8 @@ class RepMetricControllerIntegrationTest {
         }
 
         @Test
-        @DisplayName("GET /repMetrics/{id} with unknown ID -> returns 404")
-        void getByIdValidationError() throws Exception {
+        @DisplayName("GET /conditionalMetrics/{id} with unknown ID -> returns 404")
+        void getByIdNotFound() throws Exception {
             String jsonResponse = mvc.perform(
                             get(API + "/999999")
                                     .with(httpBasic("biolab", "biolab"))
@@ -234,18 +226,17 @@ class RepMetricControllerIntegrationTest {
                     .andReturn().getResponse().getContentAsString();
 
             String expectedResponse = """
-                {
-                    "status" : 404,
-                    "message": "RepMetric not found by id: 999999"
-                }
-                """;
+                    {
+                        "status" : 404,
+                        "message": "ConditionalMetric not found by id: 999999"
+                    }
+                    """;
 
             JsonNode expectedNode = objectMapper.readTree(expectedResponse);
             JsonNode actualNode   = objectMapper.readTree(jsonResponse);
 
             assertEquals(expectedNode, actualNode);
         }
-
     }
 
     @Nested
@@ -253,22 +244,24 @@ class RepMetricControllerIntegrationTest {
     class UpdateTests {
 
         @Test
-        @DisplayName("PUT /repMetrics -> updates and returns the RepMetric")
+        @DisplayName("PUT /conditionalMetrics -> updates and returns the ConditionalMetric")
         void update() throws Exception {
-            RepMetric original = repMetricRepository.save(RepMetric.builder()
-                    .repId(rep.getId())
-                    .conditionalMetricId(conditionalMetric.getId())
-                    .value(3)
+            ConditionalMetric original = conditionalMetricRepository.save(ConditionalMetric.builder()
+                    .name("Exit velocity from T")
+                    .conditionId(condition.getId())
+                    .metricId(metric.getId())
                     .build());
 
-           String updateRequest = """
-                                {
-                                   "id"                  : %d,
-                                   "repId"               : %d,
-                                   "conditionalMetricId" : %d,
-                                   "value"               : 6
-                                }
-                                """.formatted(original.getId(), rep.getId(), conditionalMetric.getId());
+            Metric updatedMetric = factory.createMetric("UpdatedMetric");
+
+            String updateRequest = """
+                    {
+                        "id"          : %d,
+                        "name"        : "Exit velocity from T",
+                        "conditionId" : %d,
+                        "metricId"    : %d
+                    }
+                    """.formatted(original.getId(), condition.getId(), updatedMetric.getId());
 
             String jsonResponse = mvc.perform(
                             put(API)
@@ -282,30 +275,34 @@ class RepMetricControllerIntegrationTest {
             JsonNode responseNode = objectMapper.readTree(jsonResponse);
 
             String expectedResponse = """
-                                {
-                                    "id"                  : %d,
-                                    "repId"               : %d,
-                                    "conditionalMetricId" : %d,
-                                    "value"               : 6
-                                 }
-                                """.formatted(original.getId(), rep.getId(), conditionalMetric.getId());
+                    {
+                        "id"          : %d,
+                        "name"        : "Exit velocity from T",
+                        "conditionId" : %d,
+                        "metricId"    : %d
+                    }
+                    """.formatted(original.getId(), condition.getId(), updatedMetric.getId());
 
             JsonNode expectedNode = objectMapper.readTree(expectedResponse);
 
             assertEquals(expectedNode, responseNode);
+
+            ConditionalMetric updated = conditionalMetricRepository.findById(original.getId()).orElseThrow();
+            assertEquals(updated.getMetricId(), updatedMetric.getId());
         }
 
         @Test
-        @DisplayName("PUT /repMetrics with invalid id -> returns 404")
-        void updateValidationError() throws Exception {
+        @DisplayName("PUT /conditionalMetrics with invalid id -> returns 404")
+        void updateNotFound() throws Exception {
 
             String updateRequest = """
-                                 {
-                                     "id"                  : 999999,
-                                     "repId"               : %d,
-                                     "conditionalMetricId" : %d
-                                 }
-                                 """.formatted(rep.getId(), conditionalMetric.getId());
+                    {
+                        "id"          : 999999,
+                        "name"        : "Exit velocity from T",
+                        "conditionId" : %d,
+                        "metricId"    : %d
+                    }
+                    """.formatted(condition.getId(), metric.getId());
 
             String jsonResponse = mvc.perform(
                             put(API)
@@ -316,21 +313,18 @@ class RepMetricControllerIntegrationTest {
                     .andExpect(status().isNotFound())
                     .andReturn().getResponse().getContentAsString();
 
-
             String expectedResponse = """
-                {
-                    "status" : 404,
-                    "message": "RepMetricService. Could not update RepMetric by id: 999999"
-                }
-                """;
+                    {
+                        "status" : 404,
+                        "message": "ConditionalMetricService. Could not update ConditionalMetric by id: 999999"
+                    }
+                    """;
 
             JsonNode expectedNode = objectMapper.readTree(expectedResponse);
             JsonNode actualNode   = objectMapper.readTree(jsonResponse);
 
             assertEquals(expectedNode, actualNode);
-
         }
-
     }
 
     @Nested
@@ -338,38 +332,39 @@ class RepMetricControllerIntegrationTest {
     class DeleteTests {
 
         @Test
-        @DisplayName("DELETE /repMetrics/{id} -> deletes the RepMetric")
+        @DisplayName("DELETE /conditionalMetrics/{id} -> deletes the ConditionalMetric")
         void delete() throws Exception {
-            RepMetric repMetric = repMetricRepository.save(RepMetric.builder()
-                    .repId(rep.getId())
-                    .conditionalMetricId(conditionalMetric.getId())
+            ConditionalMetric cm = conditionalMetricRepository.save(ConditionalMetric.builder()
+                    .name("Exit velocity from T")
+                    .conditionId(condition.getId())
+                    .metricId(metric.getId())
                     .build());
 
             String jsonResponse = mvc.perform(
-                            MockMvcRequestBuilders.delete(API + "/" + repMetric.getId())
+                            MockMvcRequestBuilders.delete(API + "/" + cm.getId())
                                     .with(httpBasic("biolab", "biolab"))
                     )
                     .andExpect(status().isOk())
                     .andReturn().getResponse().getContentAsString();
 
             String expectedResponse = """
-                {
-                    "status" : 200,
-                    "message": "Success"
-                }
-                """;
+                    {
+                        "status" : 200,
+                        "message": "Success"
+                    }
+                    """;
 
             JsonNode expectedNode = objectMapper.readTree(expectedResponse);
             JsonNode actualNode   = objectMapper.readTree(jsonResponse);
 
             assertEquals(expectedNode, actualNode);
 
-            assertFalse(repMetricRepository.existsById(repMetric.getId()));
+            assertFalse(conditionalMetricRepository.existsById(cm.getId()));
         }
 
         @Test
-        @DisplayName("DELETE /repMetrics/{id} with unknown ID -> returns 404")
-        void deleteValidationError() throws Exception {
+        @DisplayName("DELETE /conditionalMetrics/{id} with unknown ID -> returns 404")
+        void deleteNotFound() throws Exception {
             String jsonResponse = mvc.perform(
                             MockMvcRequestBuilders.delete(API + "/999999")
                                     .with(httpBasic("biolab", "biolab"))
@@ -378,11 +373,11 @@ class RepMetricControllerIntegrationTest {
                     .andReturn().getResponse().getContentAsString();
 
             String expectedResponse = """
-                {
-                    "status" : 404,
-                    "message": "RepMetricService. Could not delete id: 999999"
-                }
-                """;
+                    {
+                        "status" : 404,
+                        "message": "ConditionalMetricService. Could not delete id: 999999"
+                    }
+                    """;
 
             JsonNode expectedNode = objectMapper.readTree(expectedResponse);
             JsonNode actualNode   = objectMapper.readTree(jsonResponse);
@@ -390,5 +385,4 @@ class RepMetricControllerIntegrationTest {
             assertEquals(expectedNode, actualNode);
         }
     }
-
 }
