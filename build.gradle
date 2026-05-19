@@ -1,3 +1,5 @@
+import org.yaml.snakeyaml.Yaml
+
 buildscript {
 	repositories { mavenCentral() }
 	dependencies {
@@ -37,7 +39,7 @@ ext {
 	set('springCloudVersion', "2025.0.0")
 	set('springModulithVersion', "1.4.3")
 
-	def ds = new org.yaml.snakeyaml.Yaml()
+	def ds = new Yaml()
 			.load(file('src/main/resources/application.yml').text)
 			.spring.datasource
 
