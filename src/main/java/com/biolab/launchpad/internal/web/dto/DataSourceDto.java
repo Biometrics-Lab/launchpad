@@ -10,6 +10,7 @@ public record DataSourceDto(
         Integer integrationId,
         @NotNull(message = "DataSource metricId cannot be null")
         Integer metricId,
+        String name,
         @NotNull(message = "DataSource type cannot be null")
         String type,
         String content

@@ -41,7 +41,7 @@ databaseChangeLog:
                   constraints:
                     nullable: false
               - column:
-                  name: source_id
+                  name: data_source_id
                   type: integer
                   constraints:
                     nullable: false
@@ -232,8 +232,18 @@ databaseChangeLog:
                   constraints:
                     nullable: false
               - column:
-                  name: description
-                  type: varchar(250)
+                  name: integration_id
+                  type: integer
+                  constraints:
+                    nullable: true
+              - column:
+                  name: metric_id
+                  type: integer
+                  constraints:
+                    nullable: true
+              - column:
+                  name: content
+                  type: text
                   constraints:
                     nullable: true
         # data_source_type_dictionary
@@ -251,6 +261,22 @@ databaseChangeLog:
                   type: varchar(250)
                   constraints:
                     nullable: true
+        # integration
+        - createTable:
+            tableName: integration
+            columns:
+              - column:
+                  name: id
+                  type: integer
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: name
+                  type: varchar(100)
+                  constraints:
+                    nullable: false
         # measurement
         - createTable:
             tableName: measurement
@@ -336,7 +362,7 @@ databaseChangeLog:
                   constraints:
                     nullable: false
               - column:
-                  name: metric_id
+                  name: conditional_metric_id
                   type: integer
                   constraints:
                     nullable: false
@@ -678,11 +704,6 @@ databaseChangeLog:
                   constraints:
                     nullable: false
               - column:
-                  name: source_id
-                  type: integer
-                  constraints:
-                    nullable: false
-              - column:
                   name: data_source_id
                   type: integer
                   constraints:
@@ -760,10 +781,16 @@ databaseChangeLog:
         # data_source
         - addForeignKeyConstraint:
             baseTableName: data_source
-            baseColumnNames: type
-            referencedTableName: data_source_type_dictionary
-            referencedColumnNames: name
-            constraintName: fk_data_source_data_source_type_dictionary
+            baseColumnNames: integration_id
+            referencedTableName: integration
+            referencedColumnNames: id
+            constraintName: fk_data_source_integration
+        - addForeignKeyConstraint:
+            baseTableName: data_source
+            baseColumnNames: metric_id
+            referencedTableName: metric
+            referencedColumnNames: id
+            constraintName: fk_data_source_metric
         # team
         - addForeignKeyConstraint:
             baseTableName: team
@@ -826,10 +853,10 @@ databaseChangeLog:
             constraintName: fk_model_metric_model
         - addForeignKeyConstraint:
             baseTableName: model_metric
-            baseColumnNames: metric_id
-            referencedTableName: metric
+            baseColumnNames: conditional_metric_id
+            referencedTableName: conditional_metric
             referencedColumnNames: id
-            constraintName: fk_model_metric_metric
+            constraintName: fk_model_metric_conditional_metric
         # assessment_template
         - addForeignKeyConstraint:
             baseTableName: assessment_template
@@ -885,16 +912,10 @@ databaseChangeLog:
             constraintName: fk_template_metric_conditional_metric
         - addForeignKeyConstraint:
             baseTableName: template_metric
-            baseColumnNames: source_id
-            referencedTableName: data_source
-            referencedColumnNames: id
-            constraintName: fk_template_metric_data_source
-        - addForeignKeyConstraint:
-            baseTableName: template_metric
             baseColumnNames: data_source_id
             referencedTableName: data_source
             referencedColumnNames: id
-            constraintName: fk_template_metric_data_source_2
+            constraintName: fk_template_metric_data_source
         # assessment
         - addForeignKeyConstraint:
             baseTableName: assessment
@@ -935,7 +956,7 @@ databaseChangeLog:
             constraintName: fk_assessment_metric_conditional_metric
         - addForeignKeyConstraint:
             baseTableName: assessment_metric
-            baseColumnNames: source_id
+            baseColumnNames: data_source_id
             referencedTableName: data_source
             referencedColumnNames: id
             constraintName: fk_assessment_metric_data_source

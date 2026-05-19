@@ -70,7 +70,7 @@ class TemplateMetricControllerIntegrationTest {
                                 {
                                     "templateId"          : %d,
                                     "conditionalMetricId" : %d,
-                                    "sourceId"            : %d
+                                    "dataSourceId"        : %d
                                 }
                             """.formatted(template.getId(), conditionalMetric.getId(), source.getId());
 
@@ -95,8 +95,7 @@ class TemplateMetricControllerIntegrationTest {
                                         "id"                  : %d,
                                         "templateId"          : %d,
                                         "conditionalMetricId" : %d,
-                                        "sourceId"            : %d,
-                                        "dataSourceId"        : null,
+                                        "dataSourceId"        : %d,
                                         "description"         : null
                                       }
                                     """.formatted(id, template.getId(), conditionalMetric.getId(), source.getId());
@@ -132,7 +131,7 @@ class TemplateMetricControllerIntegrationTest {
                     """
                             {
                                 "status"  : 422,
-                                "message" : "Validation failed: conditionalMetricId: TemplateMetric conditionalMetricId cannot be null, and sourceId: TemplateMetric sourceId cannot be null, and templateId: TemplateMetric templateId cannot be null"
+                                "message" : "Validation failed: conditionalMetricId: TemplateMetric conditionalMetricId cannot be null, and templateId: TemplateMetric templateId cannot be null"
                             }
                             """;
 
@@ -153,13 +152,13 @@ class TemplateMetricControllerIntegrationTest {
             TemplateMetric templateMetric1 = templateMetricRepository.save(TemplateMetric.builder()
                     .templateId(template.getId())
                     .conditionalMetricId(conditionalMetric.getId())
-                    .sourceId(source.getId())
+                    .dataSourceId(source.getId())
                     .build());
 
             TemplateMetric templateMetric2 = templateMetricRepository.save(TemplateMetric.builder()
                     .templateId(template.getId())
                     .conditionalMetricId(conditionalMetric.getId())
-                    .sourceId(source.getId())
+                    .dataSourceId(source.getId())
                     .build());
 
             String jsonResponse = mvc.perform(
@@ -175,16 +174,14 @@ class TemplateMetricControllerIntegrationTest {
                         "id"                  : %d,
                         "templateId"          : %d,
                         "conditionalMetricId" : %d,
-                        "sourceId"            : %d,
-                        "dataSourceId"        : null,
+                        "dataSourceId"        : %d,
                         "description"         : null
                     },
                     {
                         "id"                  : %d,
                         "templateId"          : %d,
                         "conditionalMetricId" : %d,
-                        "sourceId"            : %d,
-                        "dataSourceId"        : null,
+                        "dataSourceId"        : %d,
                         "description"         : null
                     }
                 ]
@@ -204,7 +201,7 @@ class TemplateMetricControllerIntegrationTest {
             TemplateMetric templateMetric = templateMetricRepository.save(TemplateMetric.builder()
                     .templateId(template.getId())
                     .conditionalMetricId(conditionalMetric.getId())
-                    .sourceId(source.getId())
+                    .dataSourceId(source.getId())
                     .build());
 
             String jsonResponse = mvc.perform(
@@ -219,8 +216,7 @@ class TemplateMetricControllerIntegrationTest {
                                         "id"                  : %d,
                                         "templateId"          : %d,
                                         "conditionalMetricId" : %d,
-                                        "sourceId"            : %d,
-                                        "dataSourceId"        : null,
+                                        "dataSourceId"        : %d,
                                         "description"         : null
                                      }
                                     """.formatted(templateMetric.getId(), template.getId(), conditionalMetric.getId(), source.getId());
@@ -266,7 +262,7 @@ class TemplateMetricControllerIntegrationTest {
             TemplateMetric original = templateMetricRepository.save(TemplateMetric.builder()
                     .templateId(template.getId())
                     .conditionalMetricId(conditionalMetric.getId())
-                    .sourceId(source.getId())
+                    .dataSourceId(source.getId())
                     .build());
 
             ConditionalMetric updated_cm = factory.createConditionalMetric();
@@ -275,7 +271,7 @@ class TemplateMetricControllerIntegrationTest {
                                     "id"                  : %d,
                                     "templateId"          : %d,
                                     "conditionalMetricId" : %d,
-                                    "sourceId"            : %d
+                                    "dataSourceId"        : %d
                                  }
                                 """.formatted(original.getId(), template.getId(), updated_cm.getId(), source.getId());
 
@@ -295,8 +291,7 @@ class TemplateMetricControllerIntegrationTest {
                                     "id"                  : %d,
                                     "templateId"          : %d,
                                     "conditionalMetricId" : %d,
-                                    "sourceId"            : %d,
-                                    "dataSourceId"        : null,
+                                    "dataSourceId"        : %d,
                                     "description"         : null
                                  }
                                 """.formatted(original.getId(), template.getId(), updated_cm.getId(), source.getId());
@@ -319,7 +314,7 @@ class TemplateMetricControllerIntegrationTest {
                                      "id"                  : 999999,
                                      "templateId"          : %d,
                                      "conditionalMetricId" : %d,
-                                     "sourceId"            : %d
+                                     "dataSourceId"        : %d
                                  }
                                  """.formatted(template.getId(), conditionalMetric.getId(), source.getId());
 
@@ -359,7 +354,7 @@ class TemplateMetricControllerIntegrationTest {
             TemplateMetric templateMetric = templateMetricRepository.save(TemplateMetric.builder()
                     .templateId(template.getId())
                     .conditionalMetricId(conditionalMetric.getId())
-                    .sourceId(source.getId())
+                    .dataSourceId(source.getId())
                     .build());
 
             String jsonResponse = mvc.perform(

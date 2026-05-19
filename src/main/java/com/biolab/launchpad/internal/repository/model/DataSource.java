@@ -19,6 +19,7 @@ public class DataSource extends ID {
     @NotNull(message = "DataSource metricId cannot be null")
     @Column("metric_id")
     private Integer metricId;
+    private String name;
     @NotNull(message = "DataSource type cannot be null")
     private String type;
     private String content;

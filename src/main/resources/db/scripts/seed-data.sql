@@ -56,14 +56,14 @@ SELECT 'Time to Impact',(SELECT id FROM condition WHERE name = 'Hitting from T')
 WHERE NOT EXISTS (SELECT 1 FROM conditional_metric WHERE name = 'Time to Impact' AND metric_id = (SELECT id FROM metric WHERE name = 'Time to Impact'));
 
 -- data_source (→ integration, metric)
-INSERT INTO data_source (type, integration_id, metric_id, content)
-SELECT 'JSON_CONFIG', (SELECT id FROM integration WHERE name = 'Blast Motion'), (SELECT id FROM metric WHERE name = 'Bat Speed'),      '{"path": "$.batSpeed"}'
+INSERT INTO data_source (name, type, integration_id, metric_id, content)
+SELECT 'Blast Bat Speed',     'JSON_CONFIG', (SELECT id FROM integration WHERE name = 'Blast Motion'), (SELECT id FROM metric WHERE name = 'Bat Speed'),      '{"path": "$.batSpeed"}'
 WHERE NOT EXISTS (SELECT 1 FROM data_source WHERE integration_id = (SELECT id FROM integration WHERE name = 'Blast Motion') AND metric_id = (SELECT id FROM metric WHERE name = 'Bat Speed'));
-INSERT INTO data_source (type, integration_id, metric_id, content)
-SELECT 'JSON_CONFIG', (SELECT id FROM integration WHERE name = 'Blast Motion'), (SELECT id FROM metric WHERE name = 'Attack Angle'),   '{"path": "$.attackAngle"}'
+INSERT INTO data_source (name, type, integration_id, metric_id, content)
+SELECT 'Blast Attack Angle',  'JSON_CONFIG', (SELECT id FROM integration WHERE name = 'Blast Motion'), (SELECT id FROM metric WHERE name = 'Attack Angle'),   '{"path": "$.attackAngle"}'
 WHERE NOT EXISTS (SELECT 1 FROM data_source WHERE integration_id = (SELECT id FROM integration WHERE name = 'Blast Motion') AND metric_id = (SELECT id FROM metric WHERE name = 'Attack Angle'));
-INSERT INTO data_source (type, integration_id, metric_id, content)
-SELECT 'JSON_CONFIG', (SELECT id FROM integration WHERE name = 'Blast Motion'), (SELECT id FROM metric WHERE name = 'Time to Impact'),'{"path": "$.timeToContact"}'
+INSERT INTO data_source (name, type, integration_id, metric_id, content)
+SELECT 'Blast Time to Impact','JSON_CONFIG', (SELECT id FROM integration WHERE name = 'Blast Motion'), (SELECT id FROM metric WHERE name = 'Time to Impact'), '{"path": "$.timeToContact"}'
 WHERE NOT EXISTS (SELECT 1 FROM data_source WHERE integration_id = (SELECT id FROM integration WHERE name = 'Blast Motion') AND metric_id = (SELECT id FROM metric WHERE name = 'Time to Impact'));
 
 -- assessment_template (→ sport_dictionary)
@@ -115,11 +115,10 @@ INSERT INTO rep (session_id, start_time) VALUES
     );
 
 -- template_metric (→ assessment_template, conditional_metric, data_source)
-INSERT INTO template_metric (template_id, conditional_metric_id, source_id, data_source_id, description)
+INSERT INTO template_metric (template_id, conditional_metric_id, data_source_id, description)
 SELECT
     (SELECT id FROM assessment_template WHERE name = 'Blast Hitting T'),
     cm.id,
-    ds.id,
     ds.id,
     cm.name
 FROM conditional_metric cm
@@ -190,19 +189,19 @@ INSERT INTO model (sport, age_group, description) VALUES
     ('Baseball', '13U', '13U Baseball benchmark model'),
     ('Baseball', '12U', '12U Baseball benchmark model');
 
--- model_metric (→ model, metric)
-INSERT INTO model_metric (model_id, metric_id, value)
+-- model_metric (→ model, conditional_metric)
+INSERT INTO model_metric (model_id, conditional_metric_id, value)
 SELECT
     mo.id,
-    m.id,
+    cm.id,
     CASE mo.age_group
-        WHEN '14U' THEN CASE m.name WHEN 'Bat Speed' THEN 68 WHEN 'Attack Angle' THEN 15 WHEN 'Time to Impact' THEN 160 END
-        WHEN '13U' THEN CASE m.name WHEN 'Bat Speed' THEN 62 WHEN 'Attack Angle' THEN 13 WHEN 'Time to Impact' THEN 170 END
-        WHEN '12U' THEN CASE m.name WHEN 'Bat Speed' THEN 56 WHEN 'Attack Angle' THEN 12 WHEN 'Time to Impact' THEN 180 END
+        WHEN '14U' THEN CASE cm.name WHEN 'Bat Speed' THEN 68 WHEN 'Attack Angle' THEN 15 WHEN 'Time to Impact' THEN 160 END
+        WHEN '13U' THEN CASE cm.name WHEN 'Bat Speed' THEN 62 WHEN 'Attack Angle' THEN 13 WHEN 'Time to Impact' THEN 170 END
+        WHEN '12U' THEN CASE cm.name WHEN 'Bat Speed' THEN 56 WHEN 'Attack Angle' THEN 12 WHEN 'Time to Impact' THEN 180 END
     END
 FROM model mo
-CROSS JOIN metric m
-WHERE m.name IN ('Bat Speed', 'Attack Angle', 'Time to Impact');
+CROSS JOIN conditional_metric cm
+WHERE cm.condition_id = (SELECT id FROM condition WHERE name = 'Hitting from T');
 
 -- report (no FK constraints)
 INSERT INTO report (name, ext_ref) VALUES

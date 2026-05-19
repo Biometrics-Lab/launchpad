@@ -34,6 +34,7 @@ public class EntityFactory {
     private final RepMetricRepository                repMetricRepository;
     private final ConditionRepository                conditionRepository;
     private final ConditionalMetricRepository        conditionalMetricRepository;
+    private final TemplateMetricRepository           templateMetricRepository;
 
     public Measurement createMeasurement(String name) {
 
@@ -237,10 +238,10 @@ public class EntityFactory {
         );
     }
 
-    public Session1 createSession1() {
+    public Session createSession1() {
         Assessment assessment = createAssessment();
         return session1Repository.save(
-                Session1.builder()
+                Session.builder()
                         .assessmentId(assessment.getId())
                         .startTime(Timestamp.valueOf(LocalDateTime.of(2025, 10, 2, 14, 45, 1)))
                         .build()
@@ -248,10 +249,10 @@ public class EntityFactory {
     }
 
     public Rep createRep() {
-        Session1 session1 = createSession1();
+        Session session = createSession1();
         return repRepository.save(
                 Rep.builder()
-                        .session1Id(session1.getId())
+                        .session1Id(session.getId())
                         .startTime(Timestamp.valueOf(LocalDateTime.of(2025, 10, 2, 14, 45, 1)))
                         .build()
         );
@@ -291,6 +292,7 @@ public class EntityFactory {
     }
 
     void cleanup() {
+        templateMetricRepository.deleteAll();
         repMetricRepository.deleteAll();
         conditionalMetricRepository.deleteAll();
         conditionRepository.deleteAll();

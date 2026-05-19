@@ -1,9 +1,9 @@
 package com.biolab.launchpad.internal.web.controller;
 
 import com.biolab.launchpad.internal.repository.SessionResourceRepository;
+import com.biolab.launchpad.internal.repository.model.Session;
 import com.biolab.launchpad.internal.repository.model.SessionResource;
 import com.biolab.launchpad.internal.repository.model.ResourceTypeDictionary;
-import com.biolab.launchpad.internal.repository.model.Session1;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.*;
@@ -43,12 +43,12 @@ class SessionResourceControllerIntegrationTest {
     @Autowired
     EntityFactory factory;
 
-    Session1 session1;
+    Session session;
     ResourceTypeDictionary resourceTypeDictionary;
 
     @BeforeEach
     void setUp() {
-        session1                = factory.createSession1();
+        session = factory.createSession1();
         resourceTypeDictionary  = factory.createResourceTypeDictionary("rTypeDictionary");
     }
 
@@ -72,7 +72,7 @@ class SessionResourceControllerIntegrationTest {
                                     "type"           : "%s",
                                     "url"            : "desc"
                                 }
-                            """.formatted(session1.getId(), resourceTypeDictionary.getId());
+                            """.formatted(session.getId(), resourceTypeDictionary.getId());
 
             String jsonResponse = mvc.perform(
                             post(API)
@@ -98,7 +98,7 @@ class SessionResourceControllerIntegrationTest {
                                         "type"           : "%s",
                                         "url"            :"desc"
                                     }
-                            """.formatted(sessionResourceId, session1.getId(), resourceTypeDictionary.getId());
+                            """.formatted(sessionResourceId, session.getId(), resourceTypeDictionary.getId());
 
             JsonNode expectedResponseNode = objectMapper.readTree(expectedResponse);
 
@@ -150,13 +150,13 @@ class SessionResourceControllerIntegrationTest {
         void getAll() throws Exception {
 
             SessionResource sessionResource1 = sessionResourceRepository.save(SessionResource.builder()
-                    .session1Id(session1.getId())
+                    .session1Id(session.getId())
                     .type(resourceTypeDictionary.getId())
                     .url("desc")
                     .build());
 
             SessionResource sessionResource2 = sessionResourceRepository.save(SessionResource.builder()
-                    .session1Id(session1.getId())
+                    .session1Id(session.getId())
                     .type(resourceTypeDictionary.getId())
                     .url("desc")
                     .build());
@@ -183,7 +183,7 @@ class SessionResourceControllerIntegrationTest {
                         "url"            :"desc"
                     }
                 ]
-                """.formatted(sessionResource1.getId(), session1.getId(), resourceTypeDictionary.getId(), sessionResource2.getId(), session1.getId(), resourceTypeDictionary.getId());
+                """.formatted(sessionResource1.getId(), session.getId(), resourceTypeDictionary.getId(), sessionResource2.getId(), session.getId(), resourceTypeDictionary.getId());
 
             JsonNode expectedNode = objectMapper.readTree(expectedResponse);
             JsonNode actualNode   = objectMapper.readTree(jsonResponse);
@@ -196,7 +196,7 @@ class SessionResourceControllerIntegrationTest {
         void getById() throws Exception {
 
             SessionResource sessionResource = sessionResourceRepository.save(SessionResource.builder()
-                    .session1Id(session1.getId())
+                    .session1Id(session.getId())
                     .type(resourceTypeDictionary.getId())
                     .url("desc")
                     .build());
@@ -215,7 +215,7 @@ class SessionResourceControllerIntegrationTest {
                     "type"           : "%s",
                     "url"            :"desc"
                 }
-                """.formatted(sessionResource.getId(), session1.getId() ,resourceTypeDictionary.getId());
+                """.formatted(sessionResource.getId(), session.getId() ,resourceTypeDictionary.getId());
 
             JsonNode expectedNode = objectMapper.readTree(expectedResponse);
             JsonNode actualNode   = objectMapper.readTree(jsonResponse);
@@ -255,7 +255,7 @@ class SessionResourceControllerIntegrationTest {
         @DisplayName("PUT /sessionResources -> updates and returns the SessionResource")
         void update() throws Exception {
             SessionResource original = sessionResourceRepository.save(SessionResource.builder()
-                    .session1Id(session1.getId())
+                    .session1Id(session.getId())
                     .type(resourceTypeDictionary.getId())
                     .url("desc")
                     .build());
@@ -267,7 +267,7 @@ class SessionResourceControllerIntegrationTest {
                     "type"           : "%s",
                     "url"            : "descUPD"
                 }
-                """.formatted(original.getId(), session1.getId(), resourceTypeDictionary.getId());
+                """.formatted(original.getId(), session.getId(), resourceTypeDictionary.getId());
 
             String jsonResponse = mvc.perform(
                             put(API)
@@ -287,7 +287,7 @@ class SessionResourceControllerIntegrationTest {
                     "type"           : "%s",
                     "url"            :"descUPD"
                 }
-                """.formatted(original.getId(), session1.getId(), resourceTypeDictionary.getId());
+                """.formatted(original.getId(), session.getId(), resourceTypeDictionary.getId());
 
             JsonNode expectedNode = objectMapper.readTree(expectedResponse);
 
@@ -308,7 +308,7 @@ class SessionResourceControllerIntegrationTest {
                     "type"           : "%s",
                     "url"            :"desc"
                 }
-                """.formatted(session1.getId(), resourceTypeDictionary.getId());
+                """.formatted(session.getId(), resourceTypeDictionary.getId());
 
             String jsonResponse = mvc.perform(
                             put(API)
@@ -343,7 +343,7 @@ class SessionResourceControllerIntegrationTest {
         @DisplayName("DELETE /sessionResources/{id} -> deletes the SessionResource")
         void delete() throws Exception {
             SessionResource sessionResource = sessionResourceRepository.save(SessionResource.builder()
-                    .session1Id(session1.getId())
+                    .session1Id(session.getId())
                     .type(resourceTypeDictionary.getId())
                     .url("desc")
                     .build());

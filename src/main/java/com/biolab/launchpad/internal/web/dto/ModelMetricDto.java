@@ -8,7 +8,7 @@ public record ModelMetricDto(
         Integer id,
         @NotNull(message = "ModelMetric modelId cannot be null")
         Integer modelId,
-        @NotNull(message = "ModelMetric metricId cannot be null")
-        Integer metricId,
+        @NotNull(message = "ModelMetric conditionalMetricId cannot be null")
+        Integer conditionalMetricId,
         Number value
 ){}

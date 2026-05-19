@@ -1,7 +1,7 @@
 package com.biolab.launchpad.internal.web.controller;
 
 import com.biolab.launchpad.internal.repository.ModelMetricRepository;
-import com.biolab.launchpad.internal.repository.model.Metric;
+import com.biolab.launchpad.internal.repository.model.ConditionalMetric;
 import com.biolab.launchpad.internal.repository.model.Model;
 import com.biolab.launchpad.internal.repository.model.ModelMetric;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -44,12 +44,12 @@ class ModelMetricControllerIntegrationTest {
     EntityFactory factory;
 
     Model model;
-    Metric metric;
+    ConditionalMetric conditionalMetric;
 
     @BeforeEach
     void setUp() {
-        model  = factory.createModel("mod");
-        metric = factory.createMetric("metr");
+        model = factory.createModel("mod");
+        conditionalMetric = factory.createConditionalMetric();
     }
 
     @AfterEach
@@ -66,13 +66,13 @@ class ModelMetricControllerIntegrationTest {
         void create() throws Exception {
 
             String request =
-                            """ 
+                            """
                                 {
-                                    "modelId"     : %d,
-                                    "metricId"    : %d,
-                                    "value"       : 1
+                                    "modelId"             : %d,
+                                    "conditionalMetricId" : %d,
+                                    "value"               : 1
                                 }
-                            """.formatted(model.getId(), metric.getId());
+                            """.formatted(model.getId(), conditionalMetric.getId());
 
             String jsonResponse = mvc.perform(
                             post(API)
@@ -91,14 +91,14 @@ class ModelMetricControllerIntegrationTest {
 
 
             String expectedResponse =
-                    """ 
+                    """
                             {
-                                        "id"          : %d,
-                                        "modelId"     : %d,
-                                        "metricId"    : %d,
-                                        "value"       : 1
+                                        "id"                  : %d,
+                                        "modelId"             : %d,
+                                        "conditionalMetricId" : %d,
+                                        "value"               : 1
                                     }
-                            """.formatted(modelMetricId, model.getId(), metric.getId());
+                            """.formatted(modelMetricId, model.getId(), conditionalMetric.getId());
 
             JsonNode expectedResponseNode = objectMapper.readTree(expectedResponse);
 
@@ -130,8 +130,8 @@ class ModelMetricControllerIntegrationTest {
             String expectedResponse =
                     """
                             {
-                                "status"       : 422,
-                                "message"      : "Validation failed: metricId: ModelMetric metricId cannot be null, and modelId: ModelMetric modelId cannot be null"
+                                "status"  : 422,
+                                "message" : "Validation failed: conditionalMetricId: ModelMetric conditionalMetricId cannot be null, and modelId: ModelMetric modelId cannot be null"
                             }
                             """;
 
@@ -151,13 +151,13 @@ class ModelMetricControllerIntegrationTest {
 
             ModelMetric modelMetric1 = modelMetricRepository.save(ModelMetric.builder()
                     .modelId(model.getId())
-                    .metricId(metric.getId())
+                    .conditionalMetricId(conditionalMetric.getId())
                     .value(1)
                     .build());
 
             ModelMetric modelMetric2 = modelMetricRepository.save(ModelMetric.builder()
                     .modelId(model.getId())
-                    .metricId(metric.getId())
+                    .conditionalMetricId(conditionalMetric.getId())
                     .value(1)
                     .build());
 
@@ -171,19 +171,20 @@ class ModelMetricControllerIntegrationTest {
             String expectedResponse = """
                 [
                     {
-                        "id"            : %d,
-                        "modelId"       : %d,
-                        "metricId"      : %d,
-                        "value"         : 1
+                        "id"                  : %d,
+                        "modelId"             : %d,
+                        "conditionalMetricId" : %d,
+                        "value"               : 1
                     },
                     {
-                        "id"             : %d,
-                        "modelId"        : %d,
-                        "metricId"       : %d,
-                        "value"          : 1
+                        "id"                  : %d,
+                        "modelId"             : %d,
+                        "conditionalMetricId" : %d,
+                        "value"               : 1
                     }
                 ]
-                """.formatted(modelMetric1.getId(), model.getId(), metric.getId(), modelMetric2.getId(), model.getId(), metric.getId());
+                """.formatted(modelMetric1.getId(), model.getId(), conditionalMetric.getId(),
+                              modelMetric2.getId(), model.getId(), conditionalMetric.getId());
 
             JsonNode expectedNode = objectMapper.readTree(expectedResponse);
             JsonNode actualNode   = objectMapper.readTree(jsonResponse);
@@ -197,7 +198,7 @@ class ModelMetricControllerIntegrationTest {
 
             ModelMetric modelMetric = modelMetricRepository.save(ModelMetric.builder()
                     .modelId(model.getId())
-                    .metricId(metric.getId())
+                    .conditionalMetricId(conditionalMetric.getId())
                     .value(1)
                     .build());
 
@@ -210,12 +211,12 @@ class ModelMetricControllerIntegrationTest {
 
             String expectedResponse = """
                 {
-                    "id"            : %d,
-                    "modelId"       : %d,
-                    "metricId"      : %d,
-                    "value"         : 1
+                    "id"                  : %d,
+                    "modelId"             : %d,
+                    "conditionalMetricId" : %d,
+                    "value"               : 1
                 }
-                """.formatted(modelMetric.getId(), model.getId() ,metric.getId());
+                """.formatted(modelMetric.getId(), model.getId(), conditionalMetric.getId());
 
             JsonNode expectedNode = objectMapper.readTree(expectedResponse);
             JsonNode actualNode   = objectMapper.readTree(jsonResponse);
@@ -257,17 +258,17 @@ class ModelMetricControllerIntegrationTest {
         void update() throws Exception {
             ModelMetric original = modelMetricRepository.save(ModelMetric.builder()
                     .modelId(model.getId())
-                    .metricId(metric.getId())
+                    .conditionalMetricId(conditionalMetric.getId())
                     .build());
 
             String updateRequest = """
                 {
-                    "id"          : %d,
-                    "modelId"     : %d,
-                    "metricId"    : %d,
-                    "value"       : 1
+                    "id"                  : %d,
+                    "modelId"             : %d,
+                    "conditionalMetricId" : %d,
+                    "value"               : 1
                 }
-                """.formatted(original.getId(), model.getId(), metric.getId());
+                """.formatted(original.getId(), model.getId(), conditionalMetric.getId());
 
             String jsonResponse = mvc.perform(
                             put(API)
@@ -282,12 +283,12 @@ class ModelMetricControllerIntegrationTest {
 
             String expectedResponse = """
                 {
-                    "id"           : %d,
-                    "modelId"      : %d,
-                    "metricId"     : %d,
-                    "value"        : 1
+                    "id"                  : %d,
+                    "modelId"             : %d,
+                    "conditionalMetricId" : %d,
+                    "value"               : 1
                 }
-                """.formatted(original.getId(), model.getId(), metric.getId());
+                """.formatted(original.getId(), model.getId(), conditionalMetric.getId());
 
             JsonNode expectedNode = objectMapper.readTree(expectedResponse);
 
@@ -301,12 +302,12 @@ class ModelMetricControllerIntegrationTest {
 
             String updateRequest = """
                 {
-                    "id"            : 999999,
-                    "modelId"       : %d,
-                    "metricId"      : %d,
-                    "value"         : 1
+                    "id"                  : 999999,
+                    "modelId"             : %d,
+                    "conditionalMetricId" : %d,
+                    "value"               : 1
                 }
-                """.formatted(model.getId(), metric.getId());
+                """.formatted(model.getId(), conditionalMetric.getId());
 
             String jsonResponse = mvc.perform(
                             put(API)
@@ -344,7 +345,7 @@ class ModelMetricControllerIntegrationTest {
         void delete() throws Exception {
             ModelMetric modelMetric = modelMetricRepository.save(ModelMetric.builder()
                     .modelId(model.getId())
-                    .metricId(metric.getId())
+                    .conditionalMetricId(conditionalMetric.getId())
                     .value(1)
                     .build());
 

@@ -21,7 +21,7 @@ For further reference, please consider the following sections:
 * [Spring Web](https://docs.spring.io/spring-boot/3.5.3/reference/web/servlet.html)
 * [Spring for GraphQL](https://docs.spring.io/spring-boot/3.5.3/reference/web/spring-graphql.html)
 * [Rest Repositories](https://docs.spring.io/spring-boot/3.5.3/how-to/data-access.html#howto.data-access.exposing-spring-data-repositories-as-rest)
-* [Spring Session](https://docs.spring.io/spring-session1/reference/)
+* [Spring Session](https://docs.spring.io/spring-session/reference/)
 * [Spring HATEOAS](https://docs.spring.io/spring-boot/3.5.3/reference/web/spring-hateoas.html)
 * [OAuth2 Client](https://docs.spring.io/spring-boot/3.5.3/reference/web/spring-security.html#web.security.oauth2.client)
 * [Spring Data JPA](https://docs.spring.io/spring-boot/3.5.3/reference/data/sql.html#data.sql.jpa-and-spring-data)

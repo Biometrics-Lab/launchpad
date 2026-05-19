@@ -1,7 +1,7 @@
 package com.biolab.launchpad.internal.service;
 
 import com.biolab.launchpad.internal.repository.Session1Repository;
-import com.biolab.launchpad.internal.repository.model.Session1;
+import com.biolab.launchpad.internal.repository.model.Session;
 import com.biolab.launchpad.internal.security.exceptions.NotFoundByException;
 import com.biolab.launchpad.internal.security.exceptions.PersistException;
 import org.junit.jupiter.api.BeforeEach;
@@ -22,7 +22,7 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("Session1Service Unit Tests")
-class Session1ServiceTest {
+class SessionServiceTest {
 
     @Mock
     private Session1Repository session1Repository;
@@ -30,20 +30,20 @@ class Session1ServiceTest {
     @InjectMocks
     private Session1Service session1Service;
 
-    private Session1 session11Input;
-    private Session1 session11;
-    private Session1 session12;
+    private Session session11Input;
+    private Session session11;
+    private Session session12;
 
     @BeforeEach
     void setUp() {
-        session11Input = Session1.builder()
+        session11Input = Session.builder()
                 .build();
 
-        session11 = Session1.builder()
+        session11 = Session.builder()
                 .id(1)
                 .build();
 
-        session12 = Session1.builder()
+        session12 = Session.builder()
                 .id(2)
                 .build();
     }
@@ -56,7 +56,7 @@ class Session1ServiceTest {
         void create_ok_saves_and_returns_entity() {
             when(session1Repository.save(session11Input)).thenReturn(session11);
 
-            Session1 result = session1Service.create(session11Input);
+            Session result = session1Service.create(session11Input);
 
             assertThat(result).isSameAs(session11);
             verify(session1Repository).save(session11Input);
@@ -82,7 +82,7 @@ class Session1ServiceTest {
         void findAll_returns_list_from_repo() {
             when(session1Repository.findAll()).thenReturn(List.of(session11, session12));
 
-            List<Session1> all = session1Service.findAll();
+            List<Session> all = session1Service.findAll();
 
             assertThat(all).containsExactly(session11, session12);
             verify(session1Repository).findAll();
@@ -98,7 +98,7 @@ class Session1ServiceTest {
         void findById_ok_returns_optional() {
             when(session1Repository.findById(1)).thenReturn(Optional.of(session11));
 
-            Optional<Session1> result = session1Service.findById(1);
+            Optional<Session> result = session1Service.findById(1);
 
             assertThat(result).contains(session11);
             verify(session1Repository).findById(1);
@@ -160,7 +160,7 @@ class Session1ServiceTest {
             when(session1Repository.existsById(1)).thenReturn(true);
             when(session1Repository.save(session11)).thenReturn(session11);
 
-            Session1 result = session1Service.update(session11);
+            Session result = session1Service.update(session11);
 
             assertEquals(1, result.getId().intValue());
             verify(session1Repository).existsById(1);

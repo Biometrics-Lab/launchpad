@@ -10,8 +10,6 @@ public record TemplateMetricDto(
         Integer templateId,
         @NotNull(message = "TemplateMetric conditionalMetricId cannot be null")
         Integer conditionalMetricId,
-        @NotNull(message = "TemplateMetric sourceId cannot be null")
-        Integer sourceId,
         Integer dataSourceId,
         String description
 ) { }

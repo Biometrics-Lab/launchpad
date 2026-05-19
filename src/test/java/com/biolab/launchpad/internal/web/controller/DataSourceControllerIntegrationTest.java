@@ -69,6 +69,7 @@ class DataSourceControllerIntegrationTest {
                     {
                         "integrationId" : %d,
                         "metricId"      : %d,
+                        "name"          : "Exit Velocity",
                         "type"          : "JSON_CONFIG",
                         "content"       : "{\\"path\\": \\"$.exitVelocity\\"}"
                     }
@@ -93,6 +94,7 @@ class DataSourceControllerIntegrationTest {
                         "id"            : %d,
                         "integrationId" : %d,
                         "metricId"      : %d,
+                        "name"          : "Exit Velocity",
                         "type"          : "JSON_CONFIG",
                         "content"       : "{\\"path\\": \\"$.exitVelocity\\"}"
                     }
@@ -158,6 +160,7 @@ class DataSourceControllerIntegrationTest {
                             "id"            : %d,
                             "integrationId" : %d,
                             "metricId"      : %d,
+                            "name"          : null,
                             "type"          : "JSON_CONFIG",
                             "content"       : null
                         },
@@ -165,6 +168,7 @@ class DataSourceControllerIntegrationTest {
                             "id"            : %d,
                             "integrationId" : %d,
                             "metricId"      : %d,
+                            "name"          : null,
                             "type"          : "SCRIPT",
                             "content"       : "return payload.speed;"
                         }
@@ -197,6 +201,7 @@ class DataSourceControllerIntegrationTest {
                         "id"            : %d,
                         "integrationId" : %d,
                         "metricId"      : %d,
+                        "name"          : null,
                         "type"          : "MAPPING",
                         "content"       : "exit_velocity"
                     }
@@ -262,6 +267,7 @@ class DataSourceControllerIntegrationTest {
                         "id"            : %d,
                         "integrationId" : %d,
                         "metricId"      : %d,
+                        "name"          : null,
                         "type"          : "SCRIPT",
                         "content"       : "return payload.v;"
                     }
