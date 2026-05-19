@@ -43,13 +43,13 @@ class AssessmentMetricControllerIntegrationTest {
 
     Assessment        assessment;
     ConditionalMetric conditionalMetric;
-    DataSource        source;
+    DataSource        dataSource;
 
     @BeforeEach
     void setUp() {
         assessment        = factory.createAssessment();
         conditionalMetric = factory.createConditionalMetric();
-        source            = factory.createDataSource("Dsource");
+        dataSource        = factory.createDataSource();
     }
 
     @AfterEach
@@ -70,13 +70,13 @@ class AssessmentMetricControllerIntegrationTest {
                                 {
                                     "assessmentId"        : %d,
                                     "conditionalMetricId" : %d,
-                                    "sourceId"            : %d,
+                                    "dataSourceId"        : %d,
                                     "minValue"            : 1,
                                     "maxValue"            : 2,
                                     "avgValue"            : 3,
                                     "lastValue"           : 4
                                 }
-                            """.formatted(assessment.getId(), conditionalMetric.getId(), source.getId());
+                            """.formatted(assessment.getId(), conditionalMetric.getId(), dataSource.getId());
 
             String jsonResponse = mvc.perform(
                             post(API)
@@ -99,14 +99,14 @@ class AssessmentMetricControllerIntegrationTest {
                                         "id"                  : %d,
                                         "assessmentId"        : %d,
                                         "conditionalMetricId" : %d,
-                                        "sourceId"            : %d,
+                                        "dataSourceId"        : %d,
                                         "minValue"            : 1,
                                         "maxValue"            : 2,
                                         "avgValue"            : 3,
                                         "lastValue"           : 4,
                                         "description"         : null
                                       }
-                                    """.formatted(id, assessment.getId(), conditionalMetric.getId(), source.getId());
+                                    """.formatted(id, assessment.getId(), conditionalMetric.getId(), dataSource.getId());
 
             JsonNode expectedResponseNode = objectMapper.readTree(expectedResponse);
 
@@ -139,7 +139,7 @@ class AssessmentMetricControllerIntegrationTest {
                     """
                             {
                                 "status"  : 422,
-                                "message" : "Validation failed: assessmentId: AssesmentMetric assessmentId cannot be null, and conditionalMetricId: AssesmentMetric conditionalMetricId cannot be null, and sourceId: AssesmentMetric sourceId cannot be null"
+                                "message" : "Validation failed: assessmentId: AssesmentMetric assessmentId cannot be null, and conditionalMetricId: AssesmentMetric conditionalMetricId cannot be null, and dataSourceId: AssesmentMetric dataSourceId cannot be null"
                             }
                             """;
 
@@ -160,7 +160,7 @@ class AssessmentMetricControllerIntegrationTest {
             AssessmentMetric assessmentMetric1 = assessmentMetricRepository.save(AssessmentMetric.builder()
                     .assessmentId(assessment.getId())
                     .conditionalMetricId(conditionalMetric.getId())
-                    .sourceId(source.getId())
+                    .dataSourceId(dataSource.getId())
                     .minValue(1)
                     .maxValue(2)
                     .avgValue(3)
@@ -170,7 +170,7 @@ class AssessmentMetricControllerIntegrationTest {
             AssessmentMetric assessmentMetric2 = assessmentMetricRepository.save(AssessmentMetric.builder()
                     .assessmentId(assessment.getId())
                     .conditionalMetricId(conditionalMetric.getId())
-                    .sourceId(source.getId())
+                    .dataSourceId(dataSource.getId())
                     .minValue(5)
                     .maxValue(6)
                     .avgValue(7)
@@ -190,7 +190,7 @@ class AssessmentMetricControllerIntegrationTest {
                         "id"                  : %d,
                         "assessmentId"        : %d,
                         "conditionalMetricId" : %d,
-                        "sourceId"            : %d,
+                        "dataSourceId"        : %d,
                         "minValue"            : 1,
                         "maxValue"            : 2,
                         "avgValue"            : 3,
@@ -201,7 +201,7 @@ class AssessmentMetricControllerIntegrationTest {
                         "id"                  : %d,
                         "assessmentId"        : %d,
                         "conditionalMetricId" : %d,
-                        "sourceId"            : %d,
+                        "dataSourceId"        : %d,
                         "minValue"            : 5,
                         "maxValue"            : 6,
                         "avgValue"            : 7,
@@ -209,8 +209,8 @@ class AssessmentMetricControllerIntegrationTest {
                         "description"         : null
                     }
                 ]
-                """.formatted(assessmentMetric1.getId(), assessment.getId(), conditionalMetric.getId(), source.getId(),
-                              assessmentMetric2.getId(), assessment.getId(), conditionalMetric.getId(), source.getId());
+                """.formatted(assessmentMetric1.getId(), assessment.getId(), conditionalMetric.getId(), dataSource.getId(),
+                              assessmentMetric2.getId(), assessment.getId(), conditionalMetric.getId(), dataSource.getId());
 
             JsonNode expectedNode = objectMapper.readTree(expectedResponse);
             JsonNode actualNode   = objectMapper.readTree(jsonResponse);
@@ -225,7 +225,7 @@ class AssessmentMetricControllerIntegrationTest {
             AssessmentMetric assessmentMetric = assessmentMetricRepository.save(AssessmentMetric.builder()
                     .assessmentId(assessment.getId())
                     .conditionalMetricId(conditionalMetric.getId())
-                    .sourceId(source.getId())
+                    .dataSourceId(dataSource.getId())
                     .minValue(1)
                     .maxValue(2)
                     .avgValue(3)
@@ -244,14 +244,14 @@ class AssessmentMetricControllerIntegrationTest {
                                         "id"                  : %d,
                                         "assessmentId"        : %d,
                                         "conditionalMetricId" : %d,
-                                        "sourceId"            : %d,
+                                        "dataSourceId"        : %d,
                                         "minValue"            : 1,
                                         "maxValue"            : 2,
                                         "avgValue"            : 3,
                                         "lastValue"           : 4,
                                         "description"         : null
                                      }
-                                    """.formatted(assessmentMetric.getId(), assessment.getId(), conditionalMetric.getId(), source.getId());
+                                    """.formatted(assessmentMetric.getId(), assessment.getId(), conditionalMetric.getId(), dataSource.getId());
 
             JsonNode expectedNode = objectMapper.readTree(expectedResponse);
             JsonNode actualNode   = objectMapper.readTree(jsonResponse);
@@ -294,7 +294,7 @@ class AssessmentMetricControllerIntegrationTest {
             AssessmentMetric original = assessmentMetricRepository.save(AssessmentMetric.builder()
                     .assessmentId(assessment.getId())
                     .conditionalMetricId(conditionalMetric.getId())
-                    .sourceId(source.getId())
+                    .dataSourceId(dataSource.getId())
                     .minValue(1)
                     .maxValue(2)
                     .avgValue(3)
@@ -306,13 +306,13 @@ class AssessmentMetricControllerIntegrationTest {
                                     "id"                  : %d,
                                     "assessmentId"        : %d,
                                     "conditionalMetricId" : %d,
-                                    "sourceId"            : %d,
+                                    "dataSourceId"        : %d,
                                     "minValue"            : 4,
                                     "maxValue"            : 5,
                                     "avgValue"            : 6,
                                     "lastValue"           : 7
                                 }
-                                """.formatted(original.getId(), assessment.getId(), conditionalMetric.getId(), source.getId());
+                                """.formatted(original.getId(), assessment.getId(), conditionalMetric.getId(), dataSource.getId());
 
             String jsonResponse = mvc.perform(
                             put(API)
@@ -330,14 +330,14 @@ class AssessmentMetricControllerIntegrationTest {
                                     "id"                  : %d,
                                     "assessmentId"        : %d,
                                     "conditionalMetricId" : %d,
-                                    "sourceId"            : %d,
+                                    "dataSourceId"        : %d,
                                     "minValue"            : 4,
                                     "maxValue"            : 5,
                                     "avgValue"            : 6,
                                     "lastValue"           : 7,
                                     "description"         : null
                                  }
-                                """.formatted(original.getId(), assessment.getId(), conditionalMetric.getId(), source.getId());
+                                """.formatted(original.getId(), assessment.getId(), conditionalMetric.getId(), dataSource.getId());
 
             JsonNode expectedNode = objectMapper.readTree(expectedResponse);
 
@@ -353,9 +353,9 @@ class AssessmentMetricControllerIntegrationTest {
                                      "id"                  : 999999,
                                      "assessmentId"        : %d,
                                      "conditionalMetricId" : %d,
-                                     "sourceId"            : %d
+                                     "dataSourceId"        : %d
                                  }
-                                 """.formatted(assessment.getId(), conditionalMetric.getId(), source.getId());
+                                 """.formatted(assessment.getId(), conditionalMetric.getId(), dataSource.getId());
 
             String jsonResponse = mvc.perform(
                             put(API)
@@ -393,7 +393,7 @@ class AssessmentMetricControllerIntegrationTest {
             AssessmentMetric assessmentMetric = assessmentMetricRepository.save(AssessmentMetric.builder()
                     .assessmentId(assessment.getId())
                     .conditionalMetricId(conditionalMetric.getId())
-                    .sourceId(source.getId())
+                    .dataSourceId(dataSource.getId())
                     .build());
 
             String jsonResponse = mvc.perform(

@@ -13,7 +13,7 @@ import org.springframework.data.relational.core.mapping.Table;
 @Table("session_resource")
 public class SessionResource extends ID {
     @NotNull(message = "SessionResource sessionId cannot be null")
-    @Column("session1_id")
+    @Column("session_id")
     private Integer session1Id;
     @NotNull(message = "SessionResource type cannot be null")
     private String type;

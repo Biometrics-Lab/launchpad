@@ -1,10 +1,6 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
-
-## Ticket Workflow Rules
-
-- Before starting any ticket, fetch it from Notion and check the **"Blocked by"** relation property. If any blocker is not Done, tell the user which tickets must be completed first and do not start implementation.
+@/Users/romanvakulenko/runlife/claude-config/launchpad/CLAUDE.md
 
 ## Commands
 

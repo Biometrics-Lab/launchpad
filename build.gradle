@@ -1,8 +1,18 @@
+import org.yaml.snakeyaml.Yaml
+
+buildscript {
+	repositories { mavenCentral() }
+	dependencies {
+		classpath 'org.yaml:snakeyaml:2.4'
+	}
+}
+
 plugins {
 	id 'java'
 	id 'org.springframework.boot' version '3.5.3'
 	id 'io.spring.dependency-management' version '1.1.7'
 	id 'org.asciidoctor.jvm.convert' version '3.3.2'
+	id 'org.liquibase.gradle' version '2.2.2'
 }
 
 group = 'com.biolab'
@@ -28,6 +38,15 @@ ext {
 	set('snippetsDir', file("build/generated-snippets"))
 	set('springCloudVersion', "2025.0.0")
 	set('springModulithVersion', "1.4.3")
+
+	def ds = new Yaml()
+			.load(file('src/main/resources/application.yml').text)
+			.spring.datasource
+
+	dbUrl      = ds.url      as String
+	dbUser     = ds.username as String
+	dbPassword = ds.password as String
+	dbName     = dbUrl.tokenize('/').last()
 }
 
 dependencies {
@@ -81,6 +100,12 @@ dependencies {
 	testCompileOnly 'org.projectlombok:lombok'
 	testAnnotationProcessor 'org.projectlombok:lombok'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+	liquibaseRuntime 'org.liquibase:liquibase-core:4.31.1'
+	liquibaseRuntime 'org.liquibase:liquibase-commercial:4.31.1'
+	liquibaseRuntime 'org.postgresql:postgresql:42.7.7'
+	liquibaseRuntime 'org.yaml:snakeyaml:2.4'
+	liquibaseRuntime 'info.picocli:picocli:4.7.6'
 }
 
 dependencyManagement {
@@ -112,6 +137,9 @@ tasks.register('initDB', Exec) {
 	workingDir 'src/main/resources/db/scripts/'
 	//on linux
 	commandLine './initialize-db.sh'
+	environment 'DB_NAME', dbName
+	environment 'DB_USER', dbUser
+	environment 'DB_PASSWORD', dbPassword
 }
 
 tasks.register('dropDB', Exec) {
@@ -119,4 +147,36 @@ tasks.register('dropDB', Exec) {
 	workingDir 'src/main/resources/db/scripts/'
 	//on linux
 	commandLine './drop-db.sh'
+	environment 'DB_NAME', dbName
+	environment 'DB_USER', dbUser
+}
+
+liquibase {
+	activities {
+		main {
+			url               dbUrl
+			username          dbUser
+			password          dbPassword
+			changelogFile     'db/changelog/biolab.changelog.yml'
+			searchPath        "${projectDir}/src/main/resources"
+			defaultSchemaName dbName
+			driver            'org.postgresql.Driver'
+			logLevel          'severe'
+		}
+	}
+	runList = 'main'
+}
+
+tasks.named('initDB') { mustRunAfter 'dropDB' }
+tasks.named('update')  { mustRunAfter 'initDB' }
+
+tasks.register('seedDB', Exec) {
+	group = 'db'
+	description = 'Reset the database and populate it with demo seed data'
+	dependsOn 'dropDB', 'initDB', 'update'
+	workingDir 'src/main/resources/db/scripts/'
+	commandLine './seed-demo-db.sh'
+	environment 'DB_NAME', dbName
+	environment 'DB_USER', dbUser
+	environment 'DB_PASSWORD', dbPassword
 }

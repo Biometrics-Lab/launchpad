@@ -2,7 +2,7 @@ package com.biolab.launchpad.internal.web.controller;
 
 import com.biolab.launchpad.internal.repository.RepRepository;
 import com.biolab.launchpad.internal.repository.model.Rep;
-import com.biolab.launchpad.internal.repository.model.Session1;
+import com.biolab.launchpad.internal.repository.model.Session;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.*;
@@ -47,11 +47,11 @@ class RepControllerIntegrationTest {
     @Autowired
     EntityFactory factory;
 
-    Session1 session1;
+    Session session;
 
     @BeforeEach
     void setUp() {
-        session1 = factory.createSession1();
+        session = factory.createSession1();
     }
 
     @AfterEach
@@ -73,7 +73,7 @@ class RepControllerIntegrationTest {
                                     "session1Id":  %d,
                                     "startTime" : "2025-10-02T14:45:00.000+00:00"
                                 }
-                            """.formatted(session1.getId());
+                            """.formatted(session.getId());
 
             String jsonResponse = mvc.perform(
                             post(API)
@@ -98,7 +98,7 @@ class RepControllerIntegrationTest {
                                         "session1Id":  %d,
                                         "startTime" : "2025-10-02T14:45:00.000+00:00"
                                       }
-                                    """.formatted(repId, session1.getId());
+                                    """.formatted(repId, session.getId());
 
             JsonNode expectedResponseNode = objectMapper.readTree(expectedResponse);
 
@@ -152,12 +152,12 @@ class RepControllerIntegrationTest {
             ZonedDateTime zdt = ZonedDateTime.of(2025, 10, 2, 15, 45, 10, 0, ZoneOffset.UTC);
 
             Rep rep1 = repRepository.save(Rep.builder()
-                    .session1Id(session1.getId())
+                    .session1Id(session.getId())
                     .startTime(Timestamp.from(zdt.toInstant()))
                     .build());
 
             Rep rep2 = repRepository.save(Rep.builder()
-                    .session1Id(session1.getId())
+                    .session1Id(session.getId())
                     .startTime(Timestamp.from(zdt.toInstant()))
                     .build());
 
@@ -181,7 +181,7 @@ class RepControllerIntegrationTest {
                         "startTime"   : "2025-10-02T15:45:10.000+00:00"
                     }
                 ]
-                """.formatted(rep1.getId(), session1.getId(), rep2.getId(),session1.getId());
+                """.formatted(rep1.getId(), session.getId(), rep2.getId(), session.getId());
 
             JsonNode expectedNode = objectMapper.readTree(expectedResponse);
             JsonNode actualNode   = objectMapper.readTree(jsonResponse);
@@ -196,7 +196,7 @@ class RepControllerIntegrationTest {
             ZonedDateTime zdt = ZonedDateTime.of(2025, 10, 2, 15, 45, 10, 0, ZoneOffset.UTC);
 
             Rep rep = repRepository.save(Rep.builder()
-                    .session1Id(session1.getId())
+                    .session1Id(session.getId())
                     .startTime(Timestamp.from(zdt.toInstant()))
                     .build());
 
@@ -213,7 +213,7 @@ class RepControllerIntegrationTest {
                                          "session1Id"  : %d,
                                          "startTime"   : "2025-10-02T15:45:10.000+00:00"
                                      }
-                                    """.formatted(rep.getId(), session1.getId());
+                                    """.formatted(rep.getId(), session.getId());
 
             JsonNode expectedNode = objectMapper.readTree(expectedResponse);
             JsonNode actualNode   = objectMapper.readTree(jsonResponse);
@@ -254,7 +254,7 @@ class RepControllerIntegrationTest {
         @DisplayName("PUT /reps -> updates and returns the Rep")
         void update() throws Exception {
             Rep original = repRepository.save(Rep.builder()
-                    .session1Id(session1.getId())
+                    .session1Id(session.getId())
                     .startTime(Timestamp.valueOf(LocalDateTime.of(2025, 10, 2, 14, 45, 1)))
                     .build());
 
@@ -264,7 +264,7 @@ class RepControllerIntegrationTest {
                                     "session1Id" : %d,
                                     "startTime"  : "2026-10-02T14:45:00.000+00:00"
                                  }
-                                """.formatted(original.getId(), session1.getId());
+                                """.formatted(original.getId(), session.getId());
 
             String jsonResponse = mvc.perform(
                             put(API)
@@ -283,7 +283,7 @@ class RepControllerIntegrationTest {
                                     "session1Id" : %d,
                                     "startTime"  : "2026-10-02T14:45:00.000+00:00"
                                  }
-                                """.formatted(original.getId(), session1.getId());
+                                """.formatted(original.getId(), session.getId());
 
             JsonNode expectedNode = objectMapper.readTree(expectedResponse);
 
@@ -300,7 +300,7 @@ class RepControllerIntegrationTest {
                                      "session1Id" : %d,
                                      "startTime"  : "2025-10-02T14:45:00.000+00:00"
                                  }
-                                 """.formatted(session1.getId());
+                                 """.formatted(session.getId());
 
             String jsonResponse = mvc.perform(
                             put(API)
@@ -337,7 +337,7 @@ class RepControllerIntegrationTest {
         @DisplayName("DELETE /reps/{id} -> deletes the Rep")
         void delete() throws Exception {
             Rep rep = repRepository.save(Rep.builder()
-                    .session1Id(session1.getId())
+                    .session1Id(session.getId())
                     .startTime(Timestamp.valueOf(LocalDateTime.of(2025, 10, 2, 14, 45, 1)))
                     .build());
 

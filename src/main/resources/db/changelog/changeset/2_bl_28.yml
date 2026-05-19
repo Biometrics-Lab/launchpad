@@ -141,46 +141,28 @@ databaseChangeLog:
             columns:
               - column:
                   name: name
-                  value: Blast
+                  value: JSON_CONFIG
               - column:
                   name: description
-                  value: Blast Motion sensor device
+                  value: JSON-based configuration mapping
         - insert:
             tableName: data_source_type_dictionary
             columns:
               - column:
                   name: name
-                  value: Repsodo
+                  value: SCRIPT
               - column:
                   name: description
-                  value: Repsodo pitching/hitting tracker
+                  value: Custom script-based extraction
         - insert:
             tableName: data_source_type_dictionary
             columns:
               - column:
                   name: name
-                  value: Hitrex
+                  value: MAPPING
               - column:
                   name: description
-                  value: Hitrex performance tracker
-        - insert:
-            tableName: data_source_type_dictionary
-            columns:
-              - column:
-                  name: name
-                  value: CustomAPI
-              - column:
-                  name: description
-                  value: Custom external API integration
-        - insert:
-            tableName: data_source_type_dictionary
-            columns:
-              - column:
-                  name: name
-                  value: Cam
-              - column:
-                  name: description
-                  value: Camera-based data source
+                  value: Field mapping configuration
 
         # resource_type_dictionary
         - insert:

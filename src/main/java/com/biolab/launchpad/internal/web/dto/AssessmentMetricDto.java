@@ -10,8 +10,8 @@ public record AssessmentMetricDto(
         Integer assessmentId,
         @NotNull(message = "AssesmentMetric conditionalMetricId cannot be null")
         Integer conditionalMetricId,
-        @NotNull(message = "AssesmentMetric sourceId cannot be null")
-        Integer sourceId,
+        @NotNull(message = "AssesmentMetric dataSourceId cannot be null")
+        Integer dataSourceId,
         Number minValue,
         Number maxValue,
         Number avgValue,

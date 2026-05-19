@@ -2,7 +2,7 @@ package com.biolab.launchpad.internal.web.controller;
 
 import com.biolab.launchpad.internal.repository.Session1Repository;
 import com.biolab.launchpad.internal.repository.model.Assessment;
-import com.biolab.launchpad.internal.repository.model.Session1;
+import com.biolab.launchpad.internal.repository.model.Session;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.*;
@@ -29,7 +29,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @DisplayName("Session1 Integration Tests")
-class Session1ControllerIntegrationTest {
+class SessionControllerIntegrationTest {
 
     private static final String API = "/api/v1/sessions";
 
@@ -149,12 +149,12 @@ class Session1ControllerIntegrationTest {
 
             ZonedDateTime zdt = ZonedDateTime.of(2025, 10, 2, 15, 45, 10, 0, ZoneOffset.UTC);
 
-            Session1 session11 = session1Repository.save(Session1.builder()
+            Session session11 = session1Repository.save(Session.builder()
                     .assessmentId(assessment.getId())
                     .startTime(Timestamp.from(zdt.toInstant()))
                     .build());
 
-            Session1 session12 = session1Repository.save(Session1.builder()
+            Session session12 = session1Repository.save(Session.builder()
                     .assessmentId(assessment.getId())
                     .startTime(Timestamp.from(zdt.toInstant()))
                     .build());
@@ -188,18 +188,18 @@ class Session1ControllerIntegrationTest {
         }
 
         @Test
-        @DisplayName("GET /session1s/{id} -> returns session1 by ID")
+        @DisplayName("GET /session1s/{id} -> returns session by ID")
         void getById() throws Exception {
 
             ZonedDateTime zdt = ZonedDateTime.of(2025, 10, 2, 15, 45, 10, 0, ZoneOffset.UTC);
 
-            Session1 session1 = session1Repository.save(Session1.builder()
+            Session session = session1Repository.save(Session.builder()
                     .assessmentId(assessment.getId())
                     .startTime(Timestamp.from(zdt.toInstant()))
                     .build());
 
             String jsonResponse = mvc.perform(
-                            get(API + "/" + session1.getId())
+                            get(API + "/" + session.getId())
                             .with(httpBasic("biolab", "biolab"))
                     )
                     .andExpect(status().isOk())
@@ -211,7 +211,7 @@ class Session1ControllerIntegrationTest {
                                          "assessmentId"  : %d,
                                          "startTime"   : "2025-10-02T15:45:10.000+00:00"
                                      }
-                                    """.formatted(session1.getId(), assessment.getId());
+                                    """.formatted(session.getId(), assessment.getId());
 
             JsonNode expectedNode = objectMapper.readTree(expectedResponse);
             JsonNode actualNode   = objectMapper.readTree(jsonResponse);
@@ -251,7 +251,7 @@ class Session1ControllerIntegrationTest {
         @Test
         @DisplayName("PUT /session1s -> updates and returns the Session1")
         void update() throws Exception {
-            Session1 original = session1Repository.save(Session1.builder()
+            Session original = session1Repository.save(Session.builder()
                     .assessmentId(assessment.getId())
                     .startTime(Timestamp.valueOf(LocalDateTime.of(2025, 10, 2, 14, 45, 1)))
                     .build());
@@ -335,13 +335,13 @@ class Session1ControllerIntegrationTest {
         @Test
         @DisplayName("DELETE /session1s/{id} -> deletes the Session1")
         void delete() throws Exception {
-            Session1 session1 = session1Repository.save(Session1.builder()
+            Session session = session1Repository.save(Session.builder()
                     .assessmentId(assessment.getId())
                     .startTime(Timestamp.valueOf(LocalDateTime.of(2025, 10, 2, 14, 45, 1)))
                     .build());
 
             String jsonResponse = mvc.perform(
-                            MockMvcRequestBuilders.delete(API + "/" + session1.getId())
+                            MockMvcRequestBuilders.delete(API + "/" + session.getId())
                                     .with(httpBasic("biolab", "biolab"))
                     )
                     .andExpect(status().isOk())
@@ -359,7 +359,7 @@ class Session1ControllerIntegrationTest {
 
             assertEquals(expectedNode, actualNode);
 
-            assertFalse(session1Repository.existsById(session1.getId()));
+            assertFalse(session1Repository.existsById(session.getId()));
         }
 
         @Test

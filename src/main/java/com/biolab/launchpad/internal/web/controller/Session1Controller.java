@@ -1,6 +1,6 @@
 package com.biolab.launchpad.internal.web.controller;
 
-import com.biolab.launchpad.internal.repository.model.Session1;
+import com.biolab.launchpad.internal.repository.model.Session;
 import com.biolab.launchpad.internal.security.exceptions.NotFoundByException;
 import com.biolab.launchpad.internal.service.Session1Service;
 import com.biolab.launchpad.internal.web.dto.ResponseCode;
@@ -26,7 +26,7 @@ public class Session1Controller {
 
     @PostMapping
     public Session1Dto create(@Valid @RequestBody Session1Dto session1Dto) {
-        Session1 created = session1Service.create(session1Mapper.toModel(session1Dto));
+        Session created = session1Service.create(session1Mapper.toModel(session1Dto));
         return session1Mapper.toDto(created);
     }
 
@@ -54,7 +54,7 @@ public class Session1Controller {
 
     @PutMapping
     public Session1Dto update(@Valid @RequestBody Session1Dto session1DTO) {
-        Session1 updated = session1Service.update(session1Mapper.toModel(session1DTO));
+        Session updated = session1Service.update(session1Mapper.toModel(session1DTO));
         return session1Mapper.toDto(updated);
     }
 }

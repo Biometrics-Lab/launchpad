@@ -27,12 +27,14 @@ public class EntityFactory {
     private final PlayerRepository                   playerRepository;
     private final AssessmentTemplateRepository       assessmentTemplateRepository;
     private final DataSourceRepository               dataSourceRepository;
+    private final IntegrationRepository              integrationRepository;
     private final AssessmentRepository               assessmentRepository;
     private final Session1Repository                 session1Repository;
     private final RepRepository                      repRepository;
     private final RepMetricRepository                repMetricRepository;
     private final ConditionRepository                conditionRepository;
     private final ConditionalMetricRepository        conditionalMetricRepository;
+    private final TemplateMetricRepository           templateMetricRepository;
 
     public Measurement createMeasurement(String name) {
 
@@ -203,13 +205,22 @@ public class EntityFactory {
         );
     }
 
-    public DataSource createDataSource(String name) {
-        DataSourceTypeDictionary dataSourceTypeDictionary = createDataSourceTypeDictionary("AutoDataSource");
+    public Integration createIntegration(String name) {
+        return integrationRepository.save(
+                Integration.builder()
+                        .name(name)
+                        .build()
+        );
+    }
+
+    public DataSource createDataSource() {
+        Integration integration = createIntegration("AutoIntegration");
+        Metric metric           = createMetric("AutoMetric");
         return dataSourceRepository.save(
                 DataSource.builder()
-                        .name(name)
-                        .type(dataSourceTypeDictionary.getId())
-                        .description("AutoDescription_"+name)
+                        .integrationId(integration.getId())
+                        .metricId(metric.getId())
+                        .type("JSON_CONFIG")
                         .build()
         );
     }
@@ -227,10 +238,10 @@ public class EntityFactory {
         );
     }
 
-    public Session1 createSession1() {
+    public Session createSession1() {
         Assessment assessment = createAssessment();
         return session1Repository.save(
-                Session1.builder()
+                Session.builder()
                         .assessmentId(assessment.getId())
                         .startTime(Timestamp.valueOf(LocalDateTime.of(2025, 10, 2, 14, 45, 1)))
                         .build()
@@ -238,10 +249,10 @@ public class EntityFactory {
     }
 
     public Rep createRep() {
-        Session1 session1 = createSession1();
+        Session session = createSession1();
         return repRepository.save(
                 Rep.builder()
-                        .session1Id(session1.getId())
+                        .session1Id(session.getId())
                         .startTime(Timestamp.valueOf(LocalDateTime.of(2025, 10, 2, 14, 45, 1)))
                         .build()
         );
@@ -281,6 +292,7 @@ public class EntityFactory {
     }
 
     void cleanup() {
+        templateMetricRepository.deleteAll();
         repMetricRepository.deleteAll();
         conditionalMetricRepository.deleteAll();
         conditionRepository.deleteAll();
@@ -288,6 +300,7 @@ public class EntityFactory {
         session1Repository.deleteAll();
         assessmentRepository.deleteAll();
         dataSourceRepository.deleteAll();
+        integrationRepository.deleteAll();
         assessmentTemplateRepository.deleteAll();
         playerRepository.deleteAll();
         userRepository.deleteAll();

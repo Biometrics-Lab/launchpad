@@ -1,6 +1,6 @@
 package com.biolab.launchpad.internal.service;
 
-import com.biolab.launchpad.internal.repository.model.DataSource;
+import com.biolab.launchpad.internal.repository.model.Integration;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.CrudRepository;
@@ -8,9 +8,9 @@ import org.springframework.stereotype.Service;
 
 @Service
 @Log4j2
-public class DataSourceService extends EntityServiceID<DataSource> {
+public class IntegrationService extends EntityService<Integration> {
     @Autowired
-    public DataSourceService(CrudRepository<DataSource, Integer> repository) {
+    public IntegrationService(CrudRepository<Integration, Integer> repository) {
         super(repository);
     }
 }

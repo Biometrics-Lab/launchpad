@@ -41,12 +41,12 @@ class SessionMetricControllerIntegrationTest {
     @Autowired
     EntityFactory factory;
 
-    Session1          session1;
+    Session session;
     ConditionalMetric conditionalMetric;
 
     @BeforeEach
     void setUp() {
-        session1          = factory.createSession1();
+        session = factory.createSession1();
         conditionalMetric = factory.createConditionalMetric();
     }
 
@@ -72,7 +72,7 @@ class SessionMetricControllerIntegrationTest {
                                     "maxValue"            : 2,
                                     "avgValue"            : 3
                                 }
-                            """.formatted(session1.getId(), conditionalMetric.getId());
+                            """.formatted(session.getId(), conditionalMetric.getId());
 
             String jsonResponse = mvc.perform(
                             post(API)
@@ -99,7 +99,7 @@ class SessionMetricControllerIntegrationTest {
                                         "maxValue"            : 2,
                                         "avgValue"            : 3
                                       }
-                                    """.formatted(id, session1.getId(), conditionalMetric.getId());
+                                    """.formatted(id, session.getId(), conditionalMetric.getId());
 
             JsonNode expectedResponseNode = objectMapper.readTree(expectedResponse);
 
@@ -151,7 +151,7 @@ class SessionMetricControllerIntegrationTest {
         void getAll() throws Exception {
 
             SessionMetric sessionMetric1 = sessionMetricRepository.save(SessionMetric.builder()
-                    .session1Id(session1.getId())
+                    .session1Id(session.getId())
                     .conditionalMetricId(conditionalMetric.getId())
                     .minValue(1)
                     .maxValue(2)
@@ -159,7 +159,7 @@ class SessionMetricControllerIntegrationTest {
                     .build());
 
             SessionMetric sessionMetric2 = sessionMetricRepository.save(SessionMetric.builder()
-                    .session1Id(session1.getId())
+                    .session1Id(session.getId())
                     .conditionalMetricId(conditionalMetric.getId())
                     .minValue(5)
                     .maxValue(6)
@@ -192,8 +192,8 @@ class SessionMetricControllerIntegrationTest {
                         "avgValue"            : 7
                     }
                 ]
-                """.formatted(sessionMetric1.getId(), session1.getId(), conditionalMetric.getId(),
-                              sessionMetric2.getId(), session1.getId(), conditionalMetric.getId());
+                """.formatted(sessionMetric1.getId(), session.getId(), conditionalMetric.getId(),
+                              sessionMetric2.getId(), session.getId(), conditionalMetric.getId());
 
             JsonNode expectedNode = objectMapper.readTree(expectedResponse);
             JsonNode actualNode   = objectMapper.readTree(jsonResponse);
@@ -206,7 +206,7 @@ class SessionMetricControllerIntegrationTest {
         void getById() throws Exception {
 
             SessionMetric sessionMetric = sessionMetricRepository.save(SessionMetric.builder()
-                    .session1Id(session1.getId())
+                    .session1Id(session.getId())
                     .conditionalMetricId(conditionalMetric.getId())
                     .minValue(1)
                     .maxValue(2)
@@ -229,7 +229,7 @@ class SessionMetricControllerIntegrationTest {
                                         "maxValue"            : 2,
                                         "avgValue"            : 3
                                      }
-                                    """.formatted(sessionMetric.getId(), session1.getId(), conditionalMetric.getId());
+                                    """.formatted(sessionMetric.getId(), session.getId(), conditionalMetric.getId());
 
             JsonNode expectedNode = objectMapper.readTree(expectedResponse);
             JsonNode actualNode   = objectMapper.readTree(jsonResponse);
@@ -270,7 +270,7 @@ class SessionMetricControllerIntegrationTest {
         @DisplayName("PUT /sessionMetrics -> updates and returns the SessionMetric")
         void update() throws Exception {
             SessionMetric original = sessionMetricRepository.save(SessionMetric.builder()
-                    .session1Id(session1.getId())
+                    .session1Id(session.getId())
                     .conditionalMetricId(conditionalMetric.getId())
                     .minValue(1)
                     .maxValue(2)
@@ -286,7 +286,7 @@ class SessionMetricControllerIntegrationTest {
                                    "maxValue"            : 5,
                                    "avgValue"            : 6
                                 }
-                                """.formatted(original.getId(), session1.getId(), conditionalMetric.getId());
+                                """.formatted(original.getId(), session.getId(), conditionalMetric.getId());
 
             String jsonResponse = mvc.perform(
                             put(API)
@@ -308,7 +308,7 @@ class SessionMetricControllerIntegrationTest {
                                     "maxValue"            : 5,
                                     "avgValue"            : 6
                                  }
-                                """.formatted(original.getId(), session1.getId(), conditionalMetric.getId());
+                                """.formatted(original.getId(), session.getId(), conditionalMetric.getId());
 
             JsonNode expectedNode = objectMapper.readTree(expectedResponse);
 
@@ -325,7 +325,7 @@ class SessionMetricControllerIntegrationTest {
                                      "session1Id"          : %d,
                                      "conditionalMetricId" : %d
                                  }
-                                 """.formatted(session1.getId(), conditionalMetric.getId());
+                                 """.formatted(session.getId(), conditionalMetric.getId());
 
             String jsonResponse = mvc.perform(
                             put(API)
@@ -361,7 +361,7 @@ class SessionMetricControllerIntegrationTest {
         @DisplayName("DELETE /sessionMetrics/{id} -> deletes the SessionMetric")
         void delete() throws Exception {
             SessionMetric sessionMetric = sessionMetricRepository.save(SessionMetric.builder()
-                    .session1Id(session1.getId())
+                    .session1Id(session.getId())
                     .conditionalMetricId(conditionalMetric.getId())
                     .build());
 

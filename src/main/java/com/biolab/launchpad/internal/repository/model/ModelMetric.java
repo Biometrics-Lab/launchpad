@@ -15,9 +15,9 @@ public class ModelMetric extends ID {
     @NotNull(message = "ModelMetric modelId cannot be null")
     @Column("model_id")
     private Integer modelId;
-    @NotNull(message = "ModelMetric metricId cannot be null")
-    @Column("metric_id")
-    private Integer metricId;
+    @NotNull(message = "ModelMetric conditionalMetricId cannot be null")
+    @Column("conditional_metric_id")
+    private Integer conditionalMetricId;
     private Number value;
 
 }
