@@ -7,5 +7,4 @@ databaseChangeLog:
       file: db/changelog/changeset/2_bl_28.yml
   - include:
       file: db/changelog/changeset/3_bl_61.yml
-  - include:
-      file: db/changelog/changeset/4_bl_61_seed.yml
+

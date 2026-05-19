@@ -404,7 +404,7 @@ databaseChangeLog:
                     primaryKey: true
                     nullable: false
               - column:
-                  name: session1_id
+                  name: session_id
                   type: integer
                   constraints:
                     nullable: false
@@ -527,9 +527,9 @@ databaseChangeLog:
                   type: varchar(250)
                   constraints:
                     nullable: true
-        #  session1
+        #  session
         - createTable:
-            tableName: session1
+            tableName: session
             columns:
               - column:
                   name: id
@@ -560,7 +560,7 @@ databaseChangeLog:
                     primaryKey: true
                     nullable: false
               - column:
-                  name: session1_id
+                  name: session_id
                   type: integer
                   constraints:
                     nullable: false
@@ -596,7 +596,7 @@ databaseChangeLog:
                     primaryKey: true
                     nullable: false
               - column:
-                  name: session1_id
+                  name: session_id
                   type: integer
                   constraints:
                     nullable: false
@@ -939,9 +939,9 @@ databaseChangeLog:
             referencedTableName: data_source
             referencedColumnNames: id
             constraintName: fk_assessment_metric_data_source
-        # session1
+        # session
         - addForeignKeyConstraint:
-            baseTableName: session1
+            baseTableName: session
             baseColumnNames: assessment_id
             referencedTableName: assessment
             referencedColumnNames: id
@@ -949,15 +949,15 @@ databaseChangeLog:
         # rep
         - addForeignKeyConstraint:
             baseTableName: rep
-            baseColumnNames: session1_id
-            referencedTableName: session1
+            baseColumnNames: session_id
+            referencedTableName: session
             referencedColumnNames: id
             constraintName: fk_rep_session
         # session_metric
         - addForeignKeyConstraint:
             baseTableName: session_metric
-            baseColumnNames: session1_id
-            referencedTableName: session1
+            baseColumnNames: session_id
+            referencedTableName: session
             referencedColumnNames: id
             constraintName: fk_session_metric_session
         - addForeignKeyConstraint:
@@ -1008,8 +1008,8 @@ databaseChangeLog:
         # session_resource
         - addForeignKeyConstraint:
             baseTableName: session_resource
-            baseColumnNames: session1_id
-            referencedTableName: session1
+            baseColumnNames: session_id
+            referencedTableName: session
             referencedColumnNames: id
             constraintName: fk_session_resource_session
         - addForeignKeyConstraint:
