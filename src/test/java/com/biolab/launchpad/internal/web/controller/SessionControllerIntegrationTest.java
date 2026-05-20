@@ -1,6 +1,6 @@
 package com.biolab.launchpad.internal.web.controller;
 
-import com.biolab.launchpad.internal.repository.Session1Repository;
+import com.biolab.launchpad.internal.repository.SessionRepository;
 import com.biolab.launchpad.internal.repository.model.Assessment;
 import com.biolab.launchpad.internal.repository.model.Session;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -28,7 +28,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
 @AutoConfigureMockMvc
-@DisplayName("Session1 Integration Tests")
+@DisplayName("Session Integration Tests")
 class SessionControllerIntegrationTest {
 
     private static final String API = "/api/v1/sessions";
@@ -40,7 +40,7 @@ class SessionControllerIntegrationTest {
     ObjectMapper objectMapper;
 
     @Autowired
-    Session1Repository session1Repository;
+    SessionRepository sessionRepository;
 
     @Autowired
     EntityFactory factory;
@@ -54,7 +54,7 @@ class SessionControllerIntegrationTest {
 
     @AfterEach
     void tearDown() {
-        session1Repository.deleteAll();
+        sessionRepository.deleteAll();
         factory.cleanup();
     }
 
@@ -62,7 +62,7 @@ class SessionControllerIntegrationTest {
     @DisplayName("Create")
     class CreateTests {
         @Test
-        @DisplayName("POST /session1s -> creates and returns the new Session1")
+        @DisplayName("POST /sessions -> creates and returns the new Session")
         void create() throws Exception {
 
             String request =
@@ -85,8 +85,8 @@ class SessionControllerIntegrationTest {
 
             JsonNode responseNode = objectMapper.readTree(jsonResponse);
 
-            int session1Id = responseNode.get("id").asInt();
-            assertThat(session1Id).isPositive();
+            int sessionId = responseNode.get("id").asInt();
+            assertThat(sessionId).isPositive();
 
 
             String expectedResponse =
@@ -96,7 +96,7 @@ class SessionControllerIntegrationTest {
                                         "assessmentId" : %d,
                                         "startTime"    : "2025-10-02T14:45:00.000+00:00"
                                       }
-                                    """.formatted(session1Id, assessment.getId());
+                                    """.formatted(sessionId, assessment.getId());
 
             JsonNode expectedResponseNode = objectMapper.readTree(expectedResponse);
 
@@ -104,7 +104,7 @@ class SessionControllerIntegrationTest {
         }
 
         @Test
-        @DisplayName("POST /session1s with validation message -> returns 422")
+        @DisplayName("POST /sessions with validation message -> returns 422")
         void createValidationError() throws Exception {
             String request =
                             """
@@ -144,17 +144,17 @@ class SessionControllerIntegrationTest {
     class ReadTests {
 
         @Test
-        @DisplayName("GET /session1s -> returns all session1s")
+        @DisplayName("GET /sessions -> returns all sessions")
         void getAll() throws Exception {
 
             ZonedDateTime zdt = ZonedDateTime.of(2025, 10, 2, 15, 45, 10, 0, ZoneOffset.UTC);
 
-            Session session11 = session1Repository.save(Session.builder()
+            Session session11 = sessionRepository.save(Session.builder()
                     .assessmentId(assessment.getId())
                     .startTime(Timestamp.from(zdt.toInstant()))
                     .build());
 
-            Session session12 = session1Repository.save(Session.builder()
+            Session session12 = sessionRepository.save(Session.builder()
                     .assessmentId(assessment.getId())
                     .startTime(Timestamp.from(zdt.toInstant()))
                     .build());
@@ -188,12 +188,12 @@ class SessionControllerIntegrationTest {
         }
 
         @Test
-        @DisplayName("GET /session1s/{id} -> returns session by ID")
+        @DisplayName("GET /sessions/{id} -> returns session by ID")
         void getById() throws Exception {
 
             ZonedDateTime zdt = ZonedDateTime.of(2025, 10, 2, 15, 45, 10, 0, ZoneOffset.UTC);
 
-            Session session = session1Repository.save(Session.builder()
+            Session session = sessionRepository.save(Session.builder()
                     .assessmentId(assessment.getId())
                     .startTime(Timestamp.from(zdt.toInstant()))
                     .build());
@@ -220,7 +220,7 @@ class SessionControllerIntegrationTest {
         }
 
         @Test
-        @DisplayName("GET /session1s/{id} with unknown ID -> returns 404")
+        @DisplayName("GET /sessions/{id} with unknown ID -> returns 404")
         void getByIdValidationError() throws Exception {
             String jsonResponse = mvc.perform(
                             get(API + "/999999")
@@ -249,9 +249,9 @@ class SessionControllerIntegrationTest {
     class UpdateTests {
 
         @Test
-        @DisplayName("PUT /session1s -> updates and returns the Session1")
+        @DisplayName("PUT /sessions -> updates and returns the Session")
         void update() throws Exception {
-            Session original = session1Repository.save(Session.builder()
+            Session original = sessionRepository.save(Session.builder()
                     .assessmentId(assessment.getId())
                     .startTime(Timestamp.valueOf(LocalDateTime.of(2025, 10, 2, 14, 45, 1)))
                     .build());
@@ -290,7 +290,7 @@ class SessionControllerIntegrationTest {
         }
 
         @Test
-        @DisplayName("PUT /session1s with invalid id -> returns 404")
+        @DisplayName("PUT /sessions with invalid id -> returns 404")
         void updateValidationError() throws Exception {
 
             String updateRequest = """
@@ -314,7 +314,7 @@ class SessionControllerIntegrationTest {
             String expectedResponse = """
                 {
                     "status" : 404,
-                    "message": "Session1Service. Could not update Session by id: 999999"
+                    "message": "SessionService. Could not update Session by id: 999999"
                 }
                 """;
 
@@ -333,9 +333,9 @@ class SessionControllerIntegrationTest {
 
 
         @Test
-        @DisplayName("DELETE /session1s/{id} -> deletes the Session1")
+        @DisplayName("DELETE /sessions/{id} -> deletes the Session")
         void delete() throws Exception {
-            Session session = session1Repository.save(Session.builder()
+            Session session = sessionRepository.save(Session.builder()
                     .assessmentId(assessment.getId())
                     .startTime(Timestamp.valueOf(LocalDateTime.of(2025, 10, 2, 14, 45, 1)))
                     .build());
@@ -359,11 +359,11 @@ class SessionControllerIntegrationTest {
 
             assertEquals(expectedNode, actualNode);
 
-            assertFalse(session1Repository.existsById(session.getId()));
+            assertFalse(sessionRepository.existsById(session.getId()));
         }
 
         @Test
-        @DisplayName("DELETE /session1s/{id} with unknown ID -> returns 404")
+        @DisplayName("DELETE /sessions/{id} with unknown ID -> returns 404")
         void deleteValidationError() throws Exception {
             String jsonResponse = mvc.perform(
                             MockMvcRequestBuilders.delete(API + "/999999")
@@ -375,7 +375,7 @@ class SessionControllerIntegrationTest {
             String expectedResponse = """
                 {
                     "status" : 404,
-                    "message": "Session1Service. Could not delete id: 999999"
+                    "message": "SessionService. Could not delete id: 999999"
                 }
                 """;
 

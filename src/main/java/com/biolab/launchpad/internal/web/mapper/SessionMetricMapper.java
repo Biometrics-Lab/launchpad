@@ -11,8 +11,8 @@ import java.util.List;
 public interface SessionMetricMapper {
     SessionMetricMapper sessionMetricMapper = Mappers.getMapper(SessionMetricMapper.class);
 
-    SessionMetricDto toDto(SessionMetric session_metric);
-    SessionMetric toModel(SessionMetricDto session_metricDto);
-    List<SessionMetricDto> toDtos(List<SessionMetric> session_metrics);
-    List<SessionMetric> toModels(List<SessionMetricDto> session_metricDtos);
+    SessionMetricDto toDto(SessionMetric sessionMetric);
+    SessionMetric toModel(SessionMetricDto sessionMetricDto);
+    List<SessionMetricDto> toDtos(List<SessionMetric> sessionMetrics);
+    List<SessionMetric> toModels(List<SessionMetricDto> sessionMetricDtos);
 }

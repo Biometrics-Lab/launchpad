@@ -51,7 +51,7 @@ class RepControllerIntegrationTest {
 
     @BeforeEach
     void setUp() {
-        session = factory.createSession1();
+        session = factory.createSession();
     }
 
     @AfterEach
@@ -70,7 +70,7 @@ class RepControllerIntegrationTest {
             String request =
                             """
                                 {
-                                    "session1Id":  %d,
+                                    "sessionId":  %d,
                                     "startTime" : "2025-10-02T14:45:00.000+00:00"
                                 }
                             """.formatted(session.getId());
@@ -95,7 +95,7 @@ class RepControllerIntegrationTest {
                                     """
                                       {
                                         "id"        : %d,
-                                        "session1Id":  %d,
+                                        "sessionId":  %d,
                                         "startTime" : "2025-10-02T14:45:00.000+00:00"
                                       }
                                     """.formatted(repId, session.getId());
@@ -131,7 +131,7 @@ class RepControllerIntegrationTest {
                     """
                             {
                                 "status"       : 422,
-                                "message"      : "Validation failed: session1Id: Rep session1Id cannot be null, and startTime: Rep startTime cannot be null"
+                                "message"      : "Validation failed: sessionId: Rep sessionId cannot be null, and startTime: Rep startTime cannot be null"
                             }
                             """;
 
@@ -152,12 +152,12 @@ class RepControllerIntegrationTest {
             ZonedDateTime zdt = ZonedDateTime.of(2025, 10, 2, 15, 45, 10, 0, ZoneOffset.UTC);
 
             Rep rep1 = repRepository.save(Rep.builder()
-                    .session1Id(session.getId())
+                    .sessionId(session.getId())
                     .startTime(Timestamp.from(zdt.toInstant()))
                     .build());
 
             Rep rep2 = repRepository.save(Rep.builder()
-                    .session1Id(session.getId())
+                    .sessionId(session.getId())
                     .startTime(Timestamp.from(zdt.toInstant()))
                     .build());
 
@@ -172,12 +172,12 @@ class RepControllerIntegrationTest {
                 [
                     {
                         "id"         : %d,
-                        "session1Id" : %d,
+                        "sessionId" : %d,
                         "startTime"  : "2025-10-02T15:45:10.000+00:00"
                     },
                     {
                         "id"          : %d,
-                        "session1Id"  : %d,
+                        "sessionId"  : %d,
                         "startTime"   : "2025-10-02T15:45:10.000+00:00"
                     }
                 ]
@@ -196,7 +196,7 @@ class RepControllerIntegrationTest {
             ZonedDateTime zdt = ZonedDateTime.of(2025, 10, 2, 15, 45, 10, 0, ZoneOffset.UTC);
 
             Rep rep = repRepository.save(Rep.builder()
-                    .session1Id(session.getId())
+                    .sessionId(session.getId())
                     .startTime(Timestamp.from(zdt.toInstant()))
                     .build());
 
@@ -210,7 +210,7 @@ class RepControllerIntegrationTest {
             String expectedResponse = """
                                      {
                                         "id"           : %d,
-                                         "session1Id"  : %d,
+                                         "sessionId"  : %d,
                                          "startTime"   : "2025-10-02T15:45:10.000+00:00"
                                      }
                                     """.formatted(rep.getId(), session.getId());
@@ -254,14 +254,14 @@ class RepControllerIntegrationTest {
         @DisplayName("PUT /reps -> updates and returns the Rep")
         void update() throws Exception {
             Rep original = repRepository.save(Rep.builder()
-                    .session1Id(session.getId())
+                    .sessionId(session.getId())
                     .startTime(Timestamp.valueOf(LocalDateTime.of(2025, 10, 2, 14, 45, 1)))
                     .build());
 
             String updateRequest = """
                                 {
                                     "id"         : %d,
-                                    "session1Id" : %d,
+                                    "sessionId" : %d,
                                     "startTime"  : "2026-10-02T14:45:00.000+00:00"
                                  }
                                 """.formatted(original.getId(), session.getId());
@@ -280,7 +280,7 @@ class RepControllerIntegrationTest {
             String expectedResponse = """
                                 {
                                     "id"         : %d,
-                                    "session1Id" : %d,
+                                    "sessionId" : %d,
                                     "startTime"  : "2026-10-02T14:45:00.000+00:00"
                                  }
                                 """.formatted(original.getId(), session.getId());
@@ -297,7 +297,7 @@ class RepControllerIntegrationTest {
             String updateRequest = """
                                  {
                                      "id"         : 999999,
-                                     "session1Id" : %d,
+                                     "sessionId" : %d,
                                      "startTime"  : "2025-10-02T14:45:00.000+00:00"
                                  }
                                  """.formatted(session.getId());
@@ -337,7 +337,7 @@ class RepControllerIntegrationTest {
         @DisplayName("DELETE /reps/{id} -> deletes the Rep")
         void delete() throws Exception {
             Rep rep = repRepository.save(Rep.builder()
-                    .session1Id(session.getId())
+                    .sessionId(session.getId())
                     .startTime(Timestamp.valueOf(LocalDateTime.of(2025, 10, 2, 14, 45, 1)))
                     .build());
 

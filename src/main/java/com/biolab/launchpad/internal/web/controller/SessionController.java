@@ -2,10 +2,10 @@ package com.biolab.launchpad.internal.web.controller;
 
 import com.biolab.launchpad.internal.repository.model.Session;
 import com.biolab.launchpad.internal.security.exceptions.NotFoundByException;
-import com.biolab.launchpad.internal.service.Session1Service;
+import com.biolab.launchpad.internal.service.SessionService;
 import com.biolab.launchpad.internal.web.dto.ResponseCode;
 import com.biolab.launchpad.internal.web.dto.ResponseDto;
-import com.biolab.launchpad.internal.web.dto.Session1Dto;
+import com.biolab.launchpad.internal.web.dto.SessionDto;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -14,30 +14,30 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Optional;
 
-import static com.biolab.launchpad.internal.web.mapper.Session1Mapper.session1Mapper;
+import static com.biolab.launchpad.internal.web.mapper.SessionMapper.sessionMapper;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/sessions")
 @Log4j2
-public class Session1Controller {
+public class SessionController {
 
-    private final Session1Service session1Service;
+    private final SessionService sessionService;
 
     @PostMapping
-    public Session1Dto create(@Valid @RequestBody Session1Dto session1Dto) {
-        Session created = session1Service.create(session1Mapper.toModel(session1Dto));
-        return session1Mapper.toDto(created);
+    public SessionDto create(@Valid @RequestBody SessionDto sessionDto) {
+        Session created = sessionService.create(sessionMapper.toModel(sessionDto));
+        return sessionMapper.toDto(created);
     }
 
     @GetMapping
-    public List<Session1Dto> getAll() {
-        return session1Mapper.toDtos(session1Service.findAll());
+    public List<SessionDto> getAll() {
+        return sessionMapper.toDtos(sessionService.findAll());
     }
 
     @GetMapping("/{id}")
-    public Session1Dto getById(@PathVariable Integer id) {
-        Optional<Session1Dto> sessionOptional = session1Service.findById(id).map(session1Mapper::toDto);
+    public SessionDto getById(@PathVariable Integer id) {
+        Optional<SessionDto> sessionOptional = sessionService.findById(id).map(sessionMapper::toDto);
         if (sessionOptional.isPresent()) {
             return sessionOptional.get();
         } else {
@@ -48,13 +48,13 @@ public class Session1Controller {
 
     @DeleteMapping("/{id}")
     public ResponseDto delete(@PathVariable Integer id) {
-        session1Service.deleteById(id);
+        sessionService.deleteById(id);
         return ResponseCode.OK.getResponseDto();
     }
 
     @PutMapping
-    public Session1Dto update(@Valid @RequestBody Session1Dto session1DTO) {
-        Session updated = session1Service.update(session1Mapper.toModel(session1DTO));
-        return session1Mapper.toDto(updated);
+    public SessionDto update(@Valid @RequestBody SessionDto sessionDTO) {
+        Session updated = sessionService.update(sessionMapper.toModel(sessionDTO));
+        return sessionMapper.toDto(updated);
     }
 }

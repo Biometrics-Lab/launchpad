@@ -48,7 +48,7 @@ class SessionResourceControllerIntegrationTest {
 
     @BeforeEach
     void setUp() {
-        session = factory.createSession1();
+        session = factory.createSession();
         resourceTypeDictionary  = factory.createResourceTypeDictionary("rTypeDictionary");
     }
 
@@ -68,7 +68,7 @@ class SessionResourceControllerIntegrationTest {
             String request =
                             """
                                 {
-                                    "session1Id"     : %d,
+                                    "sessionId"     : %d,
                                     "type"           : "%s",
                                     "url"            : "desc",
                                     "urlStatus"      : "PENDING"
@@ -95,7 +95,7 @@ class SessionResourceControllerIntegrationTest {
                     """
                             {
                                         "id"             : %d,
-                                        "session1Id"     : %d,
+                                        "sessionId"     : %d,
                                         "type"           : "%s",
                                         "url"            : "desc",
                                         "externalUrl"    : null,
@@ -134,7 +134,7 @@ class SessionResourceControllerIntegrationTest {
                     """
                             {
                                 "status"       : 422,
-                                "message"      : "Validation failed: session1Id: SessionResource sessionId cannot be null, and type: SessionResource type cannot be null"
+                                "message"      : "Validation failed: sessionId: SessionResource sessionId cannot be null, and type: SessionResource type cannot be null"
                             }
                             """;
 
@@ -153,13 +153,13 @@ class SessionResourceControllerIntegrationTest {
         void getAll() throws Exception {
 
             SessionResource sessionResource1 = sessionResourceRepository.save(SessionResource.builder()
-                    .session1Id(session.getId())
+                    .sessionId(session.getId())
                     .type(resourceTypeDictionary.getId())
                     .url("desc")
                     .build());
 
             SessionResource sessionResource2 = sessionResourceRepository.save(SessionResource.builder()
-                    .session1Id(session.getId())
+                    .sessionId(session.getId())
                     .type(resourceTypeDictionary.getId())
                     .url("desc")
                     .build());
@@ -175,7 +175,7 @@ class SessionResourceControllerIntegrationTest {
                 [
                     {
                         "id"             : %d,
-                        "session1Id"     : %d,
+                        "sessionId"     : %d,
                         "type"           : "%s",
                         "url"            : "desc",
                         "externalUrl"    : null,
@@ -183,7 +183,7 @@ class SessionResourceControllerIntegrationTest {
                     },
                     {
                         "id"             : %d,
-                        "session1Id"     : %d,
+                        "sessionId"     : %d,
                         "type"           : "%s",
                         "url"            : "desc",
                         "externalUrl"    : null,
@@ -203,7 +203,7 @@ class SessionResourceControllerIntegrationTest {
         void getById() throws Exception {
 
             SessionResource sessionResource = sessionResourceRepository.save(SessionResource.builder()
-                    .session1Id(session.getId())
+                    .sessionId(session.getId())
                     .type(resourceTypeDictionary.getId())
                     .url("desc")
                     .build());
@@ -218,7 +218,7 @@ class SessionResourceControllerIntegrationTest {
             String expectedResponse = """
                 {
                     "id"             : %d,
-                    "session1Id"     : %d,
+                    "sessionId"     : %d,
                     "type"           : "%s",
                     "url"            : "desc",
                     "externalUrl"    : null,
@@ -264,7 +264,7 @@ class SessionResourceControllerIntegrationTest {
         @DisplayName("PUT /sessionResources -> updates and returns the SessionResource")
         void update() throws Exception {
             SessionResource original = sessionResourceRepository.save(SessionResource.builder()
-                    .session1Id(session.getId())
+                    .sessionId(session.getId())
                     .type(resourceTypeDictionary.getId())
                     .url("desc")
                     .build());
@@ -272,7 +272,7 @@ class SessionResourceControllerIntegrationTest {
             String updateRequest = """
                 {
                     "id"             : %d,
-                    "session1Id"     : %d,
+                    "sessionId"     : %d,
                     "type"           : "%s",
                     "url"            : "descUPD",
                     "urlStatus"      : "PENDING"
@@ -293,7 +293,7 @@ class SessionResourceControllerIntegrationTest {
             String expectedResponse = """
                 {
                     "id"             : %d,
-                    "session1Id"     : %d,
+                    "sessionId"     : %d,
                     "type"           : "%s",
                     "url"            : "descUPD",
                     "externalUrl"    : null,
@@ -316,7 +316,7 @@ class SessionResourceControllerIntegrationTest {
             String updateRequest = """
                 {
                     "id"             : 999999,
-                    "session1Id"     : %d,
+                    "sessionId"     : %d,
                     "type"           : "%s",
                     "url"            :"desc"
                 }
@@ -355,7 +355,7 @@ class SessionResourceControllerIntegrationTest {
         @DisplayName("DELETE /sessionResources/{id} -> deletes the SessionResource")
         void delete() throws Exception {
             SessionResource sessionResource = sessionResourceRepository.save(SessionResource.builder()
-                    .session1Id(session.getId())
+                    .sessionId(session.getId())
                     .type(resourceTypeDictionary.getId())
                     .url("desc")
                     .build());

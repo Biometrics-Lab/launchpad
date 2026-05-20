@@ -46,7 +46,7 @@ class SessionMetricControllerIntegrationTest {
 
     @BeforeEach
     void setUp() {
-        session = factory.createSession1();
+        session = factory.createSession();
         conditionalMetric = factory.createConditionalMetric();
     }
 
@@ -66,7 +66,7 @@ class SessionMetricControllerIntegrationTest {
             String request =
                             """
                                 {
-                                    "session1Id"          : %d,
+                                    "sessionId"          : %d,
                                     "conditionalMetricId" : %d,
                                     "minValue"            : 1,
                                     "maxValue"            : 2,
@@ -93,7 +93,7 @@ class SessionMetricControllerIntegrationTest {
                                     """
                                       {
                                         "id"                  : %d,
-                                        "session1Id"          : %d,
+                                        "sessionId"          : %d,
                                         "conditionalMetricId" : %d,
                                         "minValue"            : 1,
                                         "maxValue"            : 2,
@@ -132,7 +132,7 @@ class SessionMetricControllerIntegrationTest {
                     """
                             {
                                 "status"  : 422,
-                                "message" : "Validation failed: conditionalMetricId: SessionMetric conditionalMetricId cannot be null, and session1Id: SessionMetric sessionId cannot be null"
+                                "message" : "Validation failed: conditionalMetricId: SessionMetric conditionalMetricId cannot be null, and sessionId: SessionMetric sessionId cannot be null"
                             }
                             """;
 
@@ -151,7 +151,7 @@ class SessionMetricControllerIntegrationTest {
         void getAll() throws Exception {
 
             SessionMetric sessionMetric1 = sessionMetricRepository.save(SessionMetric.builder()
-                    .session1Id(session.getId())
+                    .sessionId(session.getId())
                     .conditionalMetricId(conditionalMetric.getId())
                     .minValue(1)
                     .maxValue(2)
@@ -159,7 +159,7 @@ class SessionMetricControllerIntegrationTest {
                     .build());
 
             SessionMetric sessionMetric2 = sessionMetricRepository.save(SessionMetric.builder()
-                    .session1Id(session.getId())
+                    .sessionId(session.getId())
                     .conditionalMetricId(conditionalMetric.getId())
                     .minValue(5)
                     .maxValue(6)
@@ -177,7 +177,7 @@ class SessionMetricControllerIntegrationTest {
                 [
                     {
                         "id"                  : %d,
-                        "session1Id"          : %d,
+                        "sessionId"          : %d,
                         "conditionalMetricId" : %d,
                         "minValue"            : 1,
                         "maxValue"            : 2,
@@ -185,7 +185,7 @@ class SessionMetricControllerIntegrationTest {
                    },
                     {
                         "id"                  : %d,
-                        "session1Id"          : %d,
+                        "sessionId"          : %d,
                         "conditionalMetricId" : %d,
                         "minValue"            : 5,
                         "maxValue"            : 6,
@@ -206,7 +206,7 @@ class SessionMetricControllerIntegrationTest {
         void getById() throws Exception {
 
             SessionMetric sessionMetric = sessionMetricRepository.save(SessionMetric.builder()
-                    .session1Id(session.getId())
+                    .sessionId(session.getId())
                     .conditionalMetricId(conditionalMetric.getId())
                     .minValue(1)
                     .maxValue(2)
@@ -223,7 +223,7 @@ class SessionMetricControllerIntegrationTest {
             String expectedResponse = """
                                      {
                                         "id"                  : %d,
-                                        "session1Id"          : %d,
+                                        "sessionId"          : %d,
                                         "conditionalMetricId" : %d,
                                         "minValue"            : 1,
                                         "maxValue"            : 2,
@@ -270,7 +270,7 @@ class SessionMetricControllerIntegrationTest {
         @DisplayName("PUT /sessionMetrics -> updates and returns the SessionMetric")
         void update() throws Exception {
             SessionMetric original = sessionMetricRepository.save(SessionMetric.builder()
-                    .session1Id(session.getId())
+                    .sessionId(session.getId())
                     .conditionalMetricId(conditionalMetric.getId())
                     .minValue(1)
                     .maxValue(2)
@@ -280,7 +280,7 @@ class SessionMetricControllerIntegrationTest {
            String updateRequest = """
                                 {
                                    "id"                  : %d,
-                                   "session1Id"          : %d,
+                                   "sessionId"          : %d,
                                    "conditionalMetricId" : %d,
                                    "minValue"            : 4,
                                    "maxValue"            : 5,
@@ -302,7 +302,7 @@ class SessionMetricControllerIntegrationTest {
             String expectedResponse = """
                                 {
                                     "id"                  : %d,
-                                    "session1Id"          : %d,
+                                    "sessionId"          : %d,
                                     "conditionalMetricId" : %d,
                                     "minValue"            : 4,
                                     "maxValue"            : 5,
@@ -322,7 +322,7 @@ class SessionMetricControllerIntegrationTest {
             String updateRequest = """
                                  {
                                      "id"                  : 999999,
-                                     "session1Id"          : %d,
+                                     "sessionId"          : %d,
                                      "conditionalMetricId" : %d
                                  }
                                  """.formatted(session.getId(), conditionalMetric.getId());
@@ -361,7 +361,7 @@ class SessionMetricControllerIntegrationTest {
         @DisplayName("DELETE /sessionMetrics/{id} -> deletes the SessionMetric")
         void delete() throws Exception {
             SessionMetric sessionMetric = sessionMetricRepository.save(SessionMetric.builder()
-                    .session1Id(session.getId())
+                    .sessionId(session.getId())
                     .conditionalMetricId(conditionalMetric.getId())
                     .build());
 
