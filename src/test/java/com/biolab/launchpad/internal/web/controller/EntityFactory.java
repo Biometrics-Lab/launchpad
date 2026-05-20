@@ -291,7 +291,7 @@ public class EntityFactory {
         );
     }
 
-    void cleanup() {
+    public void cleanup() {
         templateMetricRepository.deleteAll();
         repMetricRepository.deleteAll();
         conditionalMetricRepository.deleteAll();

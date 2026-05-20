@@ -1,5 +1,6 @@
 package com.biolab.launchpad.internal.web.dto;
 
+import com.biolab.common.UrlStatus;
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 
@@ -11,6 +12,8 @@ public record SessionResourceDto(
         @NotNull(message = "SessionResource type cannot be null")
         String type,
         @NotNull(message = "SessionResource url cannot be null")
-        String url
+        String url,
+        String externalUrl,
+        UrlStatus urlStatus
 ) { }
 

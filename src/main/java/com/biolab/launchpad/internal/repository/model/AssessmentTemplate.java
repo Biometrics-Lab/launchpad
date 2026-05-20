@@ -18,4 +18,6 @@ public class AssessmentTemplate extends IDName {
     private String description;
     @Column("condition_id")
     private Integer conditionId;
+    @Column("allow_external_urls")
+    private boolean allowExternalUrls;
 }

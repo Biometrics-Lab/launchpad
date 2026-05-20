@@ -314,7 +314,7 @@ class SessionControllerIntegrationTest {
             String expectedResponse = """
                 {
                     "status" : 404,
-                    "message": "Session1Service. Could not update Session1 by id: 999999"
+                    "message": "Session1Service. Could not update Session by id: 999999"
                 }
                 """;
 

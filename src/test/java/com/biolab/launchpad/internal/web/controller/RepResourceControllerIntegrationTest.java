@@ -68,9 +68,10 @@ class RepResourceControllerIntegrationTest {
             String request =
                             """
                                 {
-                                    "repId"          : %d,
-                                    "type"           : "%s",
-                                    "url"            : "desc"
+                                    "repId"       : %d,
+                                    "type"        : "%s",
+                                    "url"         : "desc",
+                                    "urlStatus"   : "PENDING"
                                 }
                             """.formatted(rep.getId(), resourceTypeDictionary.getId());
 
@@ -96,7 +97,9 @@ class RepResourceControllerIntegrationTest {
                                         "id"             : %d,
                                         "repId"          : %d,
                                         "type"           : "%s",
-                                        "url"            :"desc"
+                                        "url"            : "desc",
+                                        "externalUrl"    : null,
+                                        "urlStatus"      : "PENDING"
                                     }
                             """.formatted(repResourceId, rep.getId(), resourceTypeDictionary.getId());
 
@@ -174,13 +177,17 @@ class RepResourceControllerIntegrationTest {
                         "id"             : %d,
                         "repId"          : %d,
                         "type"           : "%s",
-                        "url"            :"desc"
+                        "url"            : "desc",
+                        "externalUrl"    : null,
+                        "urlStatus"      : "PENDING"
                     },
                     {
                         "id"             : %d,
                         "repId"          : %d,
                         "type"           : "%s",
-                        "url"            :"desc"
+                        "url"            : "desc",
+                        "externalUrl"    : null,
+                        "urlStatus"      : "PENDING"
                     }
                 ]
                 """.formatted(repResource1.getId(), rep.getId(), resourceTypeDictionary.getId(), repResource2.getId(), rep.getId(), resourceTypeDictionary.getId());
@@ -213,7 +220,9 @@ class RepResourceControllerIntegrationTest {
                     "id"             : %d,
                     "repId"          : %d,
                     "type"           : "%s",
-                    "url"            :"desc"
+                    "url"            : "desc",
+                    "externalUrl"    : null,
+                    "urlStatus"      : "PENDING"
                 }
                 """.formatted(repResource.getId(), rep.getId() ,resourceTypeDictionary.getId());
 
@@ -262,10 +271,11 @@ class RepResourceControllerIntegrationTest {
 
             String updateRequest = """
                 {
-                    "id"             : %d,
-                    "repId"          : %d,
-                    "type"           : "%s",
-                    "url"            : "descUPD"
+                    "id"          : %d,
+                    "repId"       : %d,
+                    "type"        : "%s",
+                    "url"         : "descUPD",
+                    "urlStatus"   : "PENDING"
                 }
                 """.formatted(original.getId(), rep.getId(), resourceTypeDictionary.getId());
 
@@ -285,7 +295,9 @@ class RepResourceControllerIntegrationTest {
                     "id"             : %d,
                     "repId"          : %d,
                     "type"           : "%s",
-                    "url"            :"descUPD"
+                    "url"            : "descUPD",
+                    "externalUrl"    : null,
+                    "urlStatus"      : "PENDING"
                 }
                 """.formatted(original.getId(), rep.getId(), resourceTypeDictionary.getId());
 
