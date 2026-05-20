@@ -18,7 +18,7 @@ import java.util.UUID;
 public class SessionResource extends ID {
     @NotNull(message = "SessionResource sessionId cannot be null")
     @Column("session_id")
-    private Integer session1Id;
+    private Integer sessionId;
     @NotNull(message = "SessionResource type cannot be null")
     private String type;
     @NotNull(message = "SessionResource url cannot be null")

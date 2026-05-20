@@ -36,7 +36,7 @@ public class ResourceEventService {
                     .type(event.contentType())
                     .build());
             case SESSION -> sessionResourceRepository.save(SessionResource.builder()
-                    .session1Id(event.contextId())
+                    .sessionId(event.contextId())
                     .url(event.internalUrl())
                     .uuid(event.uuid())
                     .externalUrl(event.externalUrl())

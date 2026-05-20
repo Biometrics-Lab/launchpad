@@ -1,6 +1,6 @@
 package com.biolab.launchpad.internal.service;
 
-import com.biolab.launchpad.internal.repository.Session1Repository;
+import com.biolab.launchpad.internal.repository.SessionRepository;
 import com.biolab.launchpad.internal.repository.model.Session;
 import com.biolab.launchpad.internal.security.exceptions.NotFoundByException;
 import com.biolab.launchpad.internal.security.exceptions.PersistException;
@@ -21,29 +21,29 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("Session1Service Unit Tests")
+@DisplayName("SessionService Unit Tests")
 class SessionServiceTest {
 
     @Mock
-    private Session1Repository session1Repository;
+    private SessionRepository sessionRepository;
 
     @InjectMocks
-    private Session1Service session1Service;
+    private SessionService sessionService;
 
-    private Session session11Input;
-    private Session session11;
-    private Session session12;
+    private Session session1Input;
+    private Session session1;
+    private Session session2;
 
     @BeforeEach
     void setUp() {
-        session11Input = Session.builder()
+        session1Input = Session.builder()
                 .build();
 
-        session11 = Session.builder()
+        session1 = Session.builder()
                 .id(1)
                 .build();
 
-        session12 = Session.builder()
+        session2 = Session.builder()
                 .id(2)
                 .build();
     }
@@ -54,23 +54,23 @@ class SessionServiceTest {
         @Test
         @DisplayName("should save and return entity when successful")
         void create_ok_saves_and_returns_entity() {
-            when(session1Repository.save(session11Input)).thenReturn(session11);
+            when(sessionRepository.save(session1Input)).thenReturn(session1);
 
-            Session result = session1Service.create(session11Input);
+            Session result = sessionService.create(session1Input);
 
-            assertThat(result).isSameAs(session11);
-            verify(session1Repository).save(session11Input);
-            verifyNoMoreInteractions(session1Repository);
+            assertThat(result).isSameAs(session1);
+            verify(sessionRepository).save(session1Input);
+            verifyNoMoreInteractions(sessionRepository);
         }
 
         @Test
         @DisplayName("should wrap repo exception in PersistException")
         void create_wraps_any_exception_in_PersistException() {
-            when(session1Repository.save(session11Input)).thenThrow(new RuntimeException("db down"));
+            when(sessionRepository.save(session1Input)).thenThrow(new RuntimeException("db down"));
 
-            PersistException ex = assertThrows(PersistException.class, () -> session1Service.create(session11Input));
+            PersistException ex = assertThrows(PersistException.class, () -> sessionService.create(session1Input));
             assertTrue(ex.getMessage().contains("db down"));
-            verifyNoMoreInteractions(session1Repository);
+            verifyNoMoreInteractions(sessionRepository);
         }
     }
 
@@ -78,15 +78,15 @@ class SessionServiceTest {
     @DisplayName("findAll()")
     class FindAllTests {
         @Test
-        @DisplayName("should return all session1s from repository")
+        @DisplayName("should return all sessions from repository")
         void findAll_returns_list_from_repo() {
-            when(session1Repository.findAll()).thenReturn(List.of(session11, session12));
+            when(sessionRepository.findAll()).thenReturn(List.of(session1, session2));
 
-            List<Session> all = session1Service.findAll();
+            List<Session> all = sessionService.findAll();
 
-            assertThat(all).containsExactly(session11, session12);
-            verify(session1Repository).findAll();
-            verifyNoMoreInteractions(session1Repository);
+            assertThat(all).containsExactly(session1, session2);
+            verify(sessionRepository).findAll();
+            verifyNoMoreInteractions(sessionRepository);
         }
     }
 
@@ -94,24 +94,24 @@ class SessionServiceTest {
     @DisplayName("findById()")
     class FindByIdTests {
         @Test
-        @DisplayName("should return session1 when found")
+        @DisplayName("should return session when found")
         void findById_ok_returns_optional() {
-            when(session1Repository.findById(1)).thenReturn(Optional.of(session11));
+            when(sessionRepository.findById(1)).thenReturn(Optional.of(session1));
 
-            Optional<Session> result = session1Service.findById(1);
+            Optional<Session> result = sessionService.findById(1);
 
-            assertThat(result).contains(session11);
-            verify(session1Repository).findById(1);
-            verifyNoMoreInteractions(session1Repository);
+            assertThat(result).contains(session1);
+            verify(sessionRepository).findById(1);
+            verifyNoMoreInteractions(sessionRepository);
         }
 
         @Test
         @DisplayName("should wrap repo exception in PersistException")
         void findById_wraps_any_repo_exception_in_PersistException() {
-            when(session1Repository.findById(1)).thenThrow(new RuntimeException("boom"));
+            when(sessionRepository.findById(1)).thenThrow(new RuntimeException("boom"));
 
-            assertThrows(PersistException.class, () -> session1Service.findById(1));
-            verifyNoMoreInteractions(session1Repository);
+            assertThrows(PersistException.class, () -> sessionService.findById(1));
+            verifyNoMoreInteractions(sessionRepository);
         }
     }
 
@@ -119,35 +119,35 @@ class SessionServiceTest {
     @DisplayName("deleteById()")
     class DeleteByIdTests {
         @Test
-        @DisplayName("should delete session1 when it exists")
+        @DisplayName("should delete session when it exists")
         void deleteById_when_exists_deletes() {
-            when(session1Repository.existsById(1)).thenReturn(true);
+            when(sessionRepository.existsById(1)).thenReturn(true);
 
-            session1Service.deleteById(1);
+            sessionService.deleteById(1);
 
-            verify(session1Repository).existsById(1);
-            verify(session1Repository).deleteById(1);
-            verifyNoMoreInteractions(session1Repository);
+            verify(sessionRepository).existsById(1);
+            verify(sessionRepository).deleteById(1);
+            verifyNoMoreInteractions(sessionRepository);
         }
 
         @Test
-        @DisplayName("should throw NotFoundByException when session1 does not exist")
+        @DisplayName("should throw NotFoundByException when session does not exist")
         void deleteById_when_not_exists_throws_NotFoundByException() {
-            when(session1Repository.existsById(1)).thenReturn(false);
+            when(sessionRepository.existsById(1)).thenReturn(false);
 
-            assertThrows(NotFoundByException.class, () -> session1Service.deleteById(1));
-            verify(session1Repository, never()).deleteById(anyInt());
-            verifyNoMoreInteractions(session1Repository);
+            assertThrows(NotFoundByException.class, () -> sessionService.deleteById(1));
+            verify(sessionRepository, never()).deleteById(anyInt());
+            verifyNoMoreInteractions(sessionRepository);
         }
 
         @Test
         @DisplayName("should wrap unexpected repo exception in PersistException")
         void deleteById_wraps_other_exceptions_in_PersistException() {
-            when(session1Repository.existsById(1)).thenReturn(true);
-            doThrow(new RuntimeException("constraint fail")).when(session1Repository).deleteById(1);
+            when(sessionRepository.existsById(1)).thenReturn(true);
+            doThrow(new RuntimeException("constraint fail")).when(sessionRepository).deleteById(1);
 
-            assertThrows(PersistException.class, () -> session1Service.deleteById(1));
-            verifyNoMoreInteractions(session1Repository);
+            assertThrows(PersistException.class, () -> sessionService.deleteById(1));
+            verifyNoMoreInteractions(sessionRepository);
         }
     }
 
@@ -155,39 +155,39 @@ class SessionServiceTest {
     @DisplayName("update()")
     class UpdateTests {
         @Test
-        @DisplayName("should update and return session1 when it exists")
+        @DisplayName("should update and return session when it exists")
         void update_when_exists_saves_and_returns() {
-            when(session1Repository.existsById(1)).thenReturn(true);
-            when(session1Repository.save(session11)).thenReturn(session11);
+            when(sessionRepository.existsById(1)).thenReturn(true);
+            when(sessionRepository.save(session1)).thenReturn(session1);
 
-            Session result = session1Service.update(session11);
+            Session result = sessionService.update(session1);
 
             assertEquals(1, result.getId().intValue());
-            verify(session1Repository).existsById(1);
-            verify(session1Repository).save(session11);
-            verifyNoMoreInteractions(session1Repository);
+            verify(sessionRepository).existsById(1);
+            verify(sessionRepository).save(session1);
+            verifyNoMoreInteractions(sessionRepository);
         }
 
         @Test
-        @DisplayName("should throw NotFoundByException when session1 does not exist")
+        @DisplayName("should throw NotFoundByException when session does not exist")
         void update_when_not_exists_throws_NotFoundByException() {
-            when(session1Repository.existsById(1)).thenReturn(false);
+            when(sessionRepository.existsById(1)).thenReturn(false);
 
-            assertThrows(NotFoundByException.class, () -> session1Service.update(session11));
-            verify(session1Repository).existsById(1);
-            verifyNoMoreInteractions(session1Repository);
+            assertThrows(NotFoundByException.class, () -> sessionService.update(session1));
+            verify(sessionRepository).existsById(1);
+            verifyNoMoreInteractions(sessionRepository);
         }
 
         @Test
         @DisplayName("should wrap repo exception in PersistException")
         void update_wraps_other_exceptions_in_PersistException() {
-            when(session1Repository.existsById(1)).thenReturn(true);
-            when(session1Repository.save(session11)).thenThrow(new RuntimeException("db error"));
+            when(sessionRepository.existsById(1)).thenReturn(true);
+            when(sessionRepository.save(session1)).thenThrow(new RuntimeException("db error"));
 
-            assertThrows(PersistException.class, () -> session1Service.update(session11));
-            verify(session1Repository).existsById(1);
-            verify(session1Repository).save(session11);
-            verifyNoMoreInteractions(session1Repository);
+            assertThrows(PersistException.class, () -> sessionService.update(session1));
+            verify(sessionRepository).existsById(1);
+            verify(sessionRepository).save(session1);
+            verifyNoMoreInteractions(sessionRepository);
         }
     }
 }

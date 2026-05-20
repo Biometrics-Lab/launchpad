@@ -9,9 +9,9 @@ import org.springframework.stereotype.Service;
 
 @Service
 @Log4j2
-public class Session1Service extends EntityServiceID<Session> {
+public class SessionService extends EntityServiceID<Session> {
     @Autowired
-    public Session1Service(CrudRepository<Session, Integer> repository) {
+    public SessionService(CrudRepository<Session, Integer> repository) {
         super(repository);
     }
 }

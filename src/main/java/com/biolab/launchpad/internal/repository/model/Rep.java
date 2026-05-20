@@ -14,9 +14,9 @@ import java.sql.Timestamp;
 @NoArgsConstructor
 @Table("rep")
 public class Rep  extends ID {
-    @NotNull(message = "Rep session1Id cannot be null")
+    @NotNull(message = "Rep sessionId cannot be null")
     @Column("session_id")
-    private Integer session1Id;
+    private Integer sessionId;
     @NotNull(message = "Rep startTime cannot be null")
     @Column("start_time")
     private Timestamp startTime;

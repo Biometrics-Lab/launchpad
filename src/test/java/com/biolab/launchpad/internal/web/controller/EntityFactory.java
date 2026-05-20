@@ -29,7 +29,7 @@ public class EntityFactory {
     private final DataSourceRepository               dataSourceRepository;
     private final IntegrationRepository              integrationRepository;
     private final AssessmentRepository               assessmentRepository;
-    private final Session1Repository                 session1Repository;
+    private final SessionRepository                  sessionRepository;
     private final RepRepository                      repRepository;
     private final RepMetricRepository                repMetricRepository;
     private final ConditionRepository                conditionRepository;
@@ -238,9 +238,9 @@ public class EntityFactory {
         );
     }
 
-    public Session createSession1() {
+    public Session createSession() {
         Assessment assessment = createAssessment();
-        return session1Repository.save(
+        return sessionRepository.save(
                 Session.builder()
                         .assessmentId(assessment.getId())
                         .startTime(Timestamp.valueOf(LocalDateTime.of(2025, 10, 2, 14, 45, 1)))
@@ -249,10 +249,10 @@ public class EntityFactory {
     }
 
     public Rep createRep() {
-        Session session = createSession1();
+        Session session = createSession();
         return repRepository.save(
                 Rep.builder()
-                        .session1Id(session.getId())
+                        .sessionId(session.getId())
                         .startTime(Timestamp.valueOf(LocalDateTime.of(2025, 10, 2, 14, 45, 1)))
                         .build()
         );
@@ -297,7 +297,7 @@ public class EntityFactory {
         conditionalMetricRepository.deleteAll();
         conditionRepository.deleteAll();
         repRepository.deleteAll();
-        session1Repository.deleteAll();
+        sessionRepository.deleteAll();
         assessmentRepository.deleteAll();
         dataSourceRepository.deleteAll();
         integrationRepository.deleteAll();

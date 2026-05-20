@@ -14,7 +14,7 @@ import org.springframework.data.relational.core.mapping.Table;
 public class SessionMetric extends ID {
     @NotNull(message = "SessionMetric sessionId cannot be null")
     @Column("session_id")
-    private Integer session1Id;
+    private Integer sessionId;
     @NotNull(message = "SessionMetric conditionalMetricId cannot be null")
     @Column("conditional_metric_id")
     private Integer conditionalMetricId;
