@@ -70,7 +70,8 @@ class SessionResourceControllerIntegrationTest {
                                 {
                                     "session1Id"     : %d,
                                     "type"           : "%s",
-                                    "url"            : "desc"
+                                    "url"            : "desc",
+                                    "urlStatus"      : "PENDING"
                                 }
                             """.formatted(session.getId(), resourceTypeDictionary.getId());
 
@@ -96,7 +97,9 @@ class SessionResourceControllerIntegrationTest {
                                         "id"             : %d,
                                         "session1Id"     : %d,
                                         "type"           : "%s",
-                                        "url"            :"desc"
+                                        "url"            : "desc",
+                                        "externalUrl"    : null,
+                                        "urlStatus"      : "PENDING"
                                     }
                             """.formatted(sessionResourceId, session.getId(), resourceTypeDictionary.getId());
 
@@ -174,13 +177,17 @@ class SessionResourceControllerIntegrationTest {
                         "id"             : %d,
                         "session1Id"     : %d,
                         "type"           : "%s",
-                        "url"            :"desc"
+                        "url"            : "desc",
+                        "externalUrl"    : null,
+                        "urlStatus"      : "PENDING"
                     },
                     {
                         "id"             : %d,
                         "session1Id"     : %d,
                         "type"           : "%s",
-                        "url"            :"desc"
+                        "url"            : "desc",
+                        "externalUrl"    : null,
+                        "urlStatus"      : "PENDING"
                     }
                 ]
                 """.formatted(sessionResource1.getId(), session.getId(), resourceTypeDictionary.getId(), sessionResource2.getId(), session.getId(), resourceTypeDictionary.getId());
@@ -213,7 +220,9 @@ class SessionResourceControllerIntegrationTest {
                     "id"             : %d,
                     "session1Id"     : %d,
                     "type"           : "%s",
-                    "url"            :"desc"
+                    "url"            : "desc",
+                    "externalUrl"    : null,
+                    "urlStatus"      : "PENDING"
                 }
                 """.formatted(sessionResource.getId(), session.getId() ,resourceTypeDictionary.getId());
 
@@ -265,7 +274,8 @@ class SessionResourceControllerIntegrationTest {
                     "id"             : %d,
                     "session1Id"     : %d,
                     "type"           : "%s",
-                    "url"            : "descUPD"
+                    "url"            : "descUPD",
+                    "urlStatus"      : "PENDING"
                 }
                 """.formatted(original.getId(), session.getId(), resourceTypeDictionary.getId());
 
@@ -285,7 +295,9 @@ class SessionResourceControllerIntegrationTest {
                     "id"             : %d,
                     "session1Id"     : %d,
                     "type"           : "%s",
-                    "url"            :"descUPD"
+                    "url"            : "descUPD",
+                    "externalUrl"    : null,
+                    "urlStatus"      : "PENDING"
                 }
                 """.formatted(original.getId(), session.getId(), resourceTypeDictionary.getId());
 

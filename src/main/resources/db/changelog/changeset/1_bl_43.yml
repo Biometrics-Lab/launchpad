@@ -1,0 +1,95 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1-BL-43-1
+      author: roman.vakulenko
+      changes:
+        # rep_resource — add uuid, external_url, url_status
+        - addColumn:
+            tableName: rep_resource
+            columns:
+              - column:
+                  name: uuid
+                  type: uuid
+                  defaultValueComputed: gen_random_uuid()
+                  constraints:
+                    nullable: false
+                    unique: true
+              - column:
+                  name: external_url
+                  type: varchar(2048)
+                  constraints:
+                    nullable: true
+              - column:
+                  name: url_status
+                  type: varchar(20)
+                  defaultValue: PENDING
+                  constraints:
+                    nullable: false
+
+        # session_resource — add uuid, external_url, url_status
+        - addColumn:
+            tableName: session_resource
+            columns:
+              - column:
+                  name: uuid
+                  type: uuid
+                  defaultValueComputed: gen_random_uuid()
+                  constraints:
+                    nullable: false
+                    unique: true
+              - column:
+                  name: external_url
+                  type: varchar(2048)
+                  constraints:
+                    nullable: true
+              - column:
+                  name: url_status
+                  type: varchar(20)
+                  defaultValue: PENDING
+                  constraints:
+                    nullable: false
+
+        # assessment_resource — add uuid, external_url, url_status
+        - addColumn:
+            tableName: assessment_resource
+            columns:
+              - column:
+                  name: uuid
+                  type: uuid
+                  defaultValueComputed: gen_random_uuid()
+                  constraints:
+                    nullable: false
+                    unique: true
+              - column:
+                  name: external_url
+                  type: varchar(2048)
+                  constraints:
+                    nullable: true
+              - column:
+                  name: url_status
+                  type: varchar(20)
+                  defaultValue: PENDING
+                  constraints:
+                    nullable: false
+
+        # assessment_template — add allow_external_urls
+        - addColumn:
+            tableName: assessment_template
+            columns:
+              - column:
+                  name: allow_external_urls
+                  type: boolean
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
+
+        # assessment — add allow_external_urls
+        - addColumn:
+            tableName: assessment
+            columns:
+              - column:
+                  name: allow_external_urls
+                  type: boolean
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false

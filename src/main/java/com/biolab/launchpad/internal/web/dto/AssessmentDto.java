@@ -2,7 +2,6 @@ package com.biolab.launchpad.internal.web.dto;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
-import org.springframework.data.relational.core.mapping.Column;
 
 @Builder
 public record AssessmentDto (
@@ -13,5 +12,6 @@ public record AssessmentDto (
         String sport,
         @NotNull(message = "Assessment templateId cannot be null")
         Integer templateId,
-        Integer conditionId
+        Integer conditionId,
+        Boolean allowExternalUrls
 ){}

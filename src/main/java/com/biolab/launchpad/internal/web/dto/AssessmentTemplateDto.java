@@ -12,5 +12,6 @@ public record AssessmentTemplateDto(
         @NotNull(message = "AssessmentTemplate sport cannot be null")
         String sport,
         String description,
-        Integer conditionId
+        Integer conditionId,
+        Boolean allowExternalUrls
 ){}

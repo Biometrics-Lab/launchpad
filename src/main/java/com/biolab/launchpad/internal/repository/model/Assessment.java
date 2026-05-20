@@ -25,4 +25,6 @@ public class Assessment  extends ID {
     private Integer templateId;
     @Column("condition_id")
     private Integer conditionId;
+    @Column("allow_external_urls")
+    private boolean allowExternalUrls;
 }

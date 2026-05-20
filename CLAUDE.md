@@ -17,7 +17,13 @@
 # Run a single test method
 ./gradlew test --tests "com.biolab.launchpad.internal.web.controller.PlayerControllerIntegrationTest.CreateTests.create"
 
-# Run the application (requires local PostgreSQL on localhost:5432, DB: biolab, user: biolab, password: biolab)
+# Run the application — option 1: single script (starts LocalStack + app)
+./start.sh
+
+# Run the application — option 2: manual steps
+# Start LocalStack (S3) — required before bootRun
+docker-compose up -d localstack
+# Run the app (requires local PostgreSQL on localhost:5432, DB: biolab, user: biolab, password: biolab)
 ./gradlew bootRun
 
 # Initialize the database (Linux only)
@@ -25,6 +31,12 @@
 
 # Drop the database (Linux only)
 ./gradlew dropDB
+
+# Browse S3 files (LocalStack)
+aws --endpoint-url http://localhost:4566 s3 ls s3://biolab-resources --recursive
+
+# Browse S3 files (real AWS — same command, remove --endpoint-url and set AWS credentials)
+aws s3 ls s3://biolab-resources --recursive
 ```
 
 CI runs `./gradlew test` on push to `develop`, `master`, `release/*`, and `feature/*` branches.

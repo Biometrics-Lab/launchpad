@@ -68,7 +68,8 @@ class AssessmentResourceControllerIntegrationTest {
                                 {
                                     "assessmentId"   : %d,
                                     "type"           : "%s",
-                                    "url"            : "desc"
+                                    "url"            : "desc",
+                                    "urlStatus"      : "PENDING"
                                 }
                             """.formatted(assessment.getId(), resourceTypeDictionary.getId());
 
@@ -94,7 +95,9 @@ class AssessmentResourceControllerIntegrationTest {
                                         "id"             : %d,
                                         "assessmentId"   : %d,
                                         "type"           : "%s",
-                                        "url"            :"desc"
+                                        "url"            : "desc",
+                                        "externalUrl"    : null,
+                                        "urlStatus"      : "PENDING"
                                     }
                             """.formatted(assessmentResourceId, assessment.getId(), resourceTypeDictionary.getId());
 
@@ -172,13 +175,17 @@ class AssessmentResourceControllerIntegrationTest {
                         "id"             : %d,
                         "assessmentId"   : %d,
                         "type"           : "%s",
-                        "url"            :"desc"
+                        "url"            : "desc",
+                        "externalUrl"    : null,
+                        "urlStatus"      : "PENDING"
                     },
                     {
                         "id"             : %d,
                         "assessmentId"   : %d,
                         "type"           : "%s",
-                        "url"            :"desc"
+                        "url"            : "desc",
+                        "externalUrl"    : null,
+                        "urlStatus"      : "PENDING"
                     }
                 ]
                 """.formatted(assessmentResource1.getId(), assessment.getId(), resourceTypeDictionary.getId(), assessmentResource2.getId(), assessment.getId(), resourceTypeDictionary.getId());
@@ -211,7 +218,9 @@ class AssessmentResourceControllerIntegrationTest {
                     "id"             : %d,
                     "assessmentId"   : %d,
                     "type"           : "%s",
-                    "url"            :"desc"
+                    "url"            : "desc",
+                    "externalUrl"    : null,
+                    "urlStatus"      : "PENDING"
                 }
                 """.formatted(assessmentResource.getId(), assessment.getId() ,resourceTypeDictionary.getId());
 
@@ -263,7 +272,8 @@ class AssessmentResourceControllerIntegrationTest {
                     "id"             : %d,
                     "assessmentId"   : %d,
                     "type"           : "%s",
-                    "url"            : "descUPD"
+                    "url"            : "descUPD",
+                    "urlStatus"      : "PENDING"
                 }
                 """.formatted(original.getId(), assessment.getId(), resourceTypeDictionary.getId());
 
@@ -283,7 +293,9 @@ class AssessmentResourceControllerIntegrationTest {
                     "id"             : %d,
                     "assessmentId"   : %d,
                     "type"           : "%s",
-                    "url"            :"descUPD"
+                    "url"            : "descUPD",
+                    "externalUrl"    : null,
+                    "urlStatus"      : "PENDING"
                 }
                 """.formatted(original.getId(), assessment.getId(), resourceTypeDictionary.getId());
 

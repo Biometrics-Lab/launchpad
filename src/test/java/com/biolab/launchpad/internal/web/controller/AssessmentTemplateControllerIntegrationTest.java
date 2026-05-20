@@ -92,11 +92,12 @@ class AssessmentTemplateControllerIntegrationTest {
             String expectedResponse =
                     """
                             {
-                                        "id"           : %d,
-                                        "name"         : "avg_exit_velocity",
-                                        "sport"        : "%s",
-                                        "description"  : "desc",
-                                        "conditionId"  : null
+                                        "id"                  : %d,
+                                        "name"                : "avg_exit_velocity",
+                                        "sport"               : "%s",
+                                        "description"         : "desc",
+                                        "conditionId"         : null,
+                                        "allowExternalUrls"   : false
                                     }
                             """.formatted(assessmentTemplateId, sportDictionary.getId());
 
@@ -171,18 +172,20 @@ class AssessmentTemplateControllerIntegrationTest {
             String expectedResponse = """
                     [
                         {
-                            "id"           : %d,
-                            "name"         : "avg_exit_velocity",
-                            "sport"        : "%s",
-                            "description"  : "desc",
-                            "conditionId"  : null
+                            "id"                  : %d,
+                            "name"                : "avg_exit_velocity",
+                            "sport"               : "%s",
+                            "description"         : "desc",
+                            "conditionId"         : null,
+                            "allowExternalUrls"   : false
                         },
                         {
-                            "id"           : %d,
-                            "name"         : "max_entry_velocity",
-                            "sport"        : "%s",
-                            "description"  : "desc",
-                            "conditionId"  : null
+                            "id"                  : %d,
+                            "name"                : "max_entry_velocity",
+                            "sport"               : "%s",
+                            "description"         : "desc",
+                            "conditionId"         : null,
+                            "allowExternalUrls"   : false
                         }
                     ]
                     """.formatted(assessmentTemplate1.getId(), sportDictionary.getId(), assessmentTemplate2.getId(), sportDictionary.getId());
@@ -212,11 +215,12 @@ class AssessmentTemplateControllerIntegrationTest {
 
             String expectedResponse = """
                 {
-                    "id"           : %d,
-                    "name"         : "avg_exit_velocity",
-                    "sport"        : "%s",
-                    "description"  : "desc",
-                    "conditionId"  : null
+                    "id"                  : %d,
+                    "name"                : "avg_exit_velocity",
+                    "sport"               : "%s",
+                    "description"         : "desc",
+                    "conditionId"         : null,
+                    "allowExternalUrls"   : false
                 }
                 """.formatted(assessmentTemplate.getId(), sportDictionary.getId());
 
@@ -285,11 +289,12 @@ class AssessmentTemplateControllerIntegrationTest {
 
             String expectedResponse = """
                 {
-                    "id"           : %d,
-                    "name"         : "updated_velocity",
-                    "sport"        : "%s",
-                    "description"  : "desc",
-                    "conditionId"  : null
+                    "id"                  : %d,
+                    "name"                : "updated_velocity",
+                    "sport"               : "%s",
+                    "description"         : "desc",
+                    "conditionId"         : null,
+                    "allowExternalUrls"   : false
                 }
                 """.formatted(original.getId(), sportDictionary.getId());
 

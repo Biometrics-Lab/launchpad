@@ -93,11 +93,12 @@ class AssessmentControllerIntegrationTest {
             String expectedResponse =
                                     """
                                       {
-                                        "id"          : %d,
-                                        "templateId"  : %d,
-                                        "sport"       : "%s",
-                                        "playerId"    : %d,
-                                        "conditionId" : null
+                                        "id"                  : %d,
+                                        "templateId"          : %d,
+                                        "sport"               : "%s",
+                                        "playerId"            : %d,
+                                        "conditionId"         : null,
+                                        "allowExternalUrls"   : false
                                       }
                                     """.formatted(assessmentId, template.getId(), sport.getId(), player.getId());
 
@@ -172,18 +173,20 @@ class AssessmentControllerIntegrationTest {
             String expectedResponse = """
                 [
                     {
-                        "id"          : %d,
-                        "templateId"  : %d,
-                        "sport"       : "%s",
-                        "playerId"    : %d,
-                        "conditionId" : null
+                        "id"                  : %d,
+                        "templateId"          : %d,
+                        "sport"               : "%s",
+                        "playerId"            : %d,
+                        "conditionId"         : null,
+                        "allowExternalUrls"   : false
                     },
                     {
-                        "id"          : %d,
-                        "templateId"  : %d,
-                        "sport"       : "%s",
-                        "playerId"    : %d,
-                        "conditionId" : null
+                        "id"                  : %d,
+                        "templateId"          : %d,
+                        "sport"               : "%s",
+                        "playerId"            : %d,
+                        "conditionId"         : null,
+                        "allowExternalUrls"   : false
                     }
                 ]
                 """.formatted(assessment1.getId(), template.getId(), sport.getId(), player.getId(), assessment2.getId(), template.getId(), sport.getId(), player.getId());
@@ -213,11 +216,12 @@ class AssessmentControllerIntegrationTest {
 
             String expectedResponse = """
                                      {
-                                        "id"          : %d,
-                                        "templateId"  : %d,
-                                        "sport"       : "%s",
-                                        "playerId"    : %d,
-                                        "conditionId" : null
+                                        "id"                  : %d,
+                                        "templateId"          : %d,
+                                        "sport"               : "%s",
+                                        "playerId"            : %d,
+                                        "conditionId"         : null,
+                                        "allowExternalUrls"   : false
                                      }
                                     """.formatted(assessment.getId(), template.getId(), sport.getId(), player.getId());
 
@@ -288,11 +292,12 @@ class AssessmentControllerIntegrationTest {
 
             String expectedResponse = """
                                 {
-                                    "id"          : %d,
-                                    "templateId"  : %d,
-                                    "sport"       : "%s",
-                                    "playerId"    : %d,
-                                    "conditionId" : null
+                                    "id"                  : %d,
+                                    "templateId"          : %d,
+                                    "sport"               : "%s",
+                                    "playerId"            : %d,
+                                    "conditionId"         : null,
+                                    "allowExternalUrls"   : false
                                  }
                                 """.formatted(original.getId(), template.getId(), sport.getId(), player.getId());
 

@@ -19,3 +19,11 @@ spring:
       jdbc:
         schema-initialization:
           enabled: true
+
+aws:
+  s3:
+    endpoint: http://localhost:4566
+    bucket: biolab-resources
+    region: us-east-1
+    access-key: test
+    secret-key: test
