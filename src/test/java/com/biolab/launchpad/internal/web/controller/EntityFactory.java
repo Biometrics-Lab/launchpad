@@ -35,6 +35,7 @@ public class EntityFactory {
     private final ConditionRepository                conditionRepository;
     private final ConditionalMetricRepository        conditionalMetricRepository;
     private final TemplateMetricRepository           templateMetricRepository;
+    private final AssessmentMetricRepository         assessmentMetricRepository;
 
     public Measurement createMeasurement(String name) {
 
@@ -225,6 +226,31 @@ public class EntityFactory {
         );
     }
 
+    public DataSource createDataSource(Integer metricId) {
+        Integration integration = createIntegration("AutoIntegration-" + System.nanoTime());
+        return dataSourceRepository.save(
+                DataSource.builder()
+                        .integrationId(integration.getId())
+                        .metricId(metricId)
+                        .name("AutoDataSource-" + System.nanoTime())
+                        .type("JSON_CONFIG")
+                        .content("{}")
+                        .build()
+        );
+    }
+
+    public AssessmentMetric createAssessmentMetric(Integer assessmentId, Integer conditionalMetricId) {
+        ConditionalMetric cm = conditionalMetricRepository.findById(conditionalMetricId).orElseThrow();
+        DataSource dataSource = createDataSource(cm.getMetricId());
+        return assessmentMetricRepository.save(
+                AssessmentMetric.builder()
+                        .assessmentId(assessmentId)
+                        .conditionalMetricId(conditionalMetricId)
+                        .dataSourceId(dataSource.getId())
+                        .build()
+        );
+    }
+
     public Assessment createAssessment() {
         SportDictionary sportDictionary       = createSportDictionary("AutoSportDictionary");
         Player player                         = createPlayer("AutoPlayer");
@@ -246,6 +272,12 @@ public class EntityFactory {
                         .startTime(Timestamp.valueOf(LocalDateTime.of(2025, 10, 2, 14, 45, 1)))
                         .build()
         );
+    }
+
+    public Session createActiveSession() {
+        Session session = createSession();
+        session.setStatus("ACTIVE");
+        return sessionRepository.save(session);
     }
 
     public Rep createRep() {
@@ -293,6 +325,7 @@ public class EntityFactory {
 
     public void cleanup() {
         templateMetricRepository.deleteAll();
+        assessmentMetricRepository.deleteAll();
         repMetricRepository.deleteAll();
         conditionalMetricRepository.deleteAll();
         conditionRepository.deleteAll();

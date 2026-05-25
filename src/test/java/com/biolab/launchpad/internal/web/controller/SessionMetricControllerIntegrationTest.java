@@ -95,9 +95,9 @@ class SessionMetricControllerIntegrationTest {
                                         "id"                  : %d,
                                         "sessionId"          : %d,
                                         "conditionalMetricId" : %d,
-                                        "minValue"            : 1,
-                                        "maxValue"            : 2,
-                                        "avgValue"            : 3
+                                        "minValue"            : 1.0,
+                                        "maxValue"            : 2.0,
+                                        "avgValue"            : 3.0
                                       }
                                     """.formatted(id, session.getId(), conditionalMetric.getId());
 
@@ -153,17 +153,17 @@ class SessionMetricControllerIntegrationTest {
             SessionMetric sessionMetric1 = sessionMetricRepository.save(SessionMetric.builder()
                     .sessionId(session.getId())
                     .conditionalMetricId(conditionalMetric.getId())
-                    .minValue(1)
-                    .maxValue(2)
-                    .avgValue(3)
+                    .minValue(1.0)
+                    .maxValue(2.0)
+                    .avgValue(3.0)
                     .build());
 
             SessionMetric sessionMetric2 = sessionMetricRepository.save(SessionMetric.builder()
                     .sessionId(session.getId())
                     .conditionalMetricId(conditionalMetric.getId())
-                    .minValue(5)
-                    .maxValue(6)
-                    .avgValue(7)
+                    .minValue(5.0)
+                    .maxValue(6.0)
+                    .avgValue(7.0)
                     .build());
 
             String jsonResponse = mvc.perform(
@@ -179,17 +179,17 @@ class SessionMetricControllerIntegrationTest {
                         "id"                  : %d,
                         "sessionId"          : %d,
                         "conditionalMetricId" : %d,
-                        "minValue"            : 1,
-                        "maxValue"            : 2,
-                        "avgValue"            : 3
+                        "minValue"            : 1.0,
+                        "maxValue"            : 2.0,
+                        "avgValue"            : 3.0
                    },
                     {
                         "id"                  : %d,
                         "sessionId"          : %d,
                         "conditionalMetricId" : %d,
-                        "minValue"            : 5,
-                        "maxValue"            : 6,
-                        "avgValue"            : 7
+                        "minValue"            : 5.0,
+                        "maxValue"            : 6.0,
+                        "avgValue"            : 7.0
                     }
                 ]
                 """.formatted(sessionMetric1.getId(), session.getId(), conditionalMetric.getId(),
@@ -208,9 +208,9 @@ class SessionMetricControllerIntegrationTest {
             SessionMetric sessionMetric = sessionMetricRepository.save(SessionMetric.builder()
                     .sessionId(session.getId())
                     .conditionalMetricId(conditionalMetric.getId())
-                    .minValue(1)
-                    .maxValue(2)
-                    .avgValue(3)
+                    .minValue(1.0)
+                    .maxValue(2.0)
+                    .avgValue(3.0)
                     .build());
 
             String jsonResponse = mvc.perform(
@@ -225,9 +225,9 @@ class SessionMetricControllerIntegrationTest {
                                         "id"                  : %d,
                                         "sessionId"          : %d,
                                         "conditionalMetricId" : %d,
-                                        "minValue"            : 1,
-                                        "maxValue"            : 2,
-                                        "avgValue"            : 3
+                                        "minValue"            : 1.0,
+                                        "maxValue"            : 2.0,
+                                        "avgValue"            : 3.0
                                      }
                                     """.formatted(sessionMetric.getId(), session.getId(), conditionalMetric.getId());
 
@@ -272,9 +272,9 @@ class SessionMetricControllerIntegrationTest {
             SessionMetric original = sessionMetricRepository.save(SessionMetric.builder()
                     .sessionId(session.getId())
                     .conditionalMetricId(conditionalMetric.getId())
-                    .minValue(1)
-                    .maxValue(2)
-                    .avgValue(3)
+                    .minValue(1.0)
+                    .maxValue(2.0)
+                    .avgValue(3.0)
                     .build());
 
            String updateRequest = """
@@ -304,9 +304,9 @@ class SessionMetricControllerIntegrationTest {
                                     "id"                  : %d,
                                     "sessionId"          : %d,
                                     "conditionalMetricId" : %d,
-                                    "minValue"            : 4,
-                                    "maxValue"            : 5,
-                                    "avgValue"            : 6
+                                    "minValue"            : 4.0,
+                                    "maxValue"            : 5.0,
+                                    "avgValue"            : 6.0
                                  }
                                 """.formatted(original.getId(), session.getId(), conditionalMetric.getId());
 

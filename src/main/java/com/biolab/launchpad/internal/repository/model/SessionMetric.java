@@ -19,9 +19,9 @@ public class SessionMetric extends ID {
     @Column("conditional_metric_id")
     private Integer conditionalMetricId;
     @Column("min_value")
-    private Number minValue;
+    private Double minValue;
     @Column("max_value")
-    private Number maxValue;
+    private Double maxValue;
     @Column("avg_value")
-    private Number avgValue;
+    private Double avgValue;
 }

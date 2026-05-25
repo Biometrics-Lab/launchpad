@@ -94,7 +94,8 @@ class SessionControllerIntegrationTest {
                                       {
                                         "id"           : %d,
                                         "assessmentId" : %d,
-                                        "startTime"    : "2025-10-02T14:45:00.000+00:00"
+                                        "startTime"    : "2025-10-02T14:45:00.000+00:00",
+                                        "status"       : null
                                       }
                                     """.formatted(sessionId, assessment.getId());
 
@@ -171,12 +172,14 @@ class SessionControllerIntegrationTest {
                     {
                         "id"           : %d,
                         "assessmentId" : %d,
-                        "startTime"    : "2025-10-02T15:45:10.000+00:00"
+                        "startTime"    : "2025-10-02T15:45:10.000+00:00",
+                        "status"       : null
                     },
                     {
                         "id"            : %d,
                         "assessmentId"  : %d,
-                        "startTime"     : "2025-10-02T15:45:10.000+00:00"
+                        "startTime"     : "2025-10-02T15:45:10.000+00:00",
+                        "status"        : null
                     }
                 ]
                 """.formatted(session11.getId(), assessment.getId(), session12.getId(),assessment.getId());
@@ -209,7 +212,8 @@ class SessionControllerIntegrationTest {
                                      {
                                         "id"             : %d,
                                          "assessmentId"  : %d,
-                                         "startTime"   : "2025-10-02T15:45:10.000+00:00"
+                                         "startTime"   : "2025-10-02T15:45:10.000+00:00",
+                                         "status"      : null
                                      }
                                     """.formatted(session.getId(), assessment.getId());
 
@@ -279,7 +283,8 @@ class SessionControllerIntegrationTest {
                                 {
                                     "id"            : %d,
                                     "assessmentId"  : %d,
-                                    "startTime"     : "2026-10-02T14:45:00.000+00:00"
+                                    "startTime"     : "2026-10-02T14:45:00.000+00:00",
+                                    "status"        : null
                                  }
                                 """.formatted(original.getId(), assessment.getId());
 

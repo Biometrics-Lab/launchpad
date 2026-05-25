@@ -3,6 +3,7 @@ package com.biolab.launchpad.internal.web.controller;
 import com.biolab.launchpad.internal.repository.model.Session;
 import com.biolab.launchpad.internal.security.exceptions.NotFoundByException;
 import com.biolab.launchpad.internal.service.SessionService;
+import com.biolab.launchpad.internal.service.SessionWorkflowService;
 import com.biolab.launchpad.internal.web.dto.ResponseCode;
 import com.biolab.launchpad.internal.web.dto.ResponseDto;
 import com.biolab.launchpad.internal.web.dto.SessionDto;
@@ -23,6 +24,7 @@ import static com.biolab.launchpad.internal.web.mapper.SessionMapper.sessionMapp
 public class SessionController {
 
     private final SessionService sessionService;
+    private final SessionWorkflowService sessionWorkflowService;
 
     @PostMapping
     public SessionDto create(@Valid @RequestBody SessionDto sessionDto) {
@@ -56,5 +58,15 @@ public class SessionController {
     public SessionDto update(@Valid @RequestBody SessionDto sessionDTO) {
         Session updated = sessionService.update(sessionMapper.toModel(sessionDTO));
         return sessionMapper.toDto(updated);
+    }
+
+    @PostMapping("/{id}/start")
+    public SessionDto start(@PathVariable Integer id) {
+        return sessionWorkflowService.startSession(id);
+    }
+
+    @PostMapping("/{id}/stop")
+    public SessionDto stop(@PathVariable Integer id) {
+        return sessionWorkflowService.stopSession(id);
     }
 }
