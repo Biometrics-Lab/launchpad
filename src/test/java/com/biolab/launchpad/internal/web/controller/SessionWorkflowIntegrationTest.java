@@ -3,7 +3,13 @@ package com.biolab.launchpad.internal.web.controller;
 import com.biolab.TestcontainersConfiguration;
 import com.biolab.common.SessionStartedEvent;
 import com.biolab.common.SessionStoppedEvent;
+import com.biolab.launchpad.internal.repository.AssessmentMetricRepository;
+import com.biolab.launchpad.internal.repository.RepMetricRepository;
+import com.biolab.launchpad.internal.repository.RepRepository;
 import com.biolab.launchpad.internal.repository.SessionRepository;
+import com.biolab.launchpad.internal.repository.model.Rep;
+import com.biolab.launchpad.internal.repository.model.RepMetric;
+import com.biolab.launchpad.internal.repository.model.Session;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.*;
@@ -15,6 +21,9 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.event.ApplicationEvents;
 import org.springframework.test.context.event.RecordApplicationEvents;
 import org.springframework.test.web.servlet.MockMvc;
+
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
@@ -35,6 +44,9 @@ class SessionWorkflowIntegrationTest {
     @Autowired SessionRepository sessionRepository;
     @Autowired EntityFactory entityFactory;
     @Autowired ApplicationEvents events;
+    @Autowired AssessmentMetricRepository assessmentMetricRepository;
+    @Autowired RepRepository repRepository;
+    @Autowired RepMetricRepository repMetricRepository;
 
     @AfterEach
     void tearDown() {
@@ -174,6 +186,50 @@ class SessionWorkflowIntegrationTest {
                                     .with(httpBasic("biolab", "biolab"))
                     )
                     .andExpect(status().isNotFound());
+        }
+
+        @Test
+        @DisplayName("POST /sessions/{id}/stop aggregates rep metrics into AssessmentMetric")
+        void stopComputesAssessmentMetricAggregates() throws Exception {
+            var cm = entityFactory.createConditionalMetric();
+            var assessment = entityFactory.createAssessment();
+            var am = entityFactory.createAssessmentMetric(assessment.getId(), cm.getId());
+
+            var session = sessionRepository.save(Session.builder()
+                    .assessmentId(assessment.getId())
+                    .startTime(Timestamp.valueOf(LocalDateTime.of(2025, 10, 2, 14, 45, 1)))
+                    .status("ACTIVE")
+                    .build());
+
+            var rep1 = repRepository.save(Rep.builder()
+                    .sessionId(session.getId())
+                    .startTime(Timestamp.valueOf(LocalDateTime.of(2025, 10, 2, 14, 45, 1)))
+                    .build());
+            var rep2 = repRepository.save(Rep.builder()
+                    .sessionId(session.getId())
+                    .startTime(Timestamp.valueOf(LocalDateTime.of(2025, 10, 2, 14, 45, 2)))
+                    .build());
+            repMetricRepository.save(RepMetric.builder()
+                    .repId(rep1.getId())
+                    .conditionalMetricId(cm.getId())
+                    .value(10.0)
+                    .build());
+            repMetricRepository.save(RepMetric.builder()
+                    .repId(rep2.getId())
+                    .conditionalMetricId(cm.getId())
+                    .value(20.0)
+                    .build());
+
+            mvc.perform(post(API + "/" + session.getId() + "/stop")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .with(httpBasic("biolab", "biolab")))
+                    .andExpect(status().isOk());
+
+            var updated = assessmentMetricRepository.findById(am.getId()).orElseThrow();
+            assertEquals(10.0, updated.getMinValue().doubleValue(), 0.001);
+            assertEquals(20.0, updated.getMaxValue().doubleValue(), 0.001);
+            assertEquals(15.0, updated.getAvgValue().doubleValue(), 0.001);
+            assertEquals(15.0, updated.getLastValue().doubleValue(), 0.001);
         }
     }
 }
