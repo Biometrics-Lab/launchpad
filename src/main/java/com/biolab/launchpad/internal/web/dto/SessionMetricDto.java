@@ -10,8 +10,8 @@ public record SessionMetricDto(
         Integer sessionId,
         @NotNull(message = "SessionMetric conditionalMetricId cannot be null")
         Integer conditionalMetricId,
-        Number minValue,
-        Number maxValue,
-        Number avgValue
+        Double minValue,
+        Double maxValue,
+        Double avgValue
 ) { }
 

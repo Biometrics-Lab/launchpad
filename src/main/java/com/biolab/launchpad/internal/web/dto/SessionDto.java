@@ -11,5 +11,6 @@ public record SessionDto(
         @NotNull(message = "Session assessmentId cannot be null")
         Integer assessmentId,
         @NotNull(message = "Session startTime cannot be null")
-        Timestamp startTime
+        Timestamp startTime,
+        String status
 ) { }

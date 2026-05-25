@@ -20,4 +20,6 @@ public class Session extends ID {
     @NotNull(message = "Session startTime cannot be null")
     @Column("start_time")
     private Timestamp startTime;
+    @Column("status")
+    private String status;
 }

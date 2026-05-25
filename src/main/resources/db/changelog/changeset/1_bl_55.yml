@@ -1,0 +1,13 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1-BL-55-1
+      author: roman.vakulenko
+      changes:
+        - addColumn:
+            tableName: session
+            columns:
+              - column:
+                  name: status
+                  type: varchar(20)
+                  constraints:
+                    nullable: true
