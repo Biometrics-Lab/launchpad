@@ -30,3 +30,6 @@ replay_pid*
 
 /build/
 /.gradle/
+
+# Superpowers specs and plans (local working artifacts, not for version control)
+/docs/superpowers/

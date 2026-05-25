@@ -77,7 +77,7 @@ public class SessionWorkflowService {
         session.setStatus("COMPLETE");
         Session saved = sessionRepository.save(session);
 
-        computeAggregates(id);
+        computeAggregates(id, session.getAssessmentId());
 
         eventPublisher.publishEvent(new SessionStoppedEvent(id));
         log.info("Session {} stopped", id);
@@ -85,7 +85,7 @@ public class SessionWorkflowService {
         return sessionMapper.toDto(saved);
     }
 
-    private void computeAggregates(Integer sessionId) {
+    private void computeAggregates(Integer sessionId, Integer assessmentId) {
         List<Rep> reps = repRepository.findAllBySessionId(sessionId);
         if (reps.isEmpty()) return;
 
@@ -119,6 +119,39 @@ public class SessionWorkflowService {
                                     .avgValue(avg)
                                     .build())
                     );
+        });
+
+        updateAssessmentMetrics(sessionId, assessmentId);
+    }
+
+    private void updateAssessmentMetrics(Integer sessionId, Integer assessmentId) {
+        List<Integer> allSessionIds = sessionRepository.findAllByAssessmentId(assessmentId)
+                .stream().map(Session::getId).toList();
+
+        List<SessionMetric> allSessionMetrics = sessionMetricRepository.findAllBySessionIdIn(allSessionIds);
+
+        Map<Integer, List<SessionMetric>> byMetric = allSessionMetrics.stream()
+                .collect(Collectors.groupingBy(SessionMetric::getConditionalMetricId));
+
+        byMetric.forEach((conditionalMetricId, sessionMetrics) -> {
+            double min = sessionMetrics.stream().mapToDouble(SessionMetric::getMinValue).min().orElse(0);
+            double max = sessionMetrics.stream().mapToDouble(SessionMetric::getMaxValue).max().orElse(0);
+            double avg = sessionMetrics.stream().mapToDouble(SessionMetric::getAvgValue).average().orElse(0);
+            double lastValue = sessionMetrics.stream()
+                    .filter(sm -> sm.getSessionId().equals(sessionId))
+                    .findFirst()
+                    .map(SessionMetric::getAvgValue)
+                    .orElse(avg);
+
+            assessmentMetricRepository
+                    .findByAssessmentIdAndConditionalMetricId(assessmentId, conditionalMetricId)
+                    .ifPresent(am -> {
+                        am.setMinValue(min);
+                        am.setMaxValue(max);
+                        am.setAvgValue(avg);
+                        am.setLastValue(lastValue);
+                        assessmentMetricRepository.save(am);
+                    });
         });
     }
 }

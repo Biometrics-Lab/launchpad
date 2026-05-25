@@ -36,6 +36,7 @@ public class EntityFactory {
     private final ConditionalMetricRepository        conditionalMetricRepository;
     private final TemplateMetricRepository           templateMetricRepository;
     private final AssessmentMetricRepository         assessmentMetricRepository;
+    private final SessionMetricRepository            sessionMetricRepository;
 
     public Measurement createMeasurement(String name) {
 
@@ -327,6 +328,7 @@ public class EntityFactory {
         templateMetricRepository.deleteAll();
         assessmentMetricRepository.deleteAll();
         repMetricRepository.deleteAll();
+        sessionMetricRepository.deleteAll();
         conditionalMetricRepository.deleteAll();
         conditionRepository.deleteAll();
         repRepository.deleteAll();
