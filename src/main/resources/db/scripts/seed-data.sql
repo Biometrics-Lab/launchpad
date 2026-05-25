@@ -129,15 +129,14 @@ WHERE i.name = 'Blast Motion'
   AND cm.condition_id = (SELECT id FROM condition WHERE name = 'Hitting from T');
 
 -- assessment_metric (→ assessment, conditional_metric, data_source)
-INSERT INTO assessment_metric (assessment_id, conditional_metric_id, data_source_id, min_value, max_value, avg_value, last_value)
+INSERT INTO assessment_metric (assessment_id, conditional_metric_id, data_source_id, min_value, max_value, avg_value)
 SELECT
     a.id,
     cm.id,
     ds.id,
     CASE cm.name WHEN 'Bat Speed' THEN 58 WHEN 'Attack Angle' THEN 8  WHEN 'Time to Impact' THEN 145 END,
     CASE cm.name WHEN 'Bat Speed' THEN 75 WHEN 'Attack Angle' THEN 22 WHEN 'Time to Impact' THEN 195 END,
-    CASE cm.name WHEN 'Bat Speed' THEN 67 WHEN 'Attack Angle' THEN 15 WHEN 'Time to Impact' THEN 170 END,
-    CASE cm.name WHEN 'Bat Speed' THEN 70 WHEN 'Attack Angle' THEN 16 WHEN 'Time to Impact' THEN 165 END
+    CASE cm.name WHEN 'Bat Speed' THEN 67 WHEN 'Attack Angle' THEN 15 WHEN 'Time to Impact' THEN 170 END
 FROM assessment a
 CROSS JOIN conditional_metric cm
 JOIN metric m ON m.id = cm.metric_id

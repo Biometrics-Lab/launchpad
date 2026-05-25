@@ -229,7 +229,6 @@ class SessionWorkflowIntegrationTest {
             assertEquals(10.0, updated.getMinValue().doubleValue(), 0.001);
             assertEquals(20.0, updated.getMaxValue().doubleValue(), 0.001);
             assertEquals(15.0, updated.getAvgValue().doubleValue(), 0.001);
-            assertEquals(15.0, updated.getLastValue().doubleValue(), 0.001);
         }
     }
 }

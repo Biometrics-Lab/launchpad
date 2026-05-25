@@ -330,13 +330,13 @@ public class EntityFactory {
         repMetricRepository.deleteAll();
         sessionMetricRepository.deleteAll();
         conditionalMetricRepository.deleteAll();
-        conditionRepository.deleteAll();
         repRepository.deleteAll();
         sessionRepository.deleteAll();
         assessmentRepository.deleteAll();
+        assessmentTemplateRepository.deleteAll();
+        conditionRepository.deleteAll();
         dataSourceRepository.deleteAll();
         integrationRepository.deleteAll();
-        assessmentTemplateRepository.deleteAll();
         playerRepository.deleteAll();
         userRepository.deleteAll();
         modelRepository.deleteAll();

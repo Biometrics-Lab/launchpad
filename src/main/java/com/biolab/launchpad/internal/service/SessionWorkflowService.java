@@ -137,11 +137,6 @@ public class SessionWorkflowService {
             double min = sessionMetrics.stream().mapToDouble(SessionMetric::getMinValue).min().orElse(0);
             double max = sessionMetrics.stream().mapToDouble(SessionMetric::getMaxValue).max().orElse(0);
             double avg = sessionMetrics.stream().mapToDouble(SessionMetric::getAvgValue).average().orElse(0);
-            double lastValue = sessionMetrics.stream()
-                    .filter(sm -> sm.getSessionId().equals(sessionId))
-                    .findFirst()
-                    .map(SessionMetric::getAvgValue)
-                    .orElse(avg);
 
             assessmentMetricRepository
                     .findByAssessmentIdAndConditionalMetricId(assessmentId, conditionalMetricId)
@@ -149,7 +144,6 @@ public class SessionWorkflowService {
                         am.setMinValue(min);
                         am.setMaxValue(max);
                         am.setAvgValue(avg);
-                        am.setLastValue(lastValue);
                         assessmentMetricRepository.save(am);
                     });
         });
