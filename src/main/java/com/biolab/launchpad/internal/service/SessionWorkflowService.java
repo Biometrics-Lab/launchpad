@@ -14,8 +14,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.biolab.launchpad.internal.web.mapper.SessionMapper.sessionMapper;
@@ -31,6 +30,8 @@ public class SessionWorkflowService {
     private final RepRepository repRepository;
     private final RepMetricRepository repMetricRepository;
     private final SessionMetricRepository sessionMetricRepository;
+    private final ConditionalMetricRepository conditionalMetricRepository;
+    private final MetricRepository metricRepository;
     private final ApplicationEventPublisher eventPublisher;
 
     @Transactional
@@ -77,7 +78,8 @@ public class SessionWorkflowService {
         session.setStatus("COMPLETE");
         Session saved = sessionRepository.save(session);
 
-        computeAggregates(id, session.getAssessmentId());
+        Map<Integer, Boolean> negateByConditionalMetricId = buildNegateMap(session.getAssessmentId());
+        computeAggregates(id, session.getAssessmentId(), negateByConditionalMetricId);
 
         eventPublisher.publishEvent(new SessionStoppedEvent(id));
         log.info("Session {} stopped", id);
@@ -85,7 +87,29 @@ public class SessionWorkflowService {
         return sessionMapper.toDto(saved);
     }
 
-    private void computeAggregates(Integer sessionId, Integer assessmentId) {
+    private Map<Integer, Boolean> buildNegateMap(Integer assessmentId) {
+        List<AssessmentMetric> assessmentMetrics = assessmentMetricRepository.findAllByAssessmentId(assessmentId);
+
+        List<ConditionalMetric> conditionalMetrics = new ArrayList<>();
+        conditionalMetricRepository.findAllById(
+                assessmentMetrics.stream().map(AssessmentMetric::getConditionalMetricId).toList()
+        ).forEach(conditionalMetrics::add);
+
+        Map<Integer, Integer> metricIdByCmId = conditionalMetrics.stream()
+                .collect(Collectors.toMap(ConditionalMetric::getId, ConditionalMetric::getMetricId));
+
+        Map<Integer, Boolean> negateByMetricId = new HashMap<>();
+        metricRepository.findAllById(metricIdByCmId.values())
+                .forEach(m -> negateByMetricId.put(m.getId(), m.isNegate()));
+
+        return metricIdByCmId.entrySet().stream()
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        e -> negateByMetricId.getOrDefault(e.getValue(), false)));
+    }
+
+    private void computeAggregates(Integer sessionId, Integer assessmentId,
+                                   Map<Integer, Boolean> negateByConditionalMetricId) {
         List<Rep> reps = repRepository.findAllBySessionId(sessionId);
         if (reps.isEmpty()) return;
 
@@ -98,9 +122,12 @@ public class SessionWorkflowService {
                         Collectors.mapping(RepMetric::getValue, Collectors.toList())));
 
         byMetric.forEach((conditionalMetricId, values) -> {
-            double min = values.stream().mapToDouble(Number::doubleValue).min().orElse(0);
-            double max = values.stream().mapToDouble(Number::doubleValue).max().orElse(0);
-            double avg = values.stream().mapToDouble(Number::doubleValue).average().orElse(0);
+            boolean negated = negateByConditionalMetricId.getOrDefault(conditionalMetricId, false);
+            double rawMin = values.stream().mapToDouble(Number::doubleValue).min().orElse(0);
+            double rawMax = values.stream().mapToDouble(Number::doubleValue).max().orElse(0);
+            double avg    = values.stream().mapToDouble(Number::doubleValue).average().orElse(0);
+            double min = negated ? rawMax : rawMin;
+            double max = negated ? rawMin : rawMax;
 
             sessionMetricRepository
                     .findBySessionIdAndConditionalMetricId(sessionId, conditionalMetricId)
@@ -121,10 +148,11 @@ public class SessionWorkflowService {
                     );
         });
 
-        updateAssessmentMetrics(sessionId, assessmentId);
+        updateAssessmentMetrics(assessmentId, negateByConditionalMetricId);
     }
 
-    private void updateAssessmentMetrics(Integer sessionId, Integer assessmentId) {
+    private void updateAssessmentMetrics(Integer assessmentId,
+                                         Map<Integer, Boolean> negateByConditionalMetricId) {
         List<Integer> allSessionIds = sessionRepository.findAllByAssessmentId(assessmentId)
                 .stream().map(Session::getId).toList();
 
@@ -134,14 +162,14 @@ public class SessionWorkflowService {
                 .collect(Collectors.groupingBy(SessionMetric::getConditionalMetricId));
 
         byMetric.forEach((conditionalMetricId, sessionMetrics) -> {
-            double min = sessionMetrics.stream().mapToDouble(SessionMetric::getMinValue).min().orElse(0);
-            double max = sessionMetrics.stream().mapToDouble(SessionMetric::getMaxValue).max().orElse(0);
+            boolean negated = negateByConditionalMetricId.getOrDefault(conditionalMetricId, false);
+            double min = negated
+                    ? sessionMetrics.stream().mapToDouble(SessionMetric::getMinValue).max().orElse(0)
+                    : sessionMetrics.stream().mapToDouble(SessionMetric::getMinValue).min().orElse(0);
+            double max = negated
+                    ? sessionMetrics.stream().mapToDouble(SessionMetric::getMaxValue).min().orElse(0)
+                    : sessionMetrics.stream().mapToDouble(SessionMetric::getMaxValue).max().orElse(0);
             double avg = sessionMetrics.stream().mapToDouble(SessionMetric::getAvgValue).average().orElse(0);
-            double lastValue = sessionMetrics.stream()
-                    .filter(sm -> sm.getSessionId().equals(sessionId))
-                    .findFirst()
-                    .map(SessionMetric::getAvgValue)
-                    .orElse(avg);
 
             assessmentMetricRepository
                     .findByAssessmentIdAndConditionalMetricId(assessmentId, conditionalMetricId)
@@ -149,7 +177,6 @@ public class SessionWorkflowService {
                         am.setMinValue(min);
                         am.setMaxValue(max);
                         am.setAvgValue(avg);
-                        am.setLastValue(lastValue);
                         assessmentMetricRepository.save(am);
                     });
         });

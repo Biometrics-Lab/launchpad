@@ -265,6 +265,18 @@ public class EntityFactory {
         );
     }
 
+    public Assessment createAssessment(Integer playerId) {
+        SportDictionary sportDictionary = createSportDictionary("AutoSportDictionary");
+        AssessmentTemplate assessmentTemplate = createAssessmentTemplate("AutoAssessmentTemplate");
+        return assessmentRepository.save(
+                Assessment.builder()
+                        .sport(sportDictionary.getId())
+                        .playerId(playerId)
+                        .templateId(assessmentTemplate.getId())
+                        .build()
+        );
+    }
+
     public Session createSession() {
         Assessment assessment = createAssessment();
         return sessionRepository.save(
@@ -313,6 +325,29 @@ public class EntityFactory {
         );
     }
 
+    private Metric createNegatedMetric(String name) {
+        Measurement measurement = createMeasurement("AutoMeasurement");
+        return metricRepository.save(
+            Metric.builder()
+                .name(name)
+                .measurementId(measurement.getId())
+                .negate(true)
+                .build()
+        );
+    }
+
+    public ConditionalMetric createNegatedConditionalMetric() {
+        Condition condition = createCondition("AutoCondition");
+        Metric metric       = createNegatedMetric("AutoNegatedMetric");
+        return conditionalMetricRepository.save(
+            ConditionalMetric.builder()
+                .name("AutoNegatedConditionalMetric")
+                .conditionId(condition.getId())
+                .metricId(metric.getId())
+                .build()
+        );
+    }
+
     public RepMetric createRepMetric() {
         Rep rep                               = createRep();
         ConditionalMetric conditionalMetric   = createConditionalMetric();
@@ -330,13 +365,13 @@ public class EntityFactory {
         repMetricRepository.deleteAll();
         sessionMetricRepository.deleteAll();
         conditionalMetricRepository.deleteAll();
-        conditionRepository.deleteAll();
         repRepository.deleteAll();
         sessionRepository.deleteAll();
         assessmentRepository.deleteAll();
+        assessmentTemplateRepository.deleteAll();
+        conditionRepository.deleteAll();
         dataSourceRepository.deleteAll();
         integrationRepository.deleteAll();
-        assessmentTemplateRepository.deleteAll();
         playerRepository.deleteAll();
         userRepository.deleteAll();
         modelRepository.deleteAll();

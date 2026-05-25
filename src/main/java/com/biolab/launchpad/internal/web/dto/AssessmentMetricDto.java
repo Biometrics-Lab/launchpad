@@ -15,6 +15,5 @@ public record AssessmentMetricDto(
         Number minValue,
         Number maxValue,
         Number avgValue,
-        Number lastValue,
         String description
 ){}

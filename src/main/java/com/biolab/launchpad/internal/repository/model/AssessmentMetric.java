@@ -27,7 +27,5 @@ public class AssessmentMetric extends ID {
     private Number maxValue;
     @Column("avg_value")
     private Number avgValue;
-    @Column("last_value")
-    private Number lastValue;
     private String description;
 }
