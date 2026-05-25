@@ -313,6 +313,25 @@ public class EntityFactory {
         );
     }
 
+    public ConditionalMetric createNegatedConditionalMetric() {
+        Condition condition = createCondition("AutoCondition");
+        Measurement measurement = createMeasurement("AutoMeasurement");
+        Metric metric = metricRepository.save(
+            Metric.builder()
+                .name("AutoNegatedMetric")
+                .measurementId(measurement.getId())
+                .negate(true)
+                .build()
+        );
+        return conditionalMetricRepository.save(
+            ConditionalMetric.builder()
+                .name("AutoNegatedConditionalMetric")
+                .conditionId(condition.getId())
+                .metricId(metric.getId())
+                .build()
+        );
+    }
+
     public RepMetric createRepMetric() {
         Rep rep                               = createRep();
         ConditionalMetric conditionalMetric   = createConditionalMetric();

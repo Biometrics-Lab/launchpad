@@ -189,6 +189,44 @@ class SessionWorkflowIntegrationTest {
         }
 
         @Test
+        @DisplayName("POST /sessions/{id}/stop with negated metric swaps min and max")
+        void stopNegatedMetricSwapsMinMax() throws Exception {
+            var cm = entityFactory.createNegatedConditionalMetric();
+            var assessment = entityFactory.createAssessment();
+            var am = entityFactory.createAssessmentMetric(assessment.getId(), cm.getId());
+
+            var session = sessionRepository.save(Session.builder()
+                .assessmentId(assessment.getId())
+                .startTime(Timestamp.valueOf(LocalDateTime.of(2025, 10, 2, 14, 45, 1)))
+                .status("ACTIVE")
+                .build());
+
+            var rep1 = repRepository.save(Rep.builder()
+                .sessionId(session.getId())
+                .startTime(Timestamp.valueOf(LocalDateTime.of(2025, 10, 2, 14, 45, 1)))
+                .build());
+            var rep2 = repRepository.save(Rep.builder()
+                .sessionId(session.getId())
+                .startTime(Timestamp.valueOf(LocalDateTime.of(2025, 10, 2, 14, 45, 2)))
+                .build());
+            repMetricRepository.save(RepMetric.builder()
+                .repId(rep1.getId()).conditionalMetricId(cm.getId()).value(10.0).build());
+            repMetricRepository.save(RepMetric.builder()
+                .repId(rep2.getId()).conditionalMetricId(cm.getId()).value(20.0).build());
+
+            mvc.perform(post(API + "/" + session.getId() + "/stop")
+                .contentType(MediaType.APPLICATION_JSON)
+                .with(httpBasic("biolab", "biolab")))
+                .andExpect(status().isOk());
+
+            var updated = assessmentMetricRepository.findById(am.getId()).orElseThrow();
+            // negated: larger raw value → minValue (worst); smaller raw value → maxValue (best)
+            assertEquals(20.0, updated.getMinValue().doubleValue(), 0.001);
+            assertEquals(10.0, updated.getMaxValue().doubleValue(), 0.001);
+            assertEquals(15.0, updated.getAvgValue().doubleValue(), 0.001);
+        }
+
+        @Test
         @DisplayName("POST /sessions/{id}/stop aggregates rep metrics into AssessmentMetric")
         void stopComputesAssessmentMetricAggregates() throws Exception {
             var cm = entityFactory.createConditionalMetric();
