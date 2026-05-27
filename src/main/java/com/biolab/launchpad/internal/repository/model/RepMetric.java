@@ -18,5 +18,7 @@ public class RepMetric extends ID {
     @NotNull(message = "RepMetric conditionalMetricId cannot be null")
     @Column("conditional_metric_id")
     private Integer conditionalMetricId;
+    @Column("data_source_id")
+    private Integer dataSourceId;
     private Number value;
 }

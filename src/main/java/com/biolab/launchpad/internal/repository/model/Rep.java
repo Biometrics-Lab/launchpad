@@ -13,11 +13,13 @@ import java.sql.Timestamp;
 @SuperBuilder
 @NoArgsConstructor
 @Table("rep")
-public class Rep  extends ID {
+public class Rep extends ID {
     @NotNull(message = "Rep sessionId cannot be null")
     @Column("session_id")
     private Integer sessionId;
     @NotNull(message = "Rep startTime cannot be null")
     @Column("start_time")
     private Timestamp startTime;
+    @Column("rep_number")
+    private Integer repNumber;
 }

@@ -85,6 +85,10 @@ public class ResourceStorageService {
         return internalUrl;
     }
 
+    public String getInternalUrl(UUID uuid, String filename) {
+        return buildUrl(buildKey(uuid, filename));
+    }
+
     private void downloadAndUploadAsync(String externalUrl, String key, UUID uuid) {
         s3AsyncClient.utilities()
                 .getUrl(b -> b.bucket(bucket).key(key));

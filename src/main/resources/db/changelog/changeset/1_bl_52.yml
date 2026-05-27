@@ -1,0 +1,35 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1-BL-52-1
+      author: roman.vakulenko
+      changes:
+        # Drop integration_id from data_source (removes FK to integration)
+        - dropColumn:
+            tableName: data_source
+            columnName: integration_id
+        # Drop integration table (no more FKs pointing to it)
+        - dropTable:
+            tableName: integration
+            cascadeConstraints: true
+        # Drop rep_metric_source table
+        - dropTable:
+            tableName: rep_metric_source
+            cascadeConstraints: true
+        # Add data_source_id to rep_metric
+        - addColumn:
+            tableName: rep_metric
+            columns:
+              - column:
+                  name: data_source_id
+                  type: integer
+                  constraints:
+                    nullable: true
+        # Add rep_number to rep
+        - addColumn:
+            tableName: rep
+            columns:
+              - column:
+                  name: rep_number
+                  type: integer
+                  constraints:
+                    nullable: true

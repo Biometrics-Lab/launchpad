@@ -1,5 +1,6 @@
 package com.biolab.launchpad.internal.service;
 
+import com.biolab.common.DataSourceConfig;
 import com.biolab.common.SessionMetricConfig;
 import com.biolab.common.SessionStartedEvent;
 import com.biolab.common.SessionStoppedEvent;
@@ -55,8 +56,7 @@ public class SessionWorkflowService {
                             .orElseThrow(() -> new NotFoundByException("DataSource not found by id: %d", am.getDataSourceId()));
                     return new SessionMetricConfig(
                             am.getConditionalMetricId(),
-                            am.getDataSourceId(),
-                            ds.getContent());
+                            new DataSourceConfig(ds.getId(), ds.getName(), ds.getType(), ds.getContent()));
                 })
                 .toList();
 

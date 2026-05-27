@@ -13,9 +13,6 @@ import org.springframework.data.relational.core.mapping.Table;
 @NoArgsConstructor
 @Table("data_source")
 public class DataSource extends ID {
-    @NotNull(message = "DataSource integrationId cannot be null")
-    @Column("integration_id")
-    private Integer integrationId;
     @NotNull(message = "DataSource metricId cannot be null")
     @Column("metric_id")
     private Integer metricId;

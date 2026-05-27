@@ -5,6 +5,7 @@ import java.util.List;
 
 public record RepDataReceivedEvent(
         Integer sessionId,
+        int repNumber,
         Timestamp startTime,
         List<RepMetricData> metrics,
         List<RepResourceData> resources
