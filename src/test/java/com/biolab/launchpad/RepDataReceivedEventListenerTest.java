@@ -23,6 +23,7 @@ import org.springframework.transaction.support.TransactionTemplate;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 import static org.awaitility.Awaitility.await;
@@ -68,8 +69,9 @@ class RepDataReceivedEventListenerTest {
 
         var event = new RepDataReceivedEvent(
                 session.getId(),
+                1,
                 Timestamp.valueOf(LocalDateTime.now()),
-                List.of(new RepMetricData(conditionalMetric.getId(), 42.5)),
+                List.of(new RepMetricData(conditionalMetric.getId(), null, 42.5)),
                 List.of()
         );
 
@@ -96,11 +98,12 @@ class RepDataReceivedEventListenerTest {
         var url2 = "http://localhost:4566/biolab-resources/resources/test/cam2.mp4";
         var event = new RepDataReceivedEvent(
                 session.getId(),
+                1,
                 Timestamp.valueOf(LocalDateTime.now()),
                 List.of(),
                 List.of(
-                        new RepResourceData(url1, UrlStatus.READY),
-                        new RepResourceData(url2, UrlStatus.PENDING)
+                        new RepResourceData(url1, UrlStatus.READY, UUID.randomUUID()),
+                        new RepResourceData(url2, UrlStatus.PENDING, UUID.randomUUID())
                 )
         );
 
@@ -128,8 +131,9 @@ class RepDataReceivedEventListenerTest {
     void invalidMetricDropped() {
         var event = new RepDataReceivedEvent(
                 session.getId(),
+                1,
                 Timestamp.valueOf(LocalDateTime.now()),
-                List.of(new RepMetricData(999999, 99.0)),
+                List.of(new RepMetricData(999999, null, 99.0)),
                 List.of()
         );
 

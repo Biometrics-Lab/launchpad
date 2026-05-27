@@ -6,8 +6,6 @@ import lombok.Builder;
 @Builder
 public record DataSourceDto(
         Integer id,
-        @NotNull(message = "DataSource integrationId cannot be null")
-        Integer integrationId,
         @NotNull(message = "DataSource metricId cannot be null")
         Integer metricId,
         String name,

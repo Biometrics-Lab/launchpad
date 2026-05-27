@@ -6,7 +6,10 @@ import com.biolab.common.ResourceContentType;
 import com.biolab.common.HealthCheckRequest;
 import com.biolab.common.HealthCheckResponse;
 import com.biolab.common.ResourceCreatedEvent;
+import com.biolab.common.SessionStartedEvent;
+import com.biolab.common.SessionStoppedEvent;
 import com.biolab.common.UrlType;
+import com.biolab.integration.internal.bat.BadSensorService;
 import com.biolab.integration.internal.service.ResourceStorageService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -21,6 +24,7 @@ public class IntegrationServiceGateway {
 
     private final ResourceStorageService resourceStorageService;
     private final ApplicationEventPublisher eventPublisher;
+    private final BadSensorService badSensorService;
 
     public HealthCheckResponse healthCheck(HealthCheckRequest request) {
         log.info("{} - health check - OK: {}", this.getClass().getSimpleName(), request);
@@ -33,6 +37,18 @@ public class IntegrationServiceGateway {
     @ApplicationModuleListener
     public void asyncEvent(AsyncRequest request) {
         log.info("{} - async event received - OK: {}", this.getClass().getSimpleName(), request);
+    }
+
+    @ApplicationModuleListener
+    public void onSessionStarted(SessionStartedEvent event) {
+        log.info("Session started received: sessionId={}", event.sessionId());
+        badSensorService.startSession(event.sessionId(), event.metrics());
+    }
+
+    @ApplicationModuleListener
+    public void onSessionStopped(SessionStoppedEvent event) {
+        log.info("Session stopped received: sessionId={}", event.sessionId());
+        badSensorService.stopSession(event.sessionId());
     }
 
     @ApplicationModuleListener(condition = "'" + Dictionary.Service.integration + "'.equals(#event.targetModule)")

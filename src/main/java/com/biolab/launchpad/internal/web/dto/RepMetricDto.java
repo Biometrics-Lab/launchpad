@@ -10,5 +10,6 @@ public record RepMetricDto(
         Integer repId,
         @NotNull(message = "RepMetric conditionalMetricId cannot be null")
         Integer conditionalMetricId,
+        Integer dataSourceId,
         Number value
 ) { }

@@ -37,21 +37,18 @@ class DataSourceServiceTest {
     @BeforeEach
     void setUp() {
         dataSource1Input = DataSource.builder()
-                .integrationId(10)
                 .metricId(20)
                 .type("JSON_CONFIG")
                 .build();
 
         dataSource1 = DataSource.builder()
                 .id(1)
-                .integrationId(10)
                 .metricId(20)
                 .type("JSON_CONFIG")
                 .build();
 
         dataSource2 = DataSource.builder()
                 .id(2)
-                .integrationId(10)
                 .metricId(30)
                 .type("SCRIPT")
                 .build();

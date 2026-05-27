@@ -95,6 +95,7 @@ class RepMetricControllerIntegrationTest {
                                         "id"                  : %d,
                                         "repId"               : %d,
                                         "conditionalMetricId" : %d,
+                                        "dataSourceId"        : null,
                                         "value"               : 3
                                       }
                                     """.formatted(id, rep.getId(), conditionalMetric.getId());
@@ -173,12 +174,14 @@ class RepMetricControllerIntegrationTest {
                         "id"                  : %d,
                         "repId"               : %d,
                         "conditionalMetricId" : %d,
+                        "dataSourceId"        : null,
                         "value"               : 3
                    },
                     {
                         "id"                  : %d,
                         "repId"               : %d,
                         "conditionalMetricId" : %d,
+                        "dataSourceId"        : null,
                         "value"               : 7
                     }
                 ]
@@ -213,6 +216,7 @@ class RepMetricControllerIntegrationTest {
                                         "id"                  : %d,
                                         "repId"               : %d,
                                         "conditionalMetricId" : %d,
+                                        "dataSourceId"        : null,
                                         "value"               : 3
                                      }
                                     """.formatted(repMetric.getId(), rep.getId(), conditionalMetric.getId());
@@ -286,6 +290,7 @@ class RepMetricControllerIntegrationTest {
                                     "id"                  : %d,
                                     "repId"               : %d,
                                     "conditionalMetricId" : %d,
+                                    "dataSourceId"        : null,
                                     "value"               : 6
                                  }
                                 """.formatted(original.getId(), rep.getId(), conditionalMetric.getId());

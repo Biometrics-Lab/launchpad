@@ -2,7 +2,6 @@ package com.biolab.launchpad.internal.web.controller;
 
 import com.biolab.launchpad.internal.repository.DataSourceRepository;
 import com.biolab.launchpad.internal.repository.model.DataSource;
-import com.biolab.launchpad.internal.repository.model.Integration;
 import com.biolab.launchpad.internal.repository.model.Metric;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -43,13 +42,11 @@ class DataSourceControllerIntegrationTest {
     @Autowired
     EntityFactory factory;
 
-    Integration integration;
-    Metric      metric;
+    Metric metric;
 
     @BeforeEach
     void setUp() {
-        integration = factory.createIntegration("BlastMotion");
-        metric      = factory.createMetric("ExitVelocity");
+        metric = factory.createMetric("ExitVelocity");
     }
 
     @AfterEach
@@ -67,13 +64,12 @@ class DataSourceControllerIntegrationTest {
 
             String request = """
                     {
-                        "integrationId" : %d,
                         "metricId"      : %d,
                         "name"          : "Exit Velocity",
                         "type"          : "JSON_CONFIG",
                         "content"       : "{\\"path\\": \\"$.exitVelocity\\"}"
                     }
-                    """.formatted(integration.getId(), metric.getId());
+                    """.formatted(metric.getId());
 
             String jsonResponse = mvc.perform(
                             post(API)
@@ -91,14 +87,13 @@ class DataSourceControllerIntegrationTest {
 
             String expectedResponse = """
                     {
-                        "id"            : %d,
-                        "integrationId" : %d,
-                        "metricId"      : %d,
-                        "name"          : "Exit Velocity",
-                        "type"          : "JSON_CONFIG",
-                        "content"       : "{\\"path\\": \\"$.exitVelocity\\"}"
+                        "id"       : %d,
+                        "metricId" : %d,
+                        "name"     : "Exit Velocity",
+                        "type"     : "JSON_CONFIG",
+                        "content"  : "{\\"path\\": \\"$.exitVelocity\\"}"
                     }
-                    """.formatted(dataSourceId, integration.getId(), metric.getId());
+                    """.formatted(dataSourceId, metric.getId());
 
             assertEquals(objectMapper.readTree(expectedResponse), responseNode);
         }
@@ -136,13 +131,11 @@ class DataSourceControllerIntegrationTest {
         void getAll() throws Exception {
 
             DataSource ds1 = dataSourceRepository.save(DataSource.builder()
-                    .integrationId(integration.getId())
                     .metricId(metric.getId())
                     .type("JSON_CONFIG")
                     .build());
 
             DataSource ds2 = dataSourceRepository.save(DataSource.builder()
-                    .integrationId(integration.getId())
                     .metricId(metric.getId())
                     .type("SCRIPT")
                     .content("return payload.speed;")
@@ -157,24 +150,22 @@ class DataSourceControllerIntegrationTest {
             String expectedResponse = """
                     [
                         {
-                            "id"            : %d,
-                            "integrationId" : %d,
-                            "metricId"      : %d,
-                            "name"          : null,
-                            "type"          : "JSON_CONFIG",
-                            "content"       : null
+                            "id"       : %d,
+                            "metricId" : %d,
+                            "name"     : null,
+                            "type"     : "JSON_CONFIG",
+                            "content"  : null
                         },
                         {
-                            "id"            : %d,
-                            "integrationId" : %d,
-                            "metricId"      : %d,
-                            "name"          : null,
-                            "type"          : "SCRIPT",
-                            "content"       : "return payload.speed;"
+                            "id"       : %d,
+                            "metricId" : %d,
+                            "name"     : null,
+                            "type"     : "SCRIPT",
+                            "content"  : "return payload.speed;"
                         }
                     ]
-                    """.formatted(ds1.getId(), integration.getId(), metric.getId(),
-                                  ds2.getId(), integration.getId(), metric.getId());
+                    """.formatted(ds1.getId(), metric.getId(),
+                                  ds2.getId(), metric.getId());
 
             assertEquals(objectMapper.readTree(expectedResponse), objectMapper.readTree(jsonResponse));
         }
@@ -184,7 +175,6 @@ class DataSourceControllerIntegrationTest {
         void getById() throws Exception {
 
             DataSource ds = dataSourceRepository.save(DataSource.builder()
-                    .integrationId(integration.getId())
                     .metricId(metric.getId())
                     .type("MAPPING")
                     .content("exit_velocity")
@@ -198,14 +188,13 @@ class DataSourceControllerIntegrationTest {
 
             String expectedResponse = """
                     {
-                        "id"            : %d,
-                        "integrationId" : %d,
-                        "metricId"      : %d,
-                        "name"          : null,
-                        "type"          : "MAPPING",
-                        "content"       : "exit_velocity"
+                        "id"       : %d,
+                        "metricId" : %d,
+                        "name"     : null,
+                        "type"     : "MAPPING",
+                        "content"  : "exit_velocity"
                     }
-                    """.formatted(ds.getId(), integration.getId(), metric.getId());
+                    """.formatted(ds.getId(), metric.getId());
 
             assertEquals(objectMapper.readTree(expectedResponse), objectMapper.readTree(jsonResponse));
         }
@@ -238,20 +227,18 @@ class DataSourceControllerIntegrationTest {
         @DisplayName("PUT /dataSources -> updates and returns the DataSource")
         void update() throws Exception {
             DataSource original = dataSourceRepository.save(DataSource.builder()
-                    .integrationId(integration.getId())
                     .metricId(metric.getId())
                     .type("JSON_CONFIG")
                     .build());
 
             String updateRequest = """
                     {
-                        "id"            : %d,
-                        "integrationId" : %d,
-                        "metricId"      : %d,
-                        "type"          : "SCRIPT",
-                        "content"       : "return payload.v;"
+                        "id"       : %d,
+                        "metricId" : %d,
+                        "type"     : "SCRIPT",
+                        "content"  : "return payload.v;"
                     }
-                    """.formatted(original.getId(), integration.getId(), metric.getId());
+                    """.formatted(original.getId(), metric.getId());
 
             String jsonResponse = mvc.perform(
                             put(API)
@@ -264,14 +251,13 @@ class DataSourceControllerIntegrationTest {
 
             String expectedResponse = """
                     {
-                        "id"            : %d,
-                        "integrationId" : %d,
-                        "metricId"      : %d,
-                        "name"          : null,
-                        "type"          : "SCRIPT",
-                        "content"       : "return payload.v;"
+                        "id"       : %d,
+                        "metricId" : %d,
+                        "name"     : null,
+                        "type"     : "SCRIPT",
+                        "content"  : "return payload.v;"
                     }
-                    """.formatted(original.getId(), integration.getId(), metric.getId());
+                    """.formatted(original.getId(), metric.getId());
 
             assertEquals(objectMapper.readTree(expectedResponse), objectMapper.readTree(jsonResponse));
 
@@ -284,12 +270,11 @@ class DataSourceControllerIntegrationTest {
         void updateNotFound() throws Exception {
             String updateRequest = """
                     {
-                        "id"            : 999999,
-                        "integrationId" : %d,
-                        "metricId"      : %d,
-                        "type"          : "JSON_CONFIG"
+                        "id"       : 999999,
+                        "metricId" : %d,
+                        "type"     : "JSON_CONFIG"
                     }
-                    """.formatted(integration.getId(), metric.getId());
+                    """.formatted(metric.getId());
 
             String jsonResponse = mvc.perform(
                             put(API)
@@ -319,7 +304,6 @@ class DataSourceControllerIntegrationTest {
         @DisplayName("DELETE /dataSources/{id} -> deletes the DataSource")
         void delete() throws Exception {
             DataSource ds = dataSourceRepository.save(DataSource.builder()
-                    .integrationId(integration.getId())
                     .metricId(metric.getId())
                     .type("JSON_CONFIG")
                     .build());

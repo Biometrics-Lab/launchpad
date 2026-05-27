@@ -27,3 +27,22 @@ aws:
     region: us-east-1
     access-key: test
     secret-key: test
+
+logging:
+  level:
+    com.biolab: DEBUG
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "loggers,health"
+  endpoint:
+    loggers:
+      enabled: true
+
+app:
+  blast-motion:
+    rep-interval-ms: 2000
+    resource-delay-probability: 0.3
+    scheduler-threads: 10

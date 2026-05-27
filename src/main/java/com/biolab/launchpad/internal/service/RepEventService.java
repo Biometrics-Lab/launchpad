@@ -35,7 +35,7 @@ public class RepEventService {
 
     @ApplicationModuleListener
     public void onRepDataReceived(RepDataReceivedEvent event) {
-        log.info("RepDataReceivedEvent received for session={}", event.sessionId());
+        log.info("RepDataReceivedEvent received for session={} rep={}", event.sessionId(), event.repNumber());
 
         Session session = sessionRepository.findById(event.sessionId())
                 .orElseThrow(() -> new NotFoundByException("Session not found by id: %d", event.sessionId()));
@@ -46,16 +46,19 @@ public class RepEventService {
                 .map(AssessmentMetric::getConditionalMetricId)
                 .collect(Collectors.toSet());
 
-        Rep rep = repRepository.save(Rep.builder()
-                .sessionId(event.sessionId())
-                .startTime(event.startTime())
-                .build());
+        Rep rep = repRepository.findBySessionIdAndRepNumber(event.sessionId(), event.repNumber())
+                .orElseGet(() -> repRepository.save(Rep.builder()
+                        .sessionId(event.sessionId())
+                        .startTime(event.startTime())
+                        .repNumber(event.repNumber())
+                        .build()));
 
         event.metrics().stream()
                 .filter(m -> validMetricIds.contains(m.conditionalMetricId()))
                 .forEach(m -> repMetricRepository.save(RepMetric.builder()
                         .repId(rep.getId())
                         .conditionalMetricId(m.conditionalMetricId())
+                        .dataSourceId(m.dataSourceId())
                         .value(m.value())
                         .build()));
 
@@ -65,6 +68,7 @@ public class RepEventService {
                         .url(r.url())
                         .type(ResourceContentType.VIDEO.getValue())
                         .urlStatus(r.urlStatus())
+                        .uuid(r.uuid())
                         .build()));
 
         sessionNotificationService.broadcastRep(event.sessionId(), rep);

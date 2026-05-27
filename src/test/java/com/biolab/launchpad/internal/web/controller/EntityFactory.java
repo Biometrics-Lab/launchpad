@@ -27,7 +27,6 @@ public class EntityFactory {
     private final PlayerRepository                   playerRepository;
     private final AssessmentTemplateRepository       assessmentTemplateRepository;
     private final DataSourceRepository               dataSourceRepository;
-    private final IntegrationRepository              integrationRepository;
     private final AssessmentRepository               assessmentRepository;
     private final SessionRepository                  sessionRepository;
     private final RepRepository                      repRepository;
@@ -207,20 +206,10 @@ public class EntityFactory {
         );
     }
 
-    public Integration createIntegration(String name) {
-        return integrationRepository.save(
-                Integration.builder()
-                        .name(name)
-                        .build()
-        );
-    }
-
     public DataSource createDataSource() {
-        Integration integration = createIntegration("AutoIntegration");
-        Metric metric           = createMetric("AutoMetric");
+        Metric metric = createMetric("AutoMetric");
         return dataSourceRepository.save(
                 DataSource.builder()
-                        .integrationId(integration.getId())
                         .metricId(metric.getId())
                         .type("JSON_CONFIG")
                         .build()
@@ -228,16 +217,33 @@ public class EntityFactory {
     }
 
     public DataSource createDataSource(Integer metricId) {
-        Integration integration = createIntegration("AutoIntegration-" + System.nanoTime());
         return dataSourceRepository.save(
                 DataSource.builder()
-                        .integrationId(integration.getId())
                         .metricId(metricId)
                         .name("AutoDataSource-" + System.nanoTime())
                         .type("JSON_CONFIG")
                         .content("{}")
                         .build()
         );
+    }
+
+    public DataSource createBlastMotionDataSource(Integer metricId) {
+        createDataSourceTypeDictionary("BAT_SENSOR");
+        return dataSourceRepository.save(DataSource.builder()
+                .name("AutoBlastBatSpeed-" + System.nanoTime())
+                .metricId(metricId)
+                .type("BAT_SENSOR")
+                .content("{\"integrationId\":\"blast-motion-api-demo\",\"metric\":\"BAT_SPEED\"}")
+                .build());
+    }
+
+    public ConditionalMetric createConditionalMetric(Integer metricId) {
+        Condition condition = createCondition("AutoCondition-" + System.nanoTime());
+        return conditionalMetricRepository.save(ConditionalMetric.builder()
+                .name("AutoConditionalMetric-" + System.nanoTime())
+                .conditionId(condition.getId())
+                .metricId(metricId)
+                .build());
     }
 
     public AssessmentMetric createAssessmentMetric(Integer assessmentId, Integer conditionalMetricId) {
@@ -250,6 +256,27 @@ public class EntityFactory {
                         .dataSourceId(dataSource.getId())
                         .build()
         );
+    }
+
+    public AssessmentMetric createAssessmentMetric(Integer assessmentId, Integer conditionalMetricId, Integer dataSourceId) {
+        return assessmentMetricRepository.save(AssessmentMetric.builder()
+                .assessmentId(assessmentId)
+                .conditionalMetricId(conditionalMetricId)
+                .dataSourceId(dataSourceId)
+                .build());
+    }
+
+    public Session createBlastMotionSession() {
+        createResourceTypeDictionary("Video");
+        Metric metric = createMetric("AutoBatSpeedMetric");
+        DataSource dataSource = createBlastMotionDataSource(metric.getId());
+        ConditionalMetric cm = createConditionalMetric(metric.getId());
+        Assessment assessment = createAssessment();
+        createAssessmentMetric(assessment.getId(), cm.getId(), dataSource.getId());
+        return sessionRepository.save(Session.builder()
+                .assessmentId(assessment.getId())
+                .startTime(Timestamp.valueOf(LocalDateTime.now()))
+                .build());
     }
 
     public Assessment createAssessment() {
@@ -371,7 +398,6 @@ public class EntityFactory {
         assessmentTemplateRepository.deleteAll();
         conditionRepository.deleteAll();
         dataSourceRepository.deleteAll();
-        integrationRepository.deleteAll();
         playerRepository.deleteAll();
         userRepository.deleteAll();
         modelRepository.deleteAll();
