@@ -28,4 +28,8 @@ public class AssessmentMetric extends ID {
     @Column("avg_value")
     private Number avgValue;
     private String description;
+    @Column("session_count")
+    private int sessionCount;
+    @Column("rep_count")
+    private int repCount;
 }

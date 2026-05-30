@@ -15,4 +15,6 @@ databaseChangeLog:
       file: db/changelog/changeset/3_bl_28.yml
   - include:
       file: db/changelog/changeset/1_bl_52.yml
+  - include:
+      file: db/changelog/changeset/1_bl_39.yml
 

@@ -1,6 +1,8 @@
 package com.biolab.launchpad.internal.service;
 
+import com.biolab.launchpad.internal.repository.AssessmentMetricRepository;
 import com.biolab.launchpad.internal.repository.SessionMetricRepository;
+import com.biolab.launchpad.internal.repository.SessionRepository;
 import com.biolab.launchpad.internal.repository.model.SessionMetric;
 import com.biolab.launchpad.internal.security.exceptions.NotFoundByException;
 import com.biolab.launchpad.internal.security.exceptions.PersistException;
@@ -26,6 +28,12 @@ class SessionMetricServiceTest {
 
     @Mock
     private SessionMetricRepository sessionMetricRepository;
+
+    @Mock
+    private SessionRepository sessionRepository;
+
+    @Mock
+    private AssessmentMetricRepository assessmentMetricRepository;
 
     @InjectMocks
     private SessionMetricService sessionMetricService;
@@ -55,12 +63,12 @@ class SessionMetricServiceTest {
         @DisplayName("should save and return entity when successful")
         void create_ok_saves_and_returns_entity() {
             when(sessionMetricRepository.save(sessionMetric1Input)).thenReturn(sessionMetric1);
+            when(sessionRepository.findById(null)).thenReturn(Optional.empty());
 
             SessionMetric result = sessionMetricService.create(sessionMetric1Input);
 
             assertThat(result).isSameAs(sessionMetric1);
             verify(sessionMetricRepository).save(sessionMetric1Input);
-            verifyNoMoreInteractions(sessionMetricRepository);
         }
 
         @Test

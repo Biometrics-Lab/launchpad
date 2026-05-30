@@ -9,4 +9,5 @@ import java.util.List;
 @Repository("assessmentSessionRepository")
 public interface SessionRepository extends CrudRepository<Session, Integer> {
     List<Session> findAllByAssessmentId(Integer assessmentId);
+    long countByAssessmentId(Integer assessmentId);
 }

@@ -330,6 +330,50 @@ public class EntityFactory {
         );
     }
 
+    public AssessmentMetric createAssessmentMetric() {
+        Assessment assessment = createAssessment();
+        ConditionalMetric cm  = createConditionalMetric();
+        DataSource dataSource = createDataSource(cm.getMetricId());
+        return assessmentMetricRepository.save(
+                AssessmentMetric.builder()
+                        .assessmentId(assessment.getId())
+                        .conditionalMetricId(cm.getId())
+                        .dataSourceId(dataSource.getId())
+                        .build()
+        );
+    }
+
+    public AssessmentMetric createAssessmentMetricForAssessment(Integer assessmentId) {
+        ConditionalMetric cm  = createConditionalMetric();
+        DataSource dataSource = createDataSource(cm.getMetricId());
+        return assessmentMetricRepository.save(
+                AssessmentMetric.builder()
+                        .assessmentId(assessmentId)
+                        .conditionalMetricId(cm.getId())
+                        .dataSourceId(dataSource.getId())
+                        .build()
+        );
+    }
+
+    public Session createSessionForAssessment(Integer assessmentId) {
+        return sessionRepository.save(
+                Session.builder()
+                        .assessmentId(assessmentId)
+                        .startTime(Timestamp.valueOf(LocalDateTime.of(2025, 10, 2, 14, 45, 1)))
+                        .build()
+        );
+    }
+
+    public Rep createRepForAssessment(Integer assessmentId) {
+        Session session = createSessionForAssessment(assessmentId);
+        return repRepository.save(
+                Rep.builder()
+                        .sessionId(session.getId())
+                        .startTime(Timestamp.valueOf(LocalDateTime.of(2025, 10, 2, 14, 45, 1)))
+                        .build()
+        );
+    }
+
     public Condition createCondition(String name) {
         SportDictionary sportDictionary = createSportDictionary("AutoSport");
         return conditionRepository.save(

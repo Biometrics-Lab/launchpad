@@ -1,0 +1,23 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1-BL-39-1
+      author: roman.vakulenko
+      changes:
+        - addColumn:
+            tableName: assessment_metric
+            columns:
+              - column:
+                  name: session_count
+                  type: integer
+                  constraints:
+                    nullable: false
+                  defaultValue: 0
+        - addColumn:
+            tableName: assessment_metric
+            columns:
+              - column:
+                  name: rep_count
+                  type: integer
+                  constraints:
+                    nullable: false
+                  defaultValue: 0

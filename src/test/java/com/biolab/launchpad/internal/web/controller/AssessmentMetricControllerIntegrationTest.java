@@ -19,6 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(SpringExtension.class)
@@ -88,7 +89,9 @@ class AssessmentMetricControllerIntegrationTest {
                     "minValue"            : 1,
                     "maxValue"            : 2,
                     "avgValue"            : 3,
-                    "description"         : null
+                    "description"         : null,
+                    "sessionCount"        : 0,
+                    "repCount"            : 0
                 }
             """.formatted(id, assessment.getId(), conditionalMetric.getId(), dataSource.getId());
 
@@ -143,11 +146,13 @@ class AssessmentMetricControllerIntegrationTest {
                 [
                     {
                         "id": %d, "assessmentId": %d, "conditionalMetricId": %d, "dataSourceId": %d,
-                        "minValue": 1, "maxValue": 2, "avgValue": 3, "description": null
+                        "minValue": 1, "maxValue": 2, "avgValue": 3, "description": null,
+                        "sessionCount": 0, "repCount": 0
                     },
                     {
                         "id": %d, "assessmentId": %d, "conditionalMetricId": %d, "dataSourceId": %d,
-                        "minValue": 5, "maxValue": 6, "avgValue": 7, "description": null
+                        "minValue": 5, "maxValue": 6, "avgValue": 7, "description": null,
+                        "sessionCount": 0, "repCount": 0
                     }
                 ]
             """.formatted(am1.getId(), assessment.getId(), conditionalMetric.getId(), dataSource.getId(),
@@ -170,7 +175,8 @@ class AssessmentMetricControllerIntegrationTest {
             String expectedResponse = """
                 {
                     "id": %d, "assessmentId": %d, "conditionalMetricId": %d, "dataSourceId": %d,
-                    "minValue": 1, "maxValue": 2, "avgValue": 3, "description": null
+                    "minValue": 1, "maxValue": 2, "avgValue": 3, "description": null,
+                    "sessionCount": 0, "repCount": 0
                 }
             """.formatted(am.getId(), assessment.getId(), conditionalMetric.getId(), dataSource.getId());
 
@@ -220,7 +226,8 @@ class AssessmentMetricControllerIntegrationTest {
             String expectedResponse = """
                 {
                     "id": %d, "assessmentId": %d, "conditionalMetricId": %d, "dataSourceId": %d,
-                    "minValue": 4, "maxValue": 5, "avgValue": 6, "description": null
+                    "minValue": 4, "maxValue": 5, "avgValue": 6, "description": null,
+                    "sessionCount": 0, "repCount": 0
                 }
             """.formatted(original.getId(), assessment.getId(), conditionalMetric.getId(), dataSource.getId());
 
@@ -288,6 +295,98 @@ class AssessmentMetricControllerIntegrationTest {
             """;
 
             assertEquals(objectMapper.readTree(expectedResponse), objectMapper.readTree(jsonResponse));
+        }
+    }
+
+    @Nested
+    @DisplayName("lock guards")
+    class LockGuardTests {
+
+        @Test
+        @DisplayName("DELETE returns 409 when assessment has sessions")
+        void delete_returns409_whenAssessmentHasSessions() throws Exception {
+            AssessmentMetric metric = factory.createAssessmentMetric();
+            factory.createSessionForAssessment(metric.getAssessmentId());
+
+            mvc.perform(delete(API + "/" + metric.getId())
+                    .with(httpBasic("biolab", "biolab")))
+               .andExpect(status().isConflict());
+        }
+
+        @Test
+        @DisplayName("PUT returns 409 when assessment has sessions")
+        void update_returns409_whenAssessmentHasSessions() throws Exception {
+            AssessmentMetric metric = factory.createAssessmentMetric();
+            factory.createSessionForAssessment(metric.getAssessmentId());
+
+            String body = """
+                    {"id":%d,"assessmentId":%d,"conditionalMetricId":%d,"dataSourceId":%d}
+                    """.formatted(metric.getId(), metric.getAssessmentId(), metric.getConditionalMetricId(), metric.getDataSourceId());
+
+            mvc.perform(put(API)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(body)
+                    .with(httpBasic("biolab", "biolab")))
+               .andExpect(status().isConflict());
+        }
+
+        @Test
+        @DisplayName("DELETE succeeds when assessment has no sessions")
+        void delete_succeeds_whenNoSessions() throws Exception {
+            AssessmentMetric metric = factory.createAssessmentMetric();
+
+            mvc.perform(delete(API + "/" + metric.getId())
+                    .with(httpBasic("biolab", "biolab")))
+               .andExpect(status().isOk());
+        }
+    }
+
+    @Nested
+    @DisplayName("counter updates")
+    class CounterUpdateTests {
+
+        @Test
+        @DisplayName("sessionCount increments when SessionMetric is created")
+        void sessionCount_increments_onSessionMetricCreate() throws Exception {
+            AssessmentMetric metric = factory.createAssessmentMetric();
+            Session session = factory.createSessionForAssessment(metric.getAssessmentId());
+
+            String smBody = """
+                    {"sessionId":%d,"conditionalMetricId":%d}
+                    """.formatted(session.getId(), metric.getConditionalMetricId());
+
+            mvc.perform(post("/api/v1/sessionMetrics")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(smBody)
+                    .with(httpBasic("biolab", "biolab")))
+               .andExpect(status().isOk());
+
+            mvc.perform(get(API + "/" + metric.getId())
+                    .with(httpBasic("biolab", "biolab")))
+               .andExpect(status().isOk())
+               .andExpect(jsonPath("$.sessionCount").value(1));
+        }
+
+        @Test
+        @DisplayName("repCount increments when RepMetric is created")
+        void repCount_increments_onRepMetricCreate() throws Exception {
+            AssessmentMetric metric = factory.createAssessmentMetric();
+            Rep rep = factory.createRepForAssessment(metric.getAssessmentId());
+
+            String rmBody = """
+                    {"repId":%d,"conditionalMetricId":%d}
+                    """.formatted(rep.getId(), metric.getConditionalMetricId());
+
+            mvc.perform(post("/api/v1/repMetrics")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(rmBody)
+                    .with(httpBasic("biolab", "biolab")))
+               .andExpect(status().isOk());
+
+            mvc.perform(get(API + "/" + metric.getId())
+                    .with(httpBasic("biolab", "biolab")))
+               .andExpect(status().isOk())
+               .andExpect(jsonPath("$.repCount").value(1));
         }
     }
 }
