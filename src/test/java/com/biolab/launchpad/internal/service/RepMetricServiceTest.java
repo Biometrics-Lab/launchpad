@@ -1,6 +1,9 @@
 package com.biolab.launchpad.internal.service;
 
+import com.biolab.launchpad.internal.repository.AssessmentMetricRepository;
 import com.biolab.launchpad.internal.repository.RepMetricRepository;
+import com.biolab.launchpad.internal.repository.RepRepository;
+import com.biolab.launchpad.internal.repository.SessionRepository;
 import com.biolab.launchpad.internal.repository.model.RepMetric;
 import com.biolab.launchpad.internal.security.exceptions.NotFoundByException;
 import com.biolab.launchpad.internal.security.exceptions.PersistException;
@@ -26,6 +29,15 @@ class RepMetricServiceTest {
 
     @Mock
     private RepMetricRepository repMetricRepository;
+
+    @Mock
+    private RepRepository repRepository;
+
+    @Mock
+    private SessionRepository sessionRepository;
+
+    @Mock
+    private AssessmentMetricRepository assessmentMetricRepository;
 
     @InjectMocks
     private RepMetricService repMetricService;
@@ -55,12 +67,12 @@ class RepMetricServiceTest {
         @DisplayName("should save and return entity when successful")
         void create_ok_saves_and_returns_entity() {
             when(repMetricRepository.save(repMetric1Input)).thenReturn(repMetric1);
+            when(repRepository.findById(null)).thenReturn(Optional.empty());
 
             RepMetric result = repMetricService.create(repMetric1Input);
 
             assertThat(result).isSameAs(repMetric1);
             verify(repMetricRepository).save(repMetric1Input);
-            verifyNoMoreInteractions(repMetricRepository);
         }
 
         @Test

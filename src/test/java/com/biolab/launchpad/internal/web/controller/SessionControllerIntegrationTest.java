@@ -49,7 +49,8 @@ class SessionControllerIntegrationTest {
 
     @BeforeEach
     void setUp() {
-        assessment   = factory.createAssessment();
+        assessment = factory.createAssessment();
+        factory.createAssessmentMetricForAssessment(assessment.getId());
     }
 
     @AfterEach
@@ -388,6 +389,41 @@ class SessionControllerIntegrationTest {
             JsonNode actualNode   = objectMapper.readTree(jsonResponse);
 
             assertEquals(expectedNode, actualNode);
+        }
+    }
+
+    @Nested
+    @DisplayName("zero-metrics guard")
+    class ZeroMetricsGuardTests {
+
+        @Test
+        @DisplayName("POST returns 400 when assessment has no metrics")
+        void create_returns400_whenAssessmentHasNoMetrics() throws Exception {
+            Assessment emptyAssessment = factory.createAssessment();
+
+            String body = """
+                    {"assessmentId":%d,"startTime":"2025-10-02T14:45:01.000+00:00"}
+                    """.formatted(emptyAssessment.getId());
+
+            mvc.perform(post(API)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(body)
+                    .with(httpBasic("biolab", "biolab")))
+               .andExpect(status().isBadRequest());
+        }
+
+        @Test
+        @DisplayName("POST succeeds when assessment has at least one metric")
+        void create_succeeds_whenAssessmentHasMetrics() throws Exception {
+            String body = """
+                    {"assessmentId":%d,"startTime":"2025-10-02T14:45:01.000+00:00"}
+                    """.formatted(assessment.getId());
+
+            mvc.perform(post(API)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(body)
+                    .with(httpBasic("biolab", "biolab")))
+               .andExpect(status().isOk());
         }
     }
 

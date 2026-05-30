@@ -15,5 +15,7 @@ public record AssessmentMetricDto(
         Number minValue,
         Number maxValue,
         Number avgValue,
-        String description
+        String description,
+        int sessionCount,
+        int repCount
 ){}

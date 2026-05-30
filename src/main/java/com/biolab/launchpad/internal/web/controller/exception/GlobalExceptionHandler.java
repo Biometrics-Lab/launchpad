@@ -1,5 +1,6 @@
 package com.biolab.launchpad.internal.web.controller.exception;
 
+import com.biolab.launchpad.internal.security.exceptions.BadRequestException;
 import com.biolab.launchpad.internal.security.exceptions.ConflictException;
 import com.biolab.launchpad.internal.security.exceptions.NotFoundByException;
 import com.biolab.launchpad.internal.web.dto.ResponseCode;
@@ -53,6 +54,16 @@ public class GlobalExceptionHandler {
     public ResponseDto handleNotFoundByException(NotFoundByException ex) {
         return ResponseDto.builder()
                 .status(ResponseCode.NOT_FOUND_BY.getStatus())
+                .message(ex.getMessage())
+                .build();
+    }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(BadRequestException.class)
+    public ResponseDto handleBadRequestException(BadRequestException ex) {
+        log.warn(ex.getMessage());
+        return ResponseDto.builder()
+                .status(HttpStatus.BAD_REQUEST.value())
                 .message(ex.getMessage())
                 .build();
     }

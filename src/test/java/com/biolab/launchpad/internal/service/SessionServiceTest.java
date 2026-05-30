@@ -1,7 +1,10 @@
 package com.biolab.launchpad.internal.service;
 
+import com.biolab.launchpad.internal.repository.AssessmentMetricRepository;
 import com.biolab.launchpad.internal.repository.SessionRepository;
+import com.biolab.launchpad.internal.repository.model.AssessmentMetric;
 import com.biolab.launchpad.internal.repository.model.Session;
+import com.biolab.launchpad.internal.security.exceptions.BadRequestException;
 import com.biolab.launchpad.internal.security.exceptions.NotFoundByException;
 import com.biolab.launchpad.internal.security.exceptions.PersistException;
 import org.junit.jupiter.api.BeforeEach;
@@ -27,6 +30,9 @@ class SessionServiceTest {
     @Mock
     private SessionRepository sessionRepository;
 
+    @Mock
+    private AssessmentMetricRepository assessmentMetricRepository;
+
     @InjectMocks
     private SessionService sessionService;
 
@@ -37,10 +43,12 @@ class SessionServiceTest {
     @BeforeEach
     void setUp() {
         session1Input = Session.builder()
+                .assessmentId(1)
                 .build();
 
         session1 = Session.builder()
                 .id(1)
+                .assessmentId(1)
                 .build();
 
         session2 = Session.builder()
@@ -54,23 +62,34 @@ class SessionServiceTest {
         @Test
         @DisplayName("should save and return entity when successful")
         void create_ok_saves_and_returns_entity() {
+            when(assessmentMetricRepository.findAllByAssessmentId(1))
+                .thenReturn(List.of(AssessmentMetric.builder().id(1).build()));
             when(sessionRepository.save(session1Input)).thenReturn(session1);
 
             Session result = sessionService.create(session1Input);
 
             assertThat(result).isSameAs(session1);
             verify(sessionRepository).save(session1Input);
-            verifyNoMoreInteractions(sessionRepository);
+        }
+
+        @Test
+        @DisplayName("should throw BadRequestException when assessment has no metrics")
+        void create_throws_BadRequestException_whenNoMetrics() {
+            when(assessmentMetricRepository.findAllByAssessmentId(1)).thenReturn(List.of());
+
+            assertThrows(BadRequestException.class, () -> sessionService.create(session1Input));
+            verify(sessionRepository, never()).save(any());
         }
 
         @Test
         @DisplayName("should wrap repo exception in PersistException")
         void create_wraps_any_exception_in_PersistException() {
+            when(assessmentMetricRepository.findAllByAssessmentId(1))
+                .thenReturn(List.of(AssessmentMetric.builder().id(1).build()));
             when(sessionRepository.save(session1Input)).thenThrow(new RuntimeException("db down"));
 
             PersistException ex = assertThrows(PersistException.class, () -> sessionService.create(session1Input));
             assertTrue(ex.getMessage().contains("db down"));
-            verifyNoMoreInteractions(sessionRepository);
         }
     }
 

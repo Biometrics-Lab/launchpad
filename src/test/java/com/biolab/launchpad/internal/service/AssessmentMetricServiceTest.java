@@ -1,7 +1,9 @@
 package com.biolab.launchpad.internal.service;
 
 import com.biolab.launchpad.internal.repository.AssessmentMetricRepository;
+import com.biolab.launchpad.internal.repository.SessionRepository;
 import com.biolab.launchpad.internal.repository.model.AssessmentMetric;
+import com.biolab.launchpad.internal.security.exceptions.ConflictException;
 import com.biolab.launchpad.internal.security.exceptions.NotFoundByException;
 import com.biolab.launchpad.internal.security.exceptions.PersistException;
 import org.junit.jupiter.api.BeforeEach;
@@ -27,6 +29,9 @@ class AssessmentMetricServiceTest {
     @Mock
     private AssessmentMetricRepository assessmentMetricRepository;
 
+    @Mock
+    private SessionRepository sessionRepository;
+
     @InjectMocks
     private AssessmentMetricService assessmentMetricService;
 
@@ -41,6 +46,7 @@ class AssessmentMetricServiceTest {
 
         assessmentMetric1 = AssessmentMetric.builder()
                 .id(1)
+                .assessmentId(10)
                 .build();
 
         assessmentMetric2 = AssessmentMetric.builder()
@@ -119,35 +125,50 @@ class AssessmentMetricServiceTest {
     @DisplayName("deleteById()")
     class DeleteByIdTests {
         @Test
-        @DisplayName("should delete assessment_metric when it exists")
+        @DisplayName("should delete assessment_metric when no sessions exist")
         void deleteById_when_exists_deletes() {
+            when(assessmentMetricRepository.findById(1)).thenReturn(Optional.of(assessmentMetric1));
+            when(sessionRepository.countByAssessmentId(10)).thenReturn(0L);
             when(assessmentMetricRepository.existsById(1)).thenReturn(true);
 
             assessmentMetricService.deleteById(1);
 
+            verify(assessmentMetricRepository).findById(1);
+            verify(sessionRepository).countByAssessmentId(10);
             verify(assessmentMetricRepository).existsById(1);
             verify(assessmentMetricRepository).deleteById(1);
             verifyNoMoreInteractions(assessmentMetricRepository);
         }
 
         @Test
+        @DisplayName("should throw ConflictException when assessment has sessions")
+        void deleteById_throws_ConflictException_whenAssessmentHasSessions() {
+            when(assessmentMetricRepository.findById(1)).thenReturn(Optional.of(assessmentMetric1));
+            when(sessionRepository.countByAssessmentId(10)).thenReturn(1L);
+
+            assertThrows(ConflictException.class, () -> assessmentMetricService.deleteById(1));
+            verify(assessmentMetricRepository, never()).deleteById(anyInt());
+        }
+
+        @Test
         @DisplayName("should throw NotFoundByException when assessment_metric does not exist")
         void deleteById_when_not_exists_throws_NotFoundByException() {
+            when(assessmentMetricRepository.findById(1)).thenReturn(Optional.empty());
             when(assessmentMetricRepository.existsById(1)).thenReturn(false);
 
             assertThrows(NotFoundByException.class, () -> assessmentMetricService.deleteById(1));
             verify(assessmentMetricRepository, never()).deleteById(anyInt());
-            verifyNoMoreInteractions(assessmentMetricRepository);
         }
 
         @Test
         @DisplayName("should wrap unexpected repo exception in PersistException")
         void deleteById_wraps_other_exceptions_in_PersistException() {
+            when(assessmentMetricRepository.findById(1)).thenReturn(Optional.of(assessmentMetric1));
+            when(sessionRepository.countByAssessmentId(10)).thenReturn(0L);
             when(assessmentMetricRepository.existsById(1)).thenReturn(true);
             doThrow(new RuntimeException("constraint fail")).when(assessmentMetricRepository).deleteById(1);
 
             assertThrows(PersistException.class, () -> assessmentMetricService.deleteById(1));
-            verifyNoMoreInteractions(assessmentMetricRepository);
         }
     }
 
@@ -155,8 +176,9 @@ class AssessmentMetricServiceTest {
     @DisplayName("update()")
     class UpdateTests {
         @Test
-        @DisplayName("should update and return assessment_metric when it exists")
+        @DisplayName("should update and return assessment_metric when no sessions exist")
         void update_when_exists_saves_and_returns() {
+            when(sessionRepository.countByAssessmentId(10)).thenReturn(0L);
             when(assessmentMetricRepository.existsById(1)).thenReturn(true);
             when(assessmentMetricRepository.save(assessmentMetric1)).thenReturn(assessmentMetric1);
 
@@ -169,8 +191,18 @@ class AssessmentMetricServiceTest {
         }
 
         @Test
+        @DisplayName("should throw ConflictException when assessment has sessions")
+        void update_throws_ConflictException_whenAssessmentHasSessions() {
+            when(sessionRepository.countByAssessmentId(10)).thenReturn(2L);
+
+            assertThrows(ConflictException.class, () -> assessmentMetricService.update(assessmentMetric1));
+            verify(assessmentMetricRepository, never()).save(any());
+        }
+
+        @Test
         @DisplayName("should throw NotFoundByException when assessment_metric does not exist")
         void update_when_not_exists_throws_NotFoundByException() {
+            when(sessionRepository.countByAssessmentId(10)).thenReturn(0L);
             when(assessmentMetricRepository.existsById(1)).thenReturn(false);
 
             assertThrows(NotFoundByException.class, () -> assessmentMetricService.update(assessmentMetric1));
@@ -181,6 +213,7 @@ class AssessmentMetricServiceTest {
         @Test
         @DisplayName("should wrap repo exception in PersistException")
         void update_wraps_other_exceptions_in_PersistException() {
+            when(sessionRepository.countByAssessmentId(10)).thenReturn(0L);
             when(assessmentMetricRepository.existsById(1)).thenReturn(true);
             when(assessmentMetricRepository.save(assessmentMetric1)).thenThrow(new RuntimeException("db error"));
 
