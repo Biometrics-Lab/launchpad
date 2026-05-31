@@ -1,0 +1,194 @@
+databaseChangeLog:
+  - changeSet:
+      id: BL-68-seed-dictionaries
+      author: roman.vakulenko
+      changes:
+        # sport_dictionary — matches Sport enum
+        - insert:
+            tableName: sport_dictionary
+            columns:
+              - column:
+                  name: name
+                  value: Baseball
+              - column:
+                  name: description
+                  value: Baseball sport
+        - insert:
+            tableName: sport_dictionary
+            columns:
+              - column:
+                  name: name
+                  value: Softball
+              - column:
+                  name: description
+                  value: Softball sport
+
+        # age_group_dictionary — matches AgeGroup enum
+        - insert:
+            tableName: age_group_dictionary
+            columns:
+              - column:
+                  name: name
+                  value: 8U
+              - column:
+                  name: description
+                  value: Under 8 years old
+        - insert:
+            tableName: age_group_dictionary
+            columns:
+              - column:
+                  name: name
+                  value: 9U
+              - column:
+                  name: description
+                  value: Under 9 years old
+        - insert:
+            tableName: age_group_dictionary
+            columns:
+              - column:
+                  name: name
+                  value: 10U
+              - column:
+                  name: description
+                  value: Under 10 years old
+        - insert:
+            tableName: age_group_dictionary
+            columns:
+              - column:
+                  name: name
+                  value: 11U
+              - column:
+                  name: description
+                  value: Under 11 years old
+        - insert:
+            tableName: age_group_dictionary
+            columns:
+              - column:
+                  name: name
+                  value: 12U
+              - column:
+                  name: description
+                  value: Under 12 years old
+        - insert:
+            tableName: age_group_dictionary
+            columns:
+              - column:
+                  name: name
+                  value: 13U
+              - column:
+                  name: description
+                  value: Under 13 years old
+        - insert:
+            tableName: age_group_dictionary
+            columns:
+              - column:
+                  name: name
+                  value: 14U
+              - column:
+                  name: description
+                  value: Under 14 years old
+        - insert:
+            tableName: age_group_dictionary
+            columns:
+              - column:
+                  name: name
+                  value: HSFr
+              - column:
+                  name: description
+                  value: High School Freshman
+        - insert:
+            tableName: age_group_dictionary
+            columns:
+              - column:
+                  name: name
+                  value: HSSn
+              - column:
+                  name: description
+                  value: High School Senior
+
+        # data_source_type_dictionary — matches DataSourceType enum
+        - insert:
+            tableName: data_source_type_dictionary
+            columns:
+              - column:
+                  name: name
+                  value: JSON_CONFIG
+              - column:
+                  name: description
+                  value: JSON-based configuration mapping
+        - insert:
+            tableName: data_source_type_dictionary
+            columns:
+              - column:
+                  name: name
+                  value: SCRIPT
+              - column:
+                  name: description
+                  value: Custom script-based extraction
+        - insert:
+            tableName: data_source_type_dictionary
+            columns:
+              - column:
+                  name: name
+                  value: MAPPING
+              - column:
+                  name: description
+                  value: Field mapping configuration
+
+        # resource_type_dictionary — matches ResourceContentType enum
+        - insert:
+            tableName: resource_type_dictionary
+            columns:
+              - column:
+                  name: name
+                  value: Video
+              - column:
+                  name: description
+                  value: Video recording file
+        - insert:
+            tableName: resource_type_dictionary
+            columns:
+              - column:
+                  name: name
+                  value: Image
+              - column:
+                  name: description
+                  value: Image or photo file
+        - insert:
+            tableName: resource_type_dictionary
+            columns:
+              - column:
+                  name: name
+                  value: CSV
+              - column:
+                  name: description
+                  value: CSV data export file
+
+        # user_roles_dictionary — matches UserRole enum
+        - insert:
+            tableName: user_roles_dictionary
+            columns:
+              - column:
+                  name: name
+                  value: Admin
+              - column:
+                  name: description
+                  value: System administrator
+        - insert:
+            tableName: user_roles_dictionary
+            columns:
+              - column:
+                  name: name
+                  value: Coach
+              - column:
+                  name: description
+                  value: Team coach
+        - insert:
+            tableName: user_roles_dictionary
+            columns:
+              - column:
+                  name: name
+                  value: Player
+              - column:
+                  name: description
+                  value: Athlete player

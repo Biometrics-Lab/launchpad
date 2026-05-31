@@ -5,10 +5,10 @@ import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public enum ResourceContentType {
-    VIDEO("Video"),
-    IMAGE("Image"),
-    CSV("CSV");
+public enum UserRole {
+    ADMIN("Admin"),
+    COACH("Coach"),
+    PLAYER("Player");
 
     private final String value;
 }
