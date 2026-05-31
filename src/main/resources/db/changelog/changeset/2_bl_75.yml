@@ -1,0 +1,17 @@
+databaseChangeLog:
+  - changeSet:
+      id: BL-75-seed-report-type
+      author: roman.vakulenko
+      validCheckSum: ANY
+      changes:
+        # report_type_dictionary — matches ReportType enum
+        - insert:
+            tableName: report_type_dictionary
+            columns:
+              - column:
+                  name: name
+                  value: Player Assessment Report
+              - column:
+                  name: description
+                  value: Per-player cross-assessment metric report
+

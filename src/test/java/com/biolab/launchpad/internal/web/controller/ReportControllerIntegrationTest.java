@@ -52,14 +52,13 @@ class ReportControllerIntegrationTest {
         @Test
         @DisplayName("POST /reports -> creates and returns the new Report")
         void create() throws Exception {
-
-            String request =
-                    """
-                                {
-                                    "name"    : "launch_angle",
-                                    "extRef"  : "ex"
-                                }
-                            """;
+            String request = """
+                    {
+                        "name"       : "launch_angle",
+                        "reportType" : "Player Assessment Report",
+                        "config"     : "{\\"chartType\\":\\"BAR\\"}"
+                    }
+                    """;
 
             String jsonResponse = mvc.perform(
                             post(API)
@@ -71,34 +70,28 @@ class ReportControllerIntegrationTest {
                     .andReturn().getResponse().getContentAsString();
 
             JsonNode responseNode = objectMapper.readTree(jsonResponse);
-
             int reportId = responseNode.get("id").asInt();
             assertThat(reportId).isPositive();
 
+            String expectedResponse = """
+                    {
+                        "id"         : %d,
+                        "name"       : "launch_angle",
+                        "reportType" : "Player Assessment Report",
+                        "config"     : "{\\"chartType\\":\\"BAR\\"}"
+                    }
+                    """.formatted(reportId);
 
-            String expectedResponse =
-                    """
-                            {
-                                        "id"           : %d,
-                                        "name"         : "launch_angle",
-                                        "extRef"       : "ex"
-                                    }
-                            """.formatted(reportId);
-
-            JsonNode expectedResponseNode = objectMapper.readTree(expectedResponse);
-
-            assertEquals(expectedResponseNode, responseNode);
+            assertEquals(objectMapper.readTree(expectedResponse), responseNode);
         }
 
         @Test
         @DisplayName("POST /reports with validation message -> returns 422")
         void createValidationError() throws Exception {
-
-            String request =
-                    """ 
-                         {
-                               "name" : ""
-                         }
+            String request = """
+                    {
+                        "name" : ""
+                    }
                     """;
 
             String jsonResponse = mvc.perform(
@@ -110,20 +103,14 @@ class ReportControllerIntegrationTest {
                     .andExpect(status().isBadRequest())
                     .andReturn().getResponse().getContentAsString();
 
+            String expectedResponse = """
+                    {
+                        "status"  : 422,
+                        "message" : "Validation failed: name: Name cannot be blank"
+                    }
+                    """;
 
-            JsonNode responseNode = objectMapper.readTree(jsonResponse);
-
-            String expectedResponse =
-                    """ 
-                            {
-                                "status"  : 422,
-                                "message" : "Validation failed: name: Name cannot be blank"
-                            }
-                            """;
-
-            JsonNode expectedResponseNode = objectMapper.readTree(expectedResponse);
-
-            assertEquals(expectedResponseNode, responseNode);
+            assertEquals(objectMapper.readTree(expectedResponse), objectMapper.readTree(jsonResponse));
         }
     }
 
@@ -134,15 +121,14 @@ class ReportControllerIntegrationTest {
         @Test
         @DisplayName("GET /reports -> returns all reports")
         void getAll() throws Exception {
-
             Report report1 = reportRepository.save(Report.builder()
                     .name("avg_launch_angle")
-                    .extRef("ex")
+                    .reportType("Player Assessment Report")
+                    .config("{\"chartType\":\"BAR\"}")
                     .build());
 
             Report report2 = reportRepository.save(Report.builder()
                     .name("max_launch_angle")
-                    .extRef("ex")
                     .build());
 
             String jsonResponse = mvc.perform(
@@ -154,33 +140,31 @@ class ReportControllerIntegrationTest {
                     .andReturn().getResponse().getContentAsString();
 
             String expectedResponse = """
-                [
-                    {
-                        "id"           : %d,
-                        "name"         : "avg_launch_angle",
-                        "extRef"       : "ex"
-                    },
-                    {
-                        "id"           : %d,
-                        "name"         : "max_launch_angle",
-                        "extRef"       : "ex"
-                    }
-                ]
-                """.formatted(report1.getId(), report2.getId());
+                    [
+                        {
+                            "id"         : %d,
+                            "name"       : "avg_launch_angle",
+                            "reportType" : "Player Assessment Report",
+                            "config"     : "{\\"chartType\\":\\"BAR\\"}"
+                        },
+                        {
+                            "id"         : %d,
+                            "name"       : "max_launch_angle",
+                            "reportType" : null,
+                            "config"     : null
+                        }
+                    ]
+                    """.formatted(report1.getId(), report2.getId());
 
-            JsonNode expectedNode = objectMapper.readTree(expectedResponse);
-            JsonNode actualNode   = objectMapper.readTree(jsonResponse);
-
-            assertEquals(expectedNode, actualNode);
+            assertEquals(objectMapper.readTree(expectedResponse), objectMapper.readTree(jsonResponse));
         }
 
         @Test
         @DisplayName("GET /reports/{id} -> returns report by ID")
         void getById() throws Exception {
-
             Report report = reportRepository.save(Report.builder()
                     .name("launch_angle")
-                    .extRef("ex")
+                    .reportType("Player Assessment Report")
                     .build());
 
             String jsonResponse = mvc.perform(
@@ -191,22 +175,20 @@ class ReportControllerIntegrationTest {
                     .andReturn().getResponse().getContentAsString();
 
             String expectedResponse = """
-                {
-                    "id"           : %d,
-                    "name"         : "launch_angle",
-                    "extRef"       : "ex"
-                }
-                """.formatted(report.getId());
+                    {
+                        "id"         : %d,
+                        "name"       : "launch_angle",
+                        "reportType" : "Player Assessment Report",
+                        "config"     : null
+                    }
+                    """.formatted(report.getId());
 
-            JsonNode expectedNode = objectMapper.readTree(expectedResponse);
-            JsonNode actualNode   = objectMapper.readTree(jsonResponse);
-
-            assertEquals(expectedNode, actualNode);
+            assertEquals(objectMapper.readTree(expectedResponse), objectMapper.readTree(jsonResponse));
         }
 
         @Test
         @DisplayName("GET /reports/{id} with unknown ID -> returns 404")
-        void getByIdValidationError() throws Exception {
+        void getByIdNotFound() throws Exception {
             String jsonResponse = mvc.perform(
                             get(API + "/999999")
                                     .with(httpBasic("biolab", "biolab"))
@@ -215,18 +197,14 @@ class ReportControllerIntegrationTest {
                     .andReturn().getResponse().getContentAsString();
 
             String expectedResponse = """
-                {
-                    "status" : 404,
-                    "message": "Report not found by id: 999999"
-                }
-                """;
+                    {
+                        "status"  : 404,
+                        "message" : "Report not found by id: 999999"
+                    }
+                    """;
 
-            JsonNode expectedNode = objectMapper.readTree(expectedResponse);
-            JsonNode actualNode   = objectMapper.readTree(jsonResponse);
-
-            assertEquals(expectedNode, actualNode);
+            assertEquals(objectMapper.readTree(expectedResponse), objectMapper.readTree(jsonResponse));
         }
-
     }
 
     @Nested
@@ -241,12 +219,13 @@ class ReportControllerIntegrationTest {
                     .build());
 
             String updateRequest = """
-                {
-                    "id"            : %d,
-                    "name"          : "updated_launch_angle",
-                    "extRef"        : "ex"
-                }
-                """.formatted(original.getId());
+                    {
+                        "id"         : %d,
+                        "name"       : "updated_launch_angle",
+                        "reportType" : "Player Assessment Report",
+                        "config"     : "{\\"granularity\\":\\"PER_SESSION\\"}"
+                    }
+                    """.formatted(original.getId());
 
             String jsonResponse = mvc.perform(
                             put(API)
@@ -257,36 +236,30 @@ class ReportControllerIntegrationTest {
                     .andExpect(status().isOk())
                     .andReturn().getResponse().getContentAsString();
 
-            JsonNode responseNode = objectMapper.readTree(jsonResponse);
-
             String expectedResponse = """
-                {
-                    "id"           : %d,
-                    "name"         : "updated_launch_angle",
-                    "extRef"       : "ex"
-                }
-                """.formatted(original.getId());
+                    {
+                        "id"         : %d,
+                        "name"       : "updated_launch_angle",
+                        "reportType" : "Player Assessment Report",
+                        "config"     : "{\\"granularity\\":\\"PER_SESSION\\"}"
+                    }
+                    """.formatted(original.getId());
 
-            JsonNode expectedNode = objectMapper.readTree(expectedResponse);
-
-            assertEquals(expectedNode, responseNode);
+            assertEquals(objectMapper.readTree(expectedResponse), objectMapper.readTree(jsonResponse));
 
             Report updated = reportRepository.findById(original.getId()).orElseThrow();
             assertEquals("updated_launch_angle", updated.getName());
-
         }
 
         @Test
         @DisplayName("PUT /reports with invalid id -> returns 404")
-        void updateValidationError() throws Exception {
-
+        void updateNotFound() throws Exception {
             String updateRequest = """
-                {
-                    "id"            : 999999,
-                    "name"          : "updated_launch_angle",
-                    "extRef"        : "ex"
-                }
-                """;
+                    {
+                        "id"   : 999999,
+                        "name" : "updated_launch_angle"
+                    }
+                    """;
 
             String jsonResponse = mvc.perform(
                             put(API)
@@ -297,21 +270,15 @@ class ReportControllerIntegrationTest {
                     .andExpect(status().isNotFound())
                     .andReturn().getResponse().getContentAsString();
 
-
             String expectedResponse = """
-                {
-                    "status" : 404,
-                    "message": "ReportService. Could not update Report by id: 999999"
-                }
-                """;
+                    {
+                        "status"  : 404,
+                        "message" : "ReportService. Could not update Report by id: 999999"
+                    }
+                    """;
 
-            JsonNode expectedNode = objectMapper.readTree(expectedResponse);
-            JsonNode actualNode   = objectMapper.readTree(jsonResponse);
-
-            assertEquals(expectedNode, actualNode);
-
+            assertEquals(objectMapper.readTree(expectedResponse), objectMapper.readTree(jsonResponse));
         }
-
     }
 
     @Nested
@@ -333,23 +300,19 @@ class ReportControllerIntegrationTest {
                     .andReturn().getResponse().getContentAsString();
 
             String expectedResponse = """
-                {
-                    "status" : 200,
-                    "message": "Success"
-                }
-                """;
+                    {
+                        "status"  : 200,
+                        "message" : "Success"
+                    }
+                    """;
 
-            JsonNode expectedNode = objectMapper.readTree(expectedResponse);
-            JsonNode actualNode   = objectMapper.readTree(jsonResponse);
-
-            assertEquals(expectedNode, actualNode);
-
+            assertEquals(objectMapper.readTree(expectedResponse), objectMapper.readTree(jsonResponse));
             assertFalse(reportRepository.existsById(report.getId()));
         }
 
         @Test
         @DisplayName("DELETE /reports/{id} with unknown ID -> returns 404")
-        void deleteValidationError() throws Exception {
+        void deleteNotFound() throws Exception {
             String jsonResponse = mvc.perform(
                             MockMvcRequestBuilders.delete(API + "/999999")
                                     .with(httpBasic("biolab", "biolab"))
@@ -358,16 +321,13 @@ class ReportControllerIntegrationTest {
                     .andReturn().getResponse().getContentAsString();
 
             String expectedResponse = """
-                {
-                    "status" : 404,
-                    "message": "ReportService. Could not delete id: 999999"
-                }
-                """;
+                    {
+                        "status"  : 404,
+                        "message" : "ReportService. Could not delete id: 999999"
+                    }
+                    """;
 
-            JsonNode expectedNode = objectMapper.readTree(expectedResponse);
-            JsonNode actualNode   = objectMapper.readTree(jsonResponse);
-
-            assertEquals(expectedNode, actualNode);
+            assertEquals(objectMapper.readTree(expectedResponse), objectMapper.readTree(jsonResponse));
         }
     }
 }

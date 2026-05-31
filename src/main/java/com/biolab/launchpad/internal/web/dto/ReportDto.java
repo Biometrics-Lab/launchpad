@@ -8,6 +8,6 @@ public record ReportDto(
         Integer id,
         @NotBlank(message = "Name cannot be blank")
         String name,
-        String extRef
-) { }
-
+        String reportType,
+        String config
+) {}

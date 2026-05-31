@@ -11,6 +11,9 @@ import org.springframework.data.relational.core.mapping.Table;
 @NoArgsConstructor
 @Table("report")
 public class Report extends IDName {
-    @Column("ext_ref")
-    private String extRef;
+    @Column("report_type")
+    private String reportType;
+
+    @Column("config")
+    private String config;
 }

@@ -2,6 +2,7 @@ databaseChangeLog:
   - changeSet:
       id: 1-BL-21-1
       author: viktor
+      validCheckSum: ANY
       changes:
         # --------------create tables--------------
         # age_group_dictionary
@@ -517,6 +518,21 @@ databaseChangeLog:
                   type: varchar(200)
                   constraints:
                     nullable: false
+        # report_type_dictionary
+        - createTable:
+            tableName: report_type_dictionary
+            columns:
+              - column:
+                  name: name
+                  type: varchar(50)
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: description
+                  type: varchar(200)
+                  constraints:
+                    nullable: true
         #  report
         - createTable:
             tableName: report
@@ -534,8 +550,13 @@ databaseChangeLog:
                   constraints:
                     nullable: true
               - column:
-                  name: ext_ref
-                  type: varchar(250)
+                  name: report_type
+                  type: varchar(100)
+                  constraints:
+                    nullable: true
+              - column:
+                  name: config
+                  type: text
                   constraints:
                     nullable: true
         # resource_type_dictionary
