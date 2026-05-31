@@ -4,6 +4,8 @@ databaseChangeLog:
   - include:
       file: db/changelog/changeset/1_bl_28.yml
   - include:
+      file: db/changelog/changeset/1_bl_68.yml
+  - include:
       file: db/changelog/changeset/2_bl_28.yml
   - include:
       file: db/changelog/changeset/1_bl_43.yml
@@ -17,4 +19,3 @@ databaseChangeLog:
       file: db/changelog/changeset/1_bl_52.yml
   - include:
       file: db/changelog/changeset/1_bl_39.yml
-
