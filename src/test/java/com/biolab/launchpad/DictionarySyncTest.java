@@ -64,4 +64,12 @@ class DictionarySyncTest {
         List<String> expected = Arrays.stream(UserRole.values()).map(ur -> ur.getValue()).toList();
         assertThat(db).containsExactlyInAnyOrderElementsOf(expected);
     }
+
+    @Test
+    @DisplayName("report_type_dictionary contains all ReportType enum values")
+    void reportTypeDictionaryMatchesEnum() {
+        List<String> db = jdbcClient.sql("SELECT name FROM report_type_dictionary").query(String.class).list();
+        List<String> expected = Arrays.stream(ReportType.values()).map(ReportType::getValue).toList();
+        assertThat(db).containsExactlyInAnyOrderElementsOf(expected);
+    }
 }

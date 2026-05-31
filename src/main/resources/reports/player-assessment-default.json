@@ -1,0 +1,12 @@
+{
+  "reportType": "PLAYER_ASSESSMENT",
+  "filters": {
+    "conditionIds": [],
+    "assessmentIds": [],
+    "conditionalMetricIds": []
+  },
+  "granularity": "OVERALL",
+  "valueType": "AVG",
+  "viewMode": "CHART_AND_TABLE",
+  "chartType": "BAR"
+}
