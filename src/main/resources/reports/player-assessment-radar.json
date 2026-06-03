@@ -1,0 +1,10 @@
+{
+  "name": "Radar Chart",
+  "reportType": "player-assessment",
+  "isDefault": false,
+  "filters": { "conditionalMetricIds": [] },
+  "granularity": "OVERALL",
+  "panels": [
+    { "type": "radar", "series": ["avg"] }
+  ]
+}

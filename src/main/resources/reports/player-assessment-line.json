@@ -1,0 +1,11 @@
+{
+  "name": "Line Chart",
+  "reportType": "player-assessment",
+  "isDefault": false,
+  "filters": { "conditionalMetricIds": [] },
+  "granularity": "OVERALL",
+  "panels": [
+    { "type": "line", "series": ["range", "avg"], "options": { "stroke": { "curve": "smooth", "width": 2 } } },
+    { "type": "table", "series": ["avg"] }
+  ]
+}
