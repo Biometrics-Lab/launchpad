@@ -1,0 +1,24 @@
+databaseChangeLog:
+  - changeSet:
+      id: BL-76-rename-report-type-unique-name
+      author: roman.vakulenko
+      validCheckSum: ANY
+      changes:
+        - update:
+            tableName: report_type_dictionary
+            columns:
+              - column:
+                  name: name
+                  value: player-assessment
+            where: "name = 'Player Assessment Report'"
+        - update:
+            tableName: report
+            columns:
+              - column:
+                  name: report_type
+                  value: player-assessment
+            where: "report_type = 'Player Assessment Report'"
+        - addUniqueConstraint:
+            tableName: report
+            columnNames: name
+            constraintName: uq_report_name

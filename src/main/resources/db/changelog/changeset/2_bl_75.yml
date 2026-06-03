@@ -10,7 +10,7 @@ databaseChangeLog:
             columns:
               - column:
                   name: name
-                  value: Player Assessment Report
+                  value: player-assessment
               - column:
                   name: description
                   value: Per-player cross-assessment metric report

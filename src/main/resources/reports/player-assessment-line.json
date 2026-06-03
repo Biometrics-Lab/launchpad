@@ -1,0 +1,11 @@
+{
+  "name": "Line Chart",
+  "reportType": "player-assessment",
+  "isDefault": false,
+  "filters": { "conditionalMetricIds": [] },
+  "granularity": "PER_SESSION",
+  "panels": [
+    { "type": "line", "series": ["avg"] },
+    { "type": "table", "series": ["avg"] }
+  ]
+}

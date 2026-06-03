@@ -6,7 +6,7 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public enum ReportType {
-    PLAYER_ASSESSMENT("Player Assessment Report");
+    PLAYER_ASSESSMENT("player-assessment");
 
     private final String value;
 }

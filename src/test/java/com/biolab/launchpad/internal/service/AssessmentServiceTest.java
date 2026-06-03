@@ -1,6 +1,8 @@
 package com.biolab.launchpad.internal.service;
 
+import com.biolab.launchpad.internal.repository.AssessmentMetricRepository;
 import com.biolab.launchpad.internal.repository.AssessmentRepository;
+import com.biolab.launchpad.internal.repository.TemplateMetricRepository;
 import com.biolab.launchpad.internal.repository.model.Assessment;
 import com.biolab.launchpad.internal.security.exceptions.NotFoundByException;
 import com.biolab.launchpad.internal.security.exceptions.PersistException;
@@ -20,6 +22,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -29,7 +32,12 @@ class AssessmentServiceTest {
     @Mock
     private AssessmentRepository assessmentRepository;
 
-    @InjectMocks
+    @Mock
+    private TemplateMetricRepository templateMetricRepository;
+
+    @Mock
+    private AssessmentMetricRepository assessmentMetricRepository;
+
     private AssessmentService assessmentService;
 
     private Assessment assessment1Input;
@@ -38,6 +46,8 @@ class AssessmentServiceTest {
 
     @BeforeEach
     void setUp() {
+        assessmentService = new AssessmentService(assessmentRepository, templateMetricRepository, assessmentMetricRepository);
+
         assessment1Input = Assessment.builder()
                 .build();
 
@@ -57,12 +67,14 @@ class AssessmentServiceTest {
         @DisplayName("should save and return entity when successful")
         void create_ok_saves_and_returns_entity() {
             when(assessmentRepository.save(assessment1Input)).thenReturn(assessment1);
+            when(templateMetricRepository.findByTemplateId(any())).thenReturn(List.of());
 
             Assessment result = assessmentService.create(assessment1Input);
 
             assertThat(result).isSameAs(assessment1);
             verify(assessmentRepository).save(assessment1Input);
-            verifyNoMoreInteractions(assessmentRepository);
+            verify(templateMetricRepository).findByTemplateId(any());
+            verifyNoMoreInteractions(assessmentRepository, templateMetricRepository, assessmentMetricRepository);
         }
 
         @Test
