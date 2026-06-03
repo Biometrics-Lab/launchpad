@@ -1,12 +1,11 @@
 {
-  "reportType": "PLAYER_ASSESSMENT",
-  "filters": {
-    "conditionIds": [],
-    "assessmentIds": [],
-    "conditionalMetricIds": []
-  },
+  "name": "Column Chart",
+  "reportType": "player-assessment",
+  "isDefault": true,
+  "filters": { "conditionalMetricIds": [] },
   "granularity": "OVERALL",
-  "valueType": "AVG",
-  "viewMode": "CHART_AND_TABLE",
-  "chartType": "BAR"
+  "panels": [
+    { "type": "bar", "series": ["avg"], "options": { "horizontal": false } },
+    { "type": "table", "series": ["avg"] }
+  ]
 }

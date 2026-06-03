@@ -52,7 +52,7 @@ class PlayerAssessmentReportControllerIntegrationTest {
         @Test
         @DisplayName("returns 404 when assessment does not exist")
         void assessmentNotFound() throws Exception {
-            mvc.perform(get(API + "/999999").with(httpBasic("biolab", "biolab")))
+            mvc.perform(get(API + "?assessmentId=999999").with(httpBasic("biolab", "biolab")))
                 .andExpect(status().isNotFound());
         }
     }
@@ -75,7 +75,7 @@ class PlayerAssessmentReportControllerIntegrationTest {
                 .sessionCount(5)
                 .build());
 
-            String json = mvc.perform(get(API + "/" + assessment.getId())
+            String json = mvc.perform(get(API + "?assessmentId=" + assessment.getId())
                     .with(httpBasic("biolab", "biolab")))
                 .andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsString();
@@ -97,7 +97,7 @@ class PlayerAssessmentReportControllerIntegrationTest {
         void overallEmptyState() throws Exception {
             Assessment assessment = factory.createAssessment();
 
-            String json = mvc.perform(get(API + "/" + assessment.getId())
+            String json = mvc.perform(get(API + "?assessmentId=" + assessment.getId())
                     .with(httpBasic("biolab", "biolab")))
                 .andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsString();
@@ -117,7 +117,7 @@ class PlayerAssessmentReportControllerIntegrationTest {
                 .build());
             Assessment assessment = factory.createAssessment();
 
-            mvc.perform(get(API + "/" + assessment.getId() + "?configName=My Config")
+            mvc.perform(get(API + "?assessmentId=" + assessment.getId() + "&configName=My Config")
                     .with(httpBasic("biolab", "biolab")))
                 .andExpect(status().isOk());
         }
@@ -127,7 +127,7 @@ class PlayerAssessmentReportControllerIntegrationTest {
         void usesPreset() throws Exception {
             Assessment assessment = factory.createAssessment();
 
-            mvc.perform(get(API + "/" + assessment.getId() + "?configName=Line Chart")
+            mvc.perform(get(API + "?assessmentId=" + assessment.getId() + "&configName=Line Chart")
                     .with(httpBasic("biolab", "biolab")))
                 .andExpect(status().isOk());
         }
@@ -156,7 +156,7 @@ class PlayerAssessmentReportControllerIntegrationTest {
                 .avgValue(80.0)
                 .build());
 
-            String json = mvc.perform(get(API + "/" + assessment.getId() + "?configName=Session Config")
+            String json = mvc.perform(get(API + "?assessmentId=" + assessment.getId() + "&configName=Session Config")
                     .with(httpBasic("biolab", "biolab")))
                 .andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsString();
@@ -196,7 +196,7 @@ class PlayerAssessmentReportControllerIntegrationTest {
                 .value(BigDecimal.valueOf(95.5))
                 .build());
 
-            String json = mvc.perform(get(API + "/" + assessment.getId() + "?configName=Rep Config")
+            String json = mvc.perform(get(API + "?assessmentId=" + assessment.getId() + "&configName=Rep Config")
                     .with(httpBasic("biolab", "biolab")))
                 .andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsString();

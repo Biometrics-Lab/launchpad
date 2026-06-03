@@ -8,13 +8,14 @@ import com.biolab.launchpad.internal.web.dto.reports.*;
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import org.springframework.util.MultiValueMap;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
-public class PlayerAssessmentReportExecutor implements ReportExecutor {
+public class PlayerAssessmentReportExecutor implements ReportExecutor<PlayerAssessmentReportRequest> {
 
     private final AssessmentRepository assessmentRepository;
     private final AssessmentMetricRepository assessmentMetricRepository;
@@ -30,16 +31,32 @@ public class PlayerAssessmentReportExecutor implements ReportExecutor {
     }
 
     @Override
-    public ReportDataDto execute(Integer assessmentId, ReportConfigService.ResolvedConfig config) {
+    public PlayerAssessmentReportRequest buildRequest(MultiValueMap<String, String> params) {
+        Integer assessmentId = Integer.parseInt(params.getFirst("assessmentId"));
+        String granularity = params.getFirst("granularity");
+        List<Integer> cmIds = params.getOrDefault("conditionalMetricIds", List.of())
+                .stream().map(Integer::parseInt).toList();
+        String sessionIdStr = params.getFirst("sessionId");
+        Integer sessionId = sessionIdStr != null ? Integer.parseInt(sessionIdStr) : null;
+        return new PlayerAssessmentReportRequest(assessmentId, granularity, cmIds, sessionId);
+    }
+
+    @Override
+    public ReportDataDto execute(PlayerAssessmentReportRequest request, ReportConfigService.ResolvedConfig config) {
+        Integer assessmentId = request.assessmentId();
         assessmentRepository.findById(assessmentId)
             .orElseThrow(() -> new NotFoundByException("Assessment not found by id: %d", assessmentId));
 
-        ReportGranularity granularity = extractGranularity(config.config());
-        List<Integer> cmFilter = extractCmFilter(config.config());
+        ReportGranularity granularity = request.granularity() != null
+                ? ReportGranularity.valueOf(request.granularity())
+                : extractGranularity(config.config());
+        List<Integer> cmFilter = !request.conditionalMetricIds().isEmpty()
+                ? request.conditionalMetricIds()
+                : extractCmFilter(config.config());
 
         return switch (granularity) {
             case OVERALL -> buildOverall(assessmentId, cmFilter);
-            case PER_SESSION -> buildPerSession(assessmentId, cmFilter);
+            case PER_SESSION -> buildPerSession(assessmentId, cmFilter, request.sessionId());
             case PER_REP -> buildPerRep(assessmentId, cmFilter);
         };
     }
@@ -109,9 +126,12 @@ public class PlayerAssessmentReportExecutor implements ReportExecutor {
 
     // ── PER_SESSION ───────────────────────────────────────────────────────
 
-    private ReportDataDto buildPerSession(Integer assessmentId, List<Integer> cmFilter) {
-        List<Session> sessions = sessionRepository.findAllByAssessmentId(assessmentId);
-        sessions.sort(Comparator.comparing(Session::getStartTime));
+    private ReportDataDto buildPerSession(Integer assessmentId, List<Integer> cmFilter, Integer sessionId) {
+        List<Session> allSessions = sessionRepository.findAllByAssessmentId(assessmentId);
+        allSessions.sort(Comparator.comparing(Session::getStartTime));
+        List<Session> sessions = sessionId != null
+                ? allSessions.stream().filter(s -> s.getId().equals(sessionId)).toList()
+                : allSessions;
 
         List<ReportColumnDto> columns = new ArrayList<>();
         for (int i = 0; i < sessions.size(); i++) {

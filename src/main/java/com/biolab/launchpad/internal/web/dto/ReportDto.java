@@ -1,5 +1,6 @@
 package com.biolab.launchpad.internal.web.dto;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Builder;
 
@@ -9,5 +10,6 @@ public record ReportDto(
         @NotBlank(message = "Name cannot be blank")
         String name,
         String reportType,
-        String config
+        JsonNode config,
+        boolean preset
 ) {}

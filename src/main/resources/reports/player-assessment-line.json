@@ -3,9 +3,9 @@
   "reportType": "player-assessment",
   "isDefault": false,
   "filters": { "conditionalMetricIds": [] },
-  "granularity": "OVERALL",
+  "granularity": "PER_SESSION",
   "panels": [
-    { "type": "line", "series": ["range", "avg"], "options": { "stroke": { "curve": "smooth", "width": 2 } } },
+    { "type": "line", "series": ["avg"] },
     { "type": "table", "series": ["avg"] }
   ]
 }

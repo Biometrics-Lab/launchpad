@@ -4,42 +4,39 @@ import com.biolab.launchpad.internal.repository.ReportRepository;
 import com.biolab.launchpad.internal.repository.model.Report;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import com.biolab.TestcontainersConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
 @AutoConfigureMockMvc
+@Import(TestcontainersConfiguration.class)
 @DisplayName("ReportController Integration Tests")
 class ReportControllerIntegrationTest {
 
-    private static final String API = "/api/v1/reports";
+    private static final String API = "/api/v1/report-configs";
 
-    @Autowired
-    private MockMvc mvc;
-
-    @Autowired
-    ObjectMapper objectMapper;
-
-    @Autowired
-    ReportRepository reportRepository;
+    @Autowired private MockMvc mvc;
+    @Autowired private ObjectMapper objectMapper;
+    @Autowired private ReportRepository reportRepository;
 
     @AfterEach
     void tearDown() {
@@ -47,287 +44,231 @@ class ReportControllerIntegrationTest {
     }
 
     @Nested
-    @DisplayName("Create")
+    @DisplayName("GET /reports — list")
+    class ListTests {
+        @Test
+        @DisplayName("returns presets + DB records for a reportType")
+        void listAll() throws Exception {
+            reportRepository.save(Report.builder()
+                .name("My Config")
+                .reportType("player-assessment")
+                .config("{\"granularity\":\"OVERALL\"}")
+                .build());
+
+            String json = mvc.perform(get(API + "?reportType=player-assessment")
+                    .with(httpBasic("biolab", "biolab")))
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+
+            JsonNode response = objectMapper.readTree(json);
+            assertThat(response.isArray()).isTrue();
+            // 3 presets + 1 DB record
+            assertThat(response.size()).isEqualTo(4);
+            // first item is a preset
+            assertThat(response.get(0).get("preset").asBoolean()).isTrue();
+            assertThat(response.get(0).get("id").isNull()).isTrue();
+        }
+    }
+
+    @Nested
+    @DisplayName("GET /reports/{name}")
+    class GetByNameTests {
+        @Test
+        @DisplayName("returns preset by name")
+        void getPreset() throws Exception {
+            String json = mvc.perform(get(API + "/Column Chart")
+                    .with(httpBasic("biolab", "biolab")))
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+
+            JsonNode node = objectMapper.readTree(json);
+            assertEquals("Column Chart", node.get("name").asText());
+            assertThat(node.get("preset").asBoolean()).isTrue();
+        }
+
+        @Test
+        @DisplayName("returns DB config by name")
+        void getDbConfig() throws Exception {
+            reportRepository.save(Report.builder()
+                .name("Custom Config")
+                .reportType("player-assessment")
+                .config("{\"granularity\":\"PER_SESSION\"}")
+                .build());
+
+            String json = mvc.perform(get(API + "/Custom Config")
+                    .with(httpBasic("biolab", "biolab")))
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+
+            JsonNode node = objectMapper.readTree(json);
+            assertEquals("Custom Config", node.get("name").asText());
+            assertThat(node.get("preset").asBoolean()).isFalse();
+            assertEquals("PER_SESSION", node.get("config").get("granularity").asText());
+        }
+
+        @Test
+        @DisplayName("returns 404 for unknown name")
+        void getNotFound() throws Exception {
+            mvc.perform(get(API + "/Unknown Name")
+                    .with(httpBasic("biolab", "biolab")))
+                .andExpect(status().isNotFound());
+        }
+    }
+
+    @Nested
+    @DisplayName("POST /reports")
     class CreateTests {
         @Test
-        @DisplayName("POST /reports -> creates and returns the new Report")
+        @DisplayName("creates a new DB config")
         void create() throws Exception {
             String request = """
-                    {
-                        "name"       : "launch_angle",
-                        "reportType" : "Player Assessment Report",
-                        "config"     : "{\\"chartType\\":\\"BAR\\"}"
-                    }
-                    """;
+                {
+                  "name": "My Report",
+                  "reportType": "player-assessment",
+                  "config": { "granularity": "OVERALL", "panels": [] }
+                }
+                """;
 
-            String jsonResponse = mvc.perform(
-                            post(API)
-                                    .contentType(MediaType.APPLICATION_JSON)
-                                    .content(request)
-                                    .with(httpBasic("biolab", "biolab"))
-                    )
-                    .andExpect(status().isOk())
-                    .andReturn().getResponse().getContentAsString();
+            String json = mvc.perform(post(API)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(request)
+                    .with(httpBasic("biolab", "biolab")))
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
 
-            JsonNode responseNode = objectMapper.readTree(jsonResponse);
-            int reportId = responseNode.get("id").asInt();
-            assertThat(reportId).isPositive();
-
-            String expectedResponse = """
-                    {
-                        "id"         : %d,
-                        "name"       : "launch_angle",
-                        "reportType" : "Player Assessment Report",
-                        "config"     : "{\\"chartType\\":\\"BAR\\"}"
-                    }
-                    """.formatted(reportId);
-
-            assertEquals(objectMapper.readTree(expectedResponse), responseNode);
+            JsonNode node = objectMapper.readTree(json);
+            assertThat(node.get("id").asInt()).isPositive();
+            assertEquals("My Report", node.get("name").asText());
+            assertThat(node.get("preset").asBoolean()).isFalse();
         }
 
         @Test
-        @DisplayName("POST /reports with validation message -> returns 422")
-        void createValidationError() throws Exception {
+        @DisplayName("returns 409 when name conflicts with preset")
+        void conflictWithPreset() throws Exception {
             String request = """
-                    {
-                        "name" : ""
-                    }
-                    """;
+                {
+                  "name": "Column Chart",
+                  "reportType": "player-assessment",
+                  "config": {}
+                }
+                """;
+            mvc.perform(post(API)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(request)
+                    .with(httpBasic("biolab", "biolab")))
+                .andExpect(status().isConflict());
+        }
 
-            String jsonResponse = mvc.perform(
-                            post(API)
-                                    .contentType(MediaType.APPLICATION_JSON)
-                                    .content(request)
-                                    .with(httpBasic("biolab", "biolab"))
-                    )
-                    .andExpect(status().isBadRequest())
-                    .andReturn().getResponse().getContentAsString();
+        @Test
+        @DisplayName("returns 409 when name already exists in DB")
+        void conflictWithExisting() throws Exception {
+            reportRepository.save(Report.builder()
+                .name("Duplicate")
+                .reportType("player-assessment")
+                .config("{}")
+                .build());
 
-            String expectedResponse = """
-                    {
-                        "status"  : 422,
-                        "message" : "Validation failed: name: Name cannot be blank"
-                    }
-                    """;
+            String request = """
+                { "name": "Duplicate", "reportType": "player-assessment", "config": {} }
+                """;
+            mvc.perform(post(API)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(request)
+                    .with(httpBasic("biolab", "biolab")))
+                .andExpect(status().isConflict());
+        }
 
-            assertEquals(objectMapper.readTree(expectedResponse), objectMapper.readTree(jsonResponse));
+        @Test
+        @DisplayName("returns 422 when name is blank")
+        void validationError() throws Exception {
+            String request = """
+                { "name": "", "reportType": "player-assessment", "config": {} }
+                """;
+            mvc.perform(post(API)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(request)
+                    .with(httpBasic("biolab", "biolab")))
+                .andExpect(status().isBadRequest());
         }
     }
 
     @Nested
-    @DisplayName("Read")
-    class ReadTests {
-
-        @Test
-        @DisplayName("GET /reports -> returns all reports")
-        void getAll() throws Exception {
-            Report report1 = reportRepository.save(Report.builder()
-                    .name("avg_launch_angle")
-                    .reportType("Player Assessment Report")
-                    .config("{\"chartType\":\"BAR\"}")
-                    .build());
-
-            Report report2 = reportRepository.save(Report.builder()
-                    .name("max_launch_angle")
-                    .build());
-
-            String jsonResponse = mvc.perform(
-                            get(API)
-                                    .contentType(MediaType.APPLICATION_JSON)
-                                    .with(httpBasic("biolab", "biolab"))
-                    )
-                    .andExpect(status().isOk())
-                    .andReturn().getResponse().getContentAsString();
-
-            String expectedResponse = """
-                    [
-                        {
-                            "id"         : %d,
-                            "name"       : "avg_launch_angle",
-                            "reportType" : "Player Assessment Report",
-                            "config"     : "{\\"chartType\\":\\"BAR\\"}"
-                        },
-                        {
-                            "id"         : %d,
-                            "name"       : "max_launch_angle",
-                            "reportType" : null,
-                            "config"     : null
-                        }
-                    ]
-                    """.formatted(report1.getId(), report2.getId());
-
-            assertEquals(objectMapper.readTree(expectedResponse), objectMapper.readTree(jsonResponse));
-        }
-
-        @Test
-        @DisplayName("GET /reports/{id} -> returns report by ID")
-        void getById() throws Exception {
-            Report report = reportRepository.save(Report.builder()
-                    .name("launch_angle")
-                    .reportType("Player Assessment Report")
-                    .build());
-
-            String jsonResponse = mvc.perform(
-                            get(API + "/" + report.getId())
-                                    .with(httpBasic("biolab", "biolab"))
-                    )
-                    .andExpect(status().isOk())
-                    .andReturn().getResponse().getContentAsString();
-
-            String expectedResponse = """
-                    {
-                        "id"         : %d,
-                        "name"       : "launch_angle",
-                        "reportType" : "Player Assessment Report",
-                        "config"     : null
-                    }
-                    """.formatted(report.getId());
-
-            assertEquals(objectMapper.readTree(expectedResponse), objectMapper.readTree(jsonResponse));
-        }
-
-        @Test
-        @DisplayName("GET /reports/{id} with unknown ID -> returns 404")
-        void getByIdNotFound() throws Exception {
-            String jsonResponse = mvc.perform(
-                            get(API + "/999999")
-                                    .with(httpBasic("biolab", "biolab"))
-                    )
-                    .andExpect(status().isNotFound())
-                    .andReturn().getResponse().getContentAsString();
-
-            String expectedResponse = """
-                    {
-                        "status"  : 404,
-                        "message" : "Report not found by id: 999999"
-                    }
-                    """;
-
-            assertEquals(objectMapper.readTree(expectedResponse), objectMapper.readTree(jsonResponse));
-        }
-    }
-
-    @Nested
-    @DisplayName("Update")
+    @DisplayName("PUT /reports/{name}")
     class UpdateTests {
-
         @Test
-        @DisplayName("PUT /reports -> updates and returns the Report")
+        @DisplayName("updates existing DB config")
         void update() throws Exception {
-            Report original = reportRepository.save(Report.builder()
-                    .name("launch_angle")
-                    .build());
+            reportRepository.save(Report.builder()
+                .name("To Update")
+                .reportType("player-assessment")
+                .config("{\"granularity\":\"OVERALL\"}")
+                .build());
 
-            String updateRequest = """
-                    {
-                        "id"         : %d,
-                        "name"       : "updated_launch_angle",
-                        "reportType" : "Player Assessment Report",
-                        "config"     : "{\\"granularity\\":\\"PER_SESSION\\"}"
-                    }
-                    """.formatted(original.getId());
+            String request = """
+                {
+                  "name": "To Update",
+                  "reportType": "player-assessment",
+                  "config": { "granularity": "PER_SESSION" }
+                }
+                """;
 
-            String jsonResponse = mvc.perform(
-                            put(API)
-                                    .contentType(MediaType.APPLICATION_JSON)
-                                    .content(updateRequest)
-                                    .with(httpBasic("biolab", "biolab"))
-                    )
-                    .andExpect(status().isOk())
-                    .andReturn().getResponse().getContentAsString();
+            String json = mvc.perform(put(API + "/To Update")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(request)
+                    .with(httpBasic("biolab", "biolab")))
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
 
-            String expectedResponse = """
-                    {
-                        "id"         : %d,
-                        "name"       : "updated_launch_angle",
-                        "reportType" : "Player Assessment Report",
-                        "config"     : "{\\"granularity\\":\\"PER_SESSION\\"}"
-                    }
-                    """.formatted(original.getId());
-
-            assertEquals(objectMapper.readTree(expectedResponse), objectMapper.readTree(jsonResponse));
-
-            Report updated = reportRepository.findById(original.getId()).orElseThrow();
-            assertEquals("updated_launch_angle", updated.getName());
+            assertEquals("PER_SESSION", objectMapper.readTree(json).get("config").get("granularity").asText());
         }
 
         @Test
-        @DisplayName("PUT /reports with invalid id -> returns 404")
-        void updateNotFound() throws Exception {
-            String updateRequest = """
-                    {
-                        "id"   : 999999,
-                        "name" : "updated_launch_angle"
-                    }
-                    """;
-
-            String jsonResponse = mvc.perform(
-                            put(API)
-                                    .contentType(MediaType.APPLICATION_JSON)
-                                    .content(updateRequest)
-                                    .with(httpBasic("biolab", "biolab"))
-                    )
-                    .andExpect(status().isNotFound())
-                    .andReturn().getResponse().getContentAsString();
-
-            String expectedResponse = """
-                    {
-                        "status"  : 404,
-                        "message" : "ReportService. Could not update Report by id: 999999"
-                    }
-                    """;
-
-            assertEquals(objectMapper.readTree(expectedResponse), objectMapper.readTree(jsonResponse));
+        @DisplayName("returns 409 when trying to update preset")
+        void cannotUpdatePreset() throws Exception {
+            String request = """
+                { "name": "Column Chart", "reportType": "player-assessment", "config": {} }
+                """;
+            mvc.perform(put(API + "/Column Chart")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(request)
+                    .with(httpBasic("biolab", "biolab")))
+                .andExpect(status().isConflict());
         }
     }
 
     @Nested
-    @DisplayName("Delete")
+    @DisplayName("DELETE /reports/{name}")
     class DeleteTests {
-
         @Test
-        @DisplayName("DELETE /reports/{id} -> deletes the Report")
-        void delete() throws Exception {
-            Report report = reportRepository.save(Report.builder()
-                    .name("launch_angle")
-                    .build());
+        @DisplayName("deletes existing DB config")
+        void deleteExisting() throws Exception {
+            reportRepository.save(Report.builder()
+                .name("To Delete")
+                .reportType("player-assessment")
+                .config("{}")
+                .build());
 
-            String jsonResponse = mvc.perform(
-                            MockMvcRequestBuilders.delete(API + "/" + report.getId())
-                                    .with(httpBasic("biolab", "biolab"))
-                    )
-                    .andExpect(status().isOk())
-                    .andReturn().getResponse().getContentAsString();
+            mvc.perform(delete(API + "/To Delete")
+                    .with(httpBasic("biolab", "biolab")))
+                .andExpect(status().isOk());
 
-            String expectedResponse = """
-                    {
-                        "status"  : 200,
-                        "message" : "Success"
-                    }
-                    """;
-
-            assertEquals(objectMapper.readTree(expectedResponse), objectMapper.readTree(jsonResponse));
-            assertFalse(reportRepository.existsById(report.getId()));
+            assertFalse(reportRepository.findByName("To Delete").isPresent());
         }
 
         @Test
-        @DisplayName("DELETE /reports/{id} with unknown ID -> returns 404")
-        void deleteNotFound() throws Exception {
-            String jsonResponse = mvc.perform(
-                            MockMvcRequestBuilders.delete(API + "/999999")
-                                    .with(httpBasic("biolab", "biolab"))
-                    )
-                    .andExpect(status().isNotFound())
-                    .andReturn().getResponse().getContentAsString();
+        @DisplayName("returns 409 when trying to delete preset")
+        void cannotDeletePreset() throws Exception {
+            mvc.perform(delete(API + "/Column Chart")
+                    .with(httpBasic("biolab", "biolab")))
+                .andExpect(status().isConflict());
+        }
 
-            String expectedResponse = """
-                    {
-                        "status"  : 404,
-                        "message" : "ReportService. Could not delete id: 999999"
-                    }
-                    """;
-
-            assertEquals(objectMapper.readTree(expectedResponse), objectMapper.readTree(jsonResponse));
+        @Test
+        @DisplayName("returns 404 for unknown name")
+        void notFound() throws Exception {
+            mvc.perform(delete(API + "/Unknown")
+                    .with(httpBasic("biolab", "biolab")))
+                .andExpect(status().isNotFound());
         }
     }
 }
