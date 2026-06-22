@@ -21,6 +21,7 @@ import java.time.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -424,6 +425,85 @@ class SessionControllerIntegrationTest {
                     .content(body)
                     .with(httpBasic("biolab", "biolab")))
                .andExpect(status().isOk());
+        }
+    }
+
+    @Nested
+    @DisplayName("Get Reps")
+    class GetRepsTests {
+
+        @Autowired
+        com.biolab.launchpad.internal.repository.RepRepository repRepository;
+        @Autowired
+        com.biolab.launchpad.internal.repository.RepMetricRepository repMetricRepository;
+        @Autowired
+        com.biolab.launchpad.internal.repository.RepResourceRepository repResourceRepository;
+
+        @AfterEach
+        void tearDownReps() {
+            repMetricRepository.deleteAll();
+            repResourceRepository.deleteAll();
+            repRepository.deleteAll();
+        }
+
+        @Test
+        @DisplayName("GET /sessions/{id}/reps -> returns empty list when no reps")
+        void getReps_empty() throws Exception {
+            Session session = factory.createSessionForAssessment(assessment.getId());
+
+            String jsonResponse = mvc.perform(
+                            get(API + "/" + session.getId() + "/reps")
+                                    .with(httpBasic("biolab", "biolab")))
+                    .andExpect(status().isOk())
+                    .andReturn().getResponse().getContentAsString();
+
+            JsonNode actualNode = objectMapper.readTree(jsonResponse);
+            assertTrue(actualNode.isArray());
+            assertEquals(0, actualNode.size());
+        }
+
+        @Test
+        @DisplayName("GET /sessions/{id}/reps -> returns reps with metrics")
+        void getReps_withMetrics() throws Exception {
+            Session session = factory.createSessionForAssessment(assessment.getId());
+            com.biolab.launchpad.internal.repository.model.ConditionalMetric cm =
+                    factory.createConditionalMetric();
+            factory.createAssessmentMetric(assessment.getId(), cm.getId());
+
+            com.biolab.launchpad.internal.repository.model.Rep rep = repRepository.save(
+                    com.biolab.launchpad.internal.repository.model.Rep.builder()
+                            .sessionId(session.getId())
+                            .startTime(java.sql.Timestamp.valueOf(java.time.LocalDateTime.of(2025, 10, 2, 14, 45, 1)))
+                            .repNumber(1)
+                            .build());
+
+            repMetricRepository.save(
+                    com.biolab.launchpad.internal.repository.model.RepMetric.builder()
+                            .repId(rep.getId())
+                            .conditionalMetricId(cm.getId())
+                            .value(42.5)
+                            .build());
+
+            String jsonResponse = mvc.perform(
+                            get(API + "/" + session.getId() + "/reps")
+                                    .with(httpBasic("biolab", "biolab")))
+                    .andExpect(status().isOk())
+                    .andReturn().getResponse().getContentAsString();
+
+            JsonNode actualNode = objectMapper.readTree(jsonResponse);
+            assertTrue(actualNode.isArray());
+            assertEquals(1, actualNode.size());
+
+            JsonNode repNode = actualNode.get(0);
+            assertEquals(rep.getId().intValue(), repNode.get("id").asInt());
+            assertEquals(session.getId().intValue(), repNode.get("sessionId").asInt());
+            assertEquals(1, repNode.get("repNumber").asInt());
+
+            JsonNode metrics = repNode.get("metrics");
+            assertEquals(1, metrics.size());
+            assertEquals(cm.getId().intValue(), metrics.get(0).get("conditionalMetricId").asInt());
+            assertEquals(cm.getName(), metrics.get(0).get("name").asText());
+            assertEquals(42.5, metrics.get(0).get("value").asDouble(), 0.001);
         }
     }
 

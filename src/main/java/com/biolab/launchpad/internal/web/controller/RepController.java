@@ -2,10 +2,12 @@ package com.biolab.launchpad.internal.web.controller;
 
 import com.biolab.launchpad.internal.repository.model.Rep;
 import com.biolab.launchpad.internal.security.exceptions.NotFoundByException;
+import com.biolab.launchpad.internal.service.RepResourceService;
 import com.biolab.launchpad.internal.service.RepService;
+import com.biolab.launchpad.internal.web.dto.RepDto;
+import com.biolab.launchpad.internal.web.dto.RepResourceDto;
 import com.biolab.launchpad.internal.web.dto.ResponseCode;
 import com.biolab.launchpad.internal.web.dto.ResponseDto;
-import com.biolab.launchpad.internal.web.dto.RepDto;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -15,6 +17,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static com.biolab.launchpad.internal.web.mapper.RepMapper.repMapper;
+import static com.biolab.launchpad.internal.web.mapper.RepResourceMapper.repResourceMapper;
 
 @RestController
 @RequiredArgsConstructor
@@ -23,6 +26,7 @@ import static com.biolab.launchpad.internal.web.mapper.RepMapper.repMapper;
 public class RepController {
 
     private final RepService repService;
+    private final RepResourceService repResourceService;
 
     @PostMapping
     public RepDto create(@Valid @RequestBody RepDto repDto) {
@@ -56,5 +60,10 @@ public class RepController {
     public RepDto update(@Valid @RequestBody RepDto repDTO) {
         Rep updated = repService.update(repMapper.toModel(repDTO));
         return repMapper.toDto(updated);
+    }
+
+    @GetMapping("/{id}/resources")
+    public List<RepResourceDto> getResources(@PathVariable Integer id) {
+        return repResourceMapper.toDtos(repResourceService.findAllByRepId(id));
     }
 }

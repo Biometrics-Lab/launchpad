@@ -41,8 +41,12 @@ management:
     loggers:
       enabled: true
 
+biolab:
+  websocket:
+    allowed-origin-patterns: "http://localhost:*"
+
 app:
   blast-motion:
-    rep-interval-ms: 2000
+    rep-interval-ms: 10000
     resource-delay-probability: 0.3
     scheduler-threads: 10
