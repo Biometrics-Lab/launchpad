@@ -11,6 +11,7 @@ public record RepDto(
         @NotNull(message = "Rep sessionId cannot be null")
         Integer sessionId,
         @NotNull(message = "Rep startTime cannot be null")
-        Timestamp startTime
+        Timestamp startTime,
+        Integer repNumber
 ) { }
 

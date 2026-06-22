@@ -1,14 +1,18 @@
 package com.biolab.launchpad.internal.service;
 
-import lombok.extern.log4j.Log4j2;
+import com.biolab.launchpad.internal.web.dto.RepBroadcastDto;
+import lombok.RequiredArgsConstructor;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 @Service
-@Log4j2
+@RequiredArgsConstructor
 public class SessionNotificationServiceImpl implements SessionNotificationService {
 
+    private final SimpMessagingTemplate messagingTemplate;
+
     @Override
-    public void broadcastRep(Integer sessionId, Object payload) {
-        log.info("Rep broadcast [session={}]: {}", sessionId, payload);
+    public void broadcastRep(Integer sessionId, RepBroadcastDto payload) {
+        messagingTemplate.convertAndSend("/topic/session/" + sessionId + "/reps", payload);
     }
 }

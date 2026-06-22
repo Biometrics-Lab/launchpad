@@ -11,13 +11,13 @@ import com.biolab.launchpad.internal.repository.model.AssessmentMetric;
 import com.biolab.launchpad.internal.repository.model.Rep;
 import com.biolab.launchpad.internal.repository.model.RepMetric;
 import com.biolab.launchpad.internal.repository.model.RepResource;
-import com.biolab.launchpad.internal.repository.model.Session;
 import com.biolab.launchpad.internal.security.exceptions.NotFoundByException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.modulith.events.ApplicationModuleListener;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -31,13 +31,14 @@ public class RepEventService {
     private final RepRepository repRepository;
     private final RepMetricRepository repMetricRepository;
     private final RepResourceRepository repResourceRepository;
+    private final RepService repService;
     private final SessionNotificationService sessionNotificationService;
 
     @ApplicationModuleListener
     public void onRepDataReceived(RepDataReceivedEvent event) {
         log.info("RepDataReceivedEvent received for session={} rep={}", event.sessionId(), event.repNumber());
 
-        Session session = sessionRepository.findById(event.sessionId())
+        var session = sessionRepository.findById(event.sessionId())
                 .orElseThrow(() -> new NotFoundByException("Session not found by id: %d", event.sessionId()));
 
         Set<Integer> validMetricIds = assessmentMetricRepository
@@ -53,24 +54,26 @@ public class RepEventService {
                         .repNumber(event.repNumber())
                         .build()));
 
-        event.metrics().stream()
+        List<RepMetric> savedMetrics = event.metrics().stream()
                 .filter(m -> validMetricIds.contains(m.conditionalMetricId()))
-                .forEach(m -> repMetricRepository.save(RepMetric.builder()
+                .map(m -> repMetricRepository.save(RepMetric.builder()
                         .repId(rep.getId())
                         .conditionalMetricId(m.conditionalMetricId())
                         .dataSourceId(m.dataSourceId())
                         .value(m.value())
-                        .build()));
+                        .build()))
+                .collect(Collectors.toList());
 
-        event.resources().forEach(r ->
-                repResourceRepository.save(RepResource.builder()
+        List<RepResource> savedResources = event.resources().stream()
+                .map(r -> repResourceRepository.save(RepResource.builder()
                         .repId(rep.getId())
                         .url(r.url())
                         .type(ResourceContentType.VIDEO.getValue())
                         .urlStatus(r.urlStatus())
                         .uuid(r.uuid())
-                        .build()));
+                        .build()))
+                .collect(Collectors.toList());
 
-        sessionNotificationService.broadcastRep(event.sessionId(), rep);
+        sessionNotificationService.broadcastRep(event.sessionId(), repService.buildDto(rep, savedMetrics, savedResources));
     }
 }

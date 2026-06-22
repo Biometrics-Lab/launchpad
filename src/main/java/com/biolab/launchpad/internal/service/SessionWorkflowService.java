@@ -158,6 +158,13 @@ public class SessionWorkflowService {
 
         List<SessionMetric> allSessionMetrics = sessionMetricRepository.findAllBySessionIdIn(allSessionIds);
 
+        // Count reps per conditional metric across all sessions
+        List<Integer> allRepIds = repRepository.findAllBySessionIdIn(allSessionIds)
+                .stream().map(Rep::getId).toList();
+        Map<Integer, Long> repCountByMetric = allRepIds.isEmpty() ? Map.of()
+                : repMetricRepository.findAllByRepIdIn(allRepIds).stream()
+                        .collect(Collectors.groupingBy(RepMetric::getConditionalMetricId, Collectors.counting()));
+
         Map<Integer, List<SessionMetric>> byMetric = allSessionMetrics.stream()
                 .collect(Collectors.groupingBy(SessionMetric::getConditionalMetricId));
 
@@ -170,6 +177,8 @@ public class SessionWorkflowService {
                     ? sessionMetrics.stream().mapToDouble(SessionMetric::getMaxValue).min().orElse(0)
                     : sessionMetrics.stream().mapToDouble(SessionMetric::getMaxValue).max().orElse(0);
             double avg = sessionMetrics.stream().mapToDouble(SessionMetric::getAvgValue).average().orElse(0);
+            int sessionCount = sessionMetrics.size();
+            int repCount = repCountByMetric.getOrDefault(conditionalMetricId, 0L).intValue();
 
             assessmentMetricRepository
                     .findByAssessmentIdAndConditionalMetricId(assessmentId, conditionalMetricId)
@@ -177,6 +186,8 @@ public class SessionWorkflowService {
                         am.setMinValue(min);
                         am.setMaxValue(max);
                         am.setAvgValue(avg);
+                        am.setSessionCount(sessionCount);
+                        am.setRepCount(repCount);
                         assessmentMetricRepository.save(am);
                     });
         });

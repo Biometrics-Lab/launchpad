@@ -31,6 +31,7 @@ public class BlastMotionAPIService implements BadSensorService {
     private final double resourceDelayProbability;
     private final ScheduledExecutorService scheduler;
     private final List<Map<BatSensorMetric, Double>> mockReps;
+    private final List<byte[]> mockVideos;
 
     private final Map<Integer, ScheduledFuture<?>> activeSessions = new ConcurrentHashMap<>();
     private final Map<Integer, AtomicInteger> repCounters = new ConcurrentHashMap<>();
@@ -51,6 +52,7 @@ public class BlastMotionAPIService implements BadSensorService {
         this.resourceDelayProbability = resourceDelayProbability;
         this.scheduler = Executors.newScheduledThreadPool(schedulerThreads);
         this.mockReps = loadMockReps();
+        this.mockVideos = loadMockVideos();
     }
 
     @Override
@@ -105,13 +107,13 @@ public class BlastMotionAPIService implements BadSensorService {
                     sessionId, repNumber, Timestamp.from(Instant.now()), metricData, resources);
             transactionTemplate.executeWithoutResult(tx -> eventPublisher.publishEvent(repEvent));
 
-            byte[] placeholder = new byte[]{0};
+            byte[] video = mockVideos.get((repNumber - 1) % mockVideos.size());
             if (delayed) {
                 scheduler.schedule(
-                        () -> resourceStorageService.upload(placeholder, "video/mp4", "swing.mp4", uuid),
+                        () -> resourceStorageService.upload(video, "video/mp4", "swing.mp4", uuid),
                         3000, TimeUnit.MILLISECONDS);
             } else {
-                resourceStorageService.upload(placeholder, "video/mp4", "swing.mp4", uuid);
+                resourceStorageService.upload(video, "video/mp4", "swing.mp4", uuid);
             }
 
         } catch (Exception e) {
@@ -165,5 +167,19 @@ public class BlastMotionAPIService implements BadSensorService {
         } catch (IOException e) {
             throw new IllegalStateException("Failed to load mock rep data from mock/blast-motion-reps.csv", e);
         }
+    }
+
+    private List<byte[]> loadMockVideos() {
+        List<byte[]> videos = new ArrayList<>();
+        for (int i = 1; i <= 4; i++) {
+            String path = "mock/videos/rep-" + i + ".mp4";
+            try (var stream = getClass().getClassLoader().getResourceAsStream(path)) {
+                if (stream == null) throw new IllegalStateException("Mock video not found: " + path);
+                videos.add(stream.readAllBytes());
+            } catch (IOException e) {
+                throw new IllegalStateException("Failed to load mock video: " + path, e);
+            }
+        }
+        return Collections.unmodifiableList(videos);
     }
 }

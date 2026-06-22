@@ -23,6 +23,7 @@ import java.time.ZonedDateTime;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -384,6 +385,75 @@ class RepControllerIntegrationTest {
             JsonNode actualNode   = objectMapper.readTree(jsonResponse);
 
             assertEquals(expectedNode, actualNode);
+        }
+    }
+
+    @Nested
+    @DisplayName("Get Resources")
+    class GetResourcesTests {
+
+        @Autowired
+        com.biolab.launchpad.internal.repository.RepResourceRepository repResourceRepository;
+
+        @AfterEach
+        void tearDownResources() {
+            repResourceRepository.deleteAll();
+        }
+
+        @Test
+        @DisplayName("GET /reps/{id}/resources -> returns empty list when rep has no resources")
+        void getResources_empty() throws Exception {
+            com.biolab.launchpad.internal.repository.model.Rep rep = repRepository.save(
+                    com.biolab.launchpad.internal.repository.model.Rep.builder()
+                            .sessionId(session.getId())
+                            .startTime(java.sql.Timestamp.valueOf(java.time.LocalDateTime.of(2025, 10, 2, 14, 45, 1)))
+                            .build());
+
+            String jsonResponse = mvc.perform(
+                            get(API + "/" + rep.getId() + "/resources")
+                                    .with(httpBasic("biolab", "biolab")))
+                    .andExpect(status().isOk())
+                    .andReturn().getResponse().getContentAsString();
+
+            JsonNode actualNode = objectMapper.readTree(jsonResponse);
+            assertTrue(actualNode.isArray());
+            assertEquals(0, actualNode.size());
+        }
+
+        @Test
+        @DisplayName("GET /reps/{id}/resources -> returns resources with urlStatus")
+        void getResources_withResources() throws Exception {
+            factory.createResourceTypeDictionary("Video");
+
+            com.biolab.launchpad.internal.repository.model.Rep rep = repRepository.save(
+                    com.biolab.launchpad.internal.repository.model.Rep.builder()
+                            .sessionId(session.getId())
+                            .startTime(java.sql.Timestamp.valueOf(java.time.LocalDateTime.of(2025, 10, 2, 14, 45, 1)))
+                            .build());
+
+            com.biolab.launchpad.internal.repository.model.RepResource resource = repResourceRepository.save(
+                    com.biolab.launchpad.internal.repository.model.RepResource.builder()
+                            .repId(rep.getId())
+                            .type("Video")
+                            .url("http://localhost:4566/biolab-resources/test/cam1.mp4")
+                            .urlStatus(com.biolab.common.UrlStatus.READY)
+                            .build());
+
+            String jsonResponse = mvc.perform(
+                            get(API + "/" + rep.getId() + "/resources")
+                                    .with(httpBasic("biolab", "biolab")))
+                    .andExpect(status().isOk())
+                    .andReturn().getResponse().getContentAsString();
+
+            JsonNode actualNode = objectMapper.readTree(jsonResponse);
+            assertTrue(actualNode.isArray());
+            assertEquals(1, actualNode.size());
+
+            JsonNode r = actualNode.get(0);
+            assertEquals(resource.getId().intValue(), r.get("id").asInt());
+            assertEquals(rep.getId().intValue(), r.get("repId").asInt());
+            assertEquals("Video", r.get("type").asText());
+            assertEquals("READY", r.get("urlStatus").asText());
         }
     }
 
